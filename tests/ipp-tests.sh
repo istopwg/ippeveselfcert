@@ -43,7 +43,12 @@ for file in color.jpg; do
 	fi
 done
 
-$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 IPP Results.plist" -I '{}' ipp-tests.test \;
+PLIST="$1 IPP Results $(date +'%Y%m%d%H%M').plist"
+${IPPFIND} --name "^${1}\$" "_ipp._tcp.local." -x "${IPPTOOL}" -P "${PLIST}" -I '{}' ipp-tests.test \;
+
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
+test `which plutil` && plutil -convert json -e "json" "${PLIST}"
+
 
 #
 # End of "$Id: ipp-tests.sh 12897 2015-10-09 19:18:39Z msweet $".
