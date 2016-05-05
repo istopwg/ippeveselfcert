@@ -48,13 +48,13 @@ RUNNING THE SUITE
     In the top level directory of the distribution, you can execute the
     following command to find your target printer's DNS-SD Instance Name:
 
-      ./ipptool -s
+      ./ippfind -s
 
     If your printer implements the "_print" DNS-SD subtype for the "_ipp._tcp"
     service type that is required by IPP Everywhere, you can filter the
     results using this command, if you have many printers:
 
-      ./ipptool "_print._ipp._tcp" -s
+      ./ippfind "_print._ipp._tcp" -s
 
     Once you have acquired the target printer's DNS-SD Instance Name, you can
     execute the following commands to run the 3 sets of tests ("Example Test Printer"
@@ -80,13 +80,13 @@ RUNNING THE SUITE
     In the top level directory of the distribution, you can execute the
     following command to find your target printer's DNS-SD Instance Name:
 
-      .\ipptool -s
+      .\ippfind -s
 
     If your printer implements the "_print" DNS-SD subtype for the "_ipp._tcp"
     service type that is required by IPP Everywhere, you can filter the
     results using this command, if you have many printers:
 
-      .\ipptool "_print._ipp._tcp" -s
+      .\ippfind "_print._ipp._tcp" -s
 
     Once you have acquired the target printer's DNS-SD Instance Name, you can
     execute the following commands to run the 3 sets of tests ("Example Test Printer"
