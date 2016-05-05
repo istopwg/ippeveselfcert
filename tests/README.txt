@@ -3,7 +3,8 @@ README.txt - 2015-10-09
 
 INTRODUCTION
 
-    This directory contains the IPP Everywhere Printer Self-Certification tools.
+    This directory contains the IPP Everywhere Printer Self-Certification
+    tools.
 
     In addition to the files in this directory, you must also download and
     extract one or more PWG Raster Format file archives from:
@@ -37,6 +38,69 @@ CONTENTS
       LICENSE.txt         CUPS software license
       man-*.html          HTML documentation for the tools
       README.txt          This README file
+
+
+
+RUNNING THE SUITE
+
+  Linux and OS X
+
+    In the top level directory of the distribution, you can execute the
+    following command to find your target printer's DNS-SD Instance Name:
+
+      ./ipptool -s
+
+    If your printer implements the "_print" DNS-SD subtype for the "_ipp._tcp"
+    service type that is required by IPP Everywhere, you can filter the
+    results using this command, if you have many printers:
+
+      ./ipptool "_print._ipp._tcp" -s
+
+    Once you have acquired the target printer's DNS-SD Instance Name, you can
+    execute the following commands to run the 3 sets of tests ("Example Test Printer"
+    is the example DNS-SD Instance Name in the examples below):
+
+      ./runtests.sh bonjour-tests.sh "Example Test Printer"
+      ./runtests.sh ipp-tests.sh "Example Test Printer"
+      ./runtests.sh document-tests.sh "Example Test Printer"
+
+    The corresponding PWG Raster sample files (see link in the introduction) MUST
+    be placed in a subdirectory of the "tests" directory. For example:
+
+      cd tests
+      curl http://ftp.pwg.org/pub/pwg/ipp/examples/pwg-raster-samples-300dpi-20150616.zip >temp.zip
+      unzip temp.zip
+      rm temp.zip
+      cd ..
+
+  Windows
+    You'll need to manually copy the DLL and EXE files from the "vcnet" directory
+    to the "tests" directory.
+
+    In the top level directory of the distribution, you can execute the
+    following command to find your target printer's DNS-SD Instance Name:
+
+      .\ipptool -s
+
+    If your printer implements the "_print" DNS-SD subtype for the "_ipp._tcp"
+    service type that is required by IPP Everywhere, you can filter the
+    results using this command, if you have many printers:
+
+      .\ipptool "_print._ipp._tcp" -s
+
+    Once you have acquired the target printer's DNS-SD Instance Name, you can
+    execute the following commands to run the 3 sets of tests ("Example Test Printer"
+    is the example DNS-SD Instance Name in the examples below):
+
+      cd tests
+      .\bonjour-tests.bat "Example Test Printer"
+      .\ipp-tests.bat "Example Test Printer"
+      .\document-tests.bat "Example Test Printer"
+
+    The corresponding PWG Raster sample files (see link in the introduction) MUST
+    be placed in a subdirectory of the "tests" directory. After downloading the
+    files just extract them using Windows Explorer.
+
 
 
 GETTING SUPPORT AND OTHER RESOURCES
