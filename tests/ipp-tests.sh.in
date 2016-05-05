@@ -47,7 +47,7 @@ PLIST="$1 IPP Results $(date +'%Y%m%d%H%M').plist"
 ${IPPFIND} --name "^${1}\$" "_ipp._tcp.local." -x "${IPPTOOL}" -P "${PLIST}" -I '{}' ipp-tests.test \;
 
 # confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
-test `which plutil` && plutil -convert json -e "json" "${PLIST}"
+test `which plutil` && plutil -lint -s "${PLIST}"
 
 
 #
