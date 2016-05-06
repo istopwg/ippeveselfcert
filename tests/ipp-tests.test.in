@@ -168,7 +168,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 #
 # Required by: PWG 5100.14 Section 5.x
 {
-	NAME "I-9. Get-Printer-Attributes Operation (default)"
+	NAME "I-9. Get-Printer-Attributes Operation (IPP Everywhere Baseline)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -178,18 +178,31 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	STATUS successful-ok
 
+    # Conditional requirement indicator detection
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/openxps" DEFINE-MATCH HAVE_OPENXPS
+	EXPECT feed-orientation-supported OF-TYPE keyword IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_FEED_ORIENTATION
+	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3 DEFINE-MATCH HAVE_FINISHINGS
+	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "2.1" DEFINE-MATCH HAVE_IPP_2_1
+	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "2.2" DEFINE-MATCH HAVE_IPP_2_2
+    EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true DEFINE-MATCH HAVE_MULTIPLE_DOCUMENT_JOBS
+    
+
 	# PWG 5100.14 - Table 5 - Operations
 	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0002 # Print-Job
-	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
-	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
-	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
-	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
-	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
-	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
-	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
-	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
-	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
-	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0004  # Validate-Job
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0005  # Create-Job
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0006  # Send-Document
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0008  # Cancel-Job
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0009  # Get-Job-Attributes
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x000a  # Get-Jobs
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x000b  # Get-Printer-Attributes
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0039  # Cancel-My-Jobs
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x003b  # Close-Job
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x003c  # Identify-Printer
+
 
 	# PWG 5100.14 - Table 6 - Printer Description Attributes
 	EXPECT charset-configured OF-TYPE charset IN-GROUP printer-attributes-tag COUNT 1
@@ -200,8 +213,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT color-supported WITH-VALUE true DEFINE-MATCH HAVE_COLOR
 
 	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "none"
-	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
-	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
 
 	EXPECT copies-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
@@ -209,15 +220,12 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT document-format-default OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
 	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
-	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
 
 	EXPECT document-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_PDF
 
-	EXPECT feed-orientation-supported OF-TYPE keyword IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_FEED_ORIENTATION
 	EXPECT feed-orientation-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_FEED_ORIENTATION
 
-	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3 DEFINE-MATCH HAVE_FINISHINGS
-	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE-FROM finishings-supported IF-DEFINED HAVE_FINISHINGS
 
 	EXPECT generated-natural-language-supported OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag
 
@@ -310,17 +318,15 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# operations-supported tested above for required operations
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6,7
 	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6,7
+	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM orientation-requested-supported
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT output-bin-default DEFINE-VALUE DEFAULT_OUTPUT_BIN
 	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM output-bin-supported
+	EXPECT output-bin-default DEFINE-VALUE DEFAULT_OUTPUT_BIN
 
-	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number" IF-DEFINED HAVE_PDF
-	EXPECT overrides-supported WITH-VALUE "pages" IF-DEFINED HAVE_PDF
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number" IF-DEFINED HAVE_MULTIPLE_DOCUMENT_JOBS
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "pages" IF-DEFINED HAVE_PDF
 
 	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true IF-DEFINED HAVE_PDF
 
@@ -329,25 +335,21 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT pages-per-minute-color OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_COLOR
 	EXPECT !pages-per-minute-color IF-NOT-DEFINED HAVE_COLOR
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
-	EXPECT print-color-mode-default DEFINE-VALUE DEFAULT_PRINT_COLOR_MODE
 	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
+	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM print-color-mode-supported
+	EXPECT print-color-mode-default DEFINE-VALUE DEFAULT_PRINT_COLOR_MODE
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|graphic|photo|text|text-and-graphic)$/"
-	EXPECT print-content-optimize-default DEFINE-VALUE DEFAULT_PRINT_CONTENT_OPTIMIZE
 	EXPECT print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)$/"
+	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM print-content-optimize-supported
+	EXPECT print-content-optimize-default DEFINE-VALUE DEFAULT_PRINT_CONTENT_OPTIMIZE
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
-	EXPECT print-rendering-intent-default DEFINE-VALUE DEFAULT_PRINT_RENDERING_INTENT
 	EXPECT print-rendering-intent-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
+	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM print-rendering-intent-supported
+	EXPECT print-rendering-intent-default DEFINE-VALUE DEFAULT_PRINT_RENDERING_INTENT
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
-	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
 	EXPECT print-quality-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5
+	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM print-quality-supported
+	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
 
 	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$ALERT_REGEX"
 	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
@@ -391,10 +393,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT printer-organizational-unit OF-TYPE text IN-GROUP printer-attributes-tag
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT printer-resolution-default OF-TYPE resolution IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT printer-resolution-default DEFINE-VALUE DEFAULT_PRINTER_RESOLUTION
 	EXPECT printer-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+	EXPECT printer-resolution-default OF-TYPE resolution IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM printer-resolution-supported
+	EXPECT printer-resolution-default DEFINE-VALUE DEFAULT_PRINTER_RESOLUTION
 
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 
@@ -429,10 +430,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
-	EXPECT sides-default DEFINE-VALUE DEFAULT_SIDES
 	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM sides-supported
+	EXPECT sides-default DEFINE-VALUE DEFAULT_SIDES
 
 	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 

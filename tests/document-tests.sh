@@ -54,7 +54,12 @@ if test "`ls -d pwg-raster-samples-*dpi-20150616 2>/dev/null`" = ""; then
 	exit 1
 fi
 
-$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 Document Results.plist" -I '{}' document-tests.test \;
+
+PLIST="$1 Document Results $(date +'%Y%m%d%H%M').plist"
+$IPPFIND --name "$1" "_ipp._tcp.local." -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
+
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
+test `which plutil` && plutil -lint -s "${PLIST}"
 
 #
 # End of "$Id: document-tests.sh 12897 2015-10-09 19:18:39Z msweet $".
