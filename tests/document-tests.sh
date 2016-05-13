@@ -16,10 +16,12 @@
 # WHETHER EXPRESS OR IMPLIED INCLUDING (WITHOUT LIMITATION) ANY IMPLIED
 # WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# Usage:
-#
-#   ./document-tests.sh "Printer Name"
-#
+
+if test $# -ne 1; then
+    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo ""
+    exit 1
+fi
 
 if test -x ../test/ippfind-static; then
 	IPPFIND="../test/ippfind-static"
@@ -56,7 +58,7 @@ fi
 
 
 PLIST="$1 Document Results $(date +'%Y%m%d%H%M').plist"
-$IPPFIND --name "$1" "_ipp._tcp.local." -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
+$IPPFIND --name "^$1$" "_ipp._tcp.local." -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
 
 # confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
 test `which plutil` && plutil -lint -s "${PLIST}"

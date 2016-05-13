@@ -16,10 +16,12 @@
 # WHETHER EXPRESS OR IMPLIED INCLUDING (WITHOUT LIMITATION) ANY IMPLIED
 # WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# Usage:
-#
-#   ./bonjour-tests.sh "Printer Name"
-#
+
+if test $# -lt 1; then
+    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo ""
+    exit 1
+fi
 
 if test -x ../test/ippfind-static; then
 	IPPFIND="../test/ippfind-static"
@@ -37,7 +39,12 @@ else
 	IPPTOOL="ipptool"
 fi
 
-PLIST="$1 Bonjour Results $(date +'%Y%m%d%H%M').plist"
+# when making recursive calls we want to keep using the same plist name
+if test -f "$3"; then
+    PLIST="${3}"
+else
+    PLIST="$1 Bonjour Results $(date +'%Y%m%d%H%M').plist"
+fi
 
 #
 # Figure out the proper echo options...
@@ -170,7 +177,7 @@ end_test() {
 
 # B-1. IPP Browse test: Printers appear in a search for "_ipp._tcp,_print" services?
 start_test "B-1. IPP Browse test"
-$IPPFIND _ipp._tcp,_print.local. --name "$1" --quiet
+$IPPFIND --name "^${1}$" "_ipp._tcp,_print.local." --quiet
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
@@ -181,43 +188,43 @@ fi
 
 # B-2. IPP TXT keys test: The IPP TXT record contains all required keys.
 start_test "B-2. IPP TXT keys test"
-$IPPFIND --name "$1" "_ipp._tcp.local." --txt adminurl --txt pdl --txt rp --txt UUID --quiet
+$IPPFIND --name "^${1}$" "_ipp._tcp.local." --txt adminurl --txt pdl --txt rp --txt UUID --quiet
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
 else
 	fail=`expr $fail + 1`
-	$IPPFIND "$1._ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail2 \;
+	$IPPFIND --name "^${1}$" "._ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail2 "${PLIST}" \;
 fi
 
 # B-3. IPP Resolve test: Printer responds to an IPP Get-Printer-Attributes request using the resolved hostname, port, and resource path.
 start_test "B-3. IPP Resolve test"
-$IPPFIND --name "$1" "_ipp._tcp.local." --ls >/dev/null
+$IPPFIND --name "^${1}$" "_ipp._tcp.local." --ls >/dev/null
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
 else
 	fail=`expr $fail + 1`
 	echo "<key>Errors</key><array>" >>"$PLIST"
-    $IPPFIND --name "$1" "_ipp._tcp.local." --ls | awk '{ print "<string>" $0 "</string>" }' >>"$PLIST"
+    $IPPFIND --name "^${1}$" "_ipp._tcp.local." --ls | awk '{ print "<string>" $0 "</string>" }' >>"$PLIST"
 	echo "</array>" >>"$PLIST"
 	end_test FAIL
 fi
 
 # B-4. IPP TXT values test: The IPP TXT record values match the reported IPP attribute values.
 start_test "B-4. IPP TXT values test"
-$IPPFIND --name "$1" "_ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
+$IPPFIND --name "^${1}$" "_ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
 else
 	fail=`expr $fail + 1`
-    $IPPFIND --name "$1" "_ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail4 \;
+    $IPPFIND --name "^${1}$" "_ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail4 "${PLIST}" \;
 fi
 
 # B-5. TLS tests: Performed only if TLS is supported
 start_test "B-5. TLS tests"
-$IPPFIND --name "$1" "_ipp._tcp.local." --txt tls --quiet
+$IPPFIND --name "^${1}$" "_ipp._tcp.local." --txt tls --quiet
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	HAVE_TLS=1
@@ -231,7 +238,7 @@ fi
 # B-5.1 HTTP Upgrade test: Printer responds to an IPP Get-Printer-Attributes request after doing an HTTP Upgrade to TLS.
 start_test "B-5.1 HTTP Upgrade test"
 if test $HAVE_TLS = 1; then
-	error=`$IPPFIND --name "$1" "_ipp._tcp.local." -x $IPPTOOL -E -q '{}' bonjour-access-tests.test \; 2>&1`
+	error=`$IPPFIND --name "^${1}$" "_ipp._tcp.local." -x $IPPTOOL -E -q '{}' bonjour-access-tests.test \; 2>&1`
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
@@ -250,7 +257,7 @@ fi
 # B-5.2 IPPS Browse test: Printer appears in a search for "_ipps._tcp,_print" services.
 start_test "B-5.2 IPPS Browse test"
 if test $HAVE_TLS = 1; then
-	$IPPFIND "_ipps._tcp,_print.local." --name "$1" --quiet
+	$IPPFIND --name "^${1}$" "_ipps._tcp,_print.local." --quiet
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
@@ -266,13 +273,13 @@ fi
 # B-5.3 IPPS TXT keys test: The TXT record for IPPS contains all required keys
 start_test "B-5.3 IPPS TXT keys test"
 if test $HAVE_TLS = 1; then
-    $IPPFIND --name "$1" "_ipps._tcp.local." --txt adminurl --txt pdl --txt rp --txt TLS --txt UUID --quiet
+    $IPPFIND --name "^${1}$" "_ipps._tcp.local." --txt adminurl --txt pdl --txt rp --txt TLS --txt UUID --quiet
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
 	else
 		fail=`expr $fail + 1`
-	    $IPPFIND --name "$1" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.3 \;
+	    $IPPFIND --name "^${1}$" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.3 "${PLIST}" \;
 	fi
 else
 	skip=`expr $skip + 1`
@@ -282,14 +289,14 @@ fi
 # B-5.4 IPPS Resolve test: Printer responds to an IPPS Get-Printer-Attributes request using the resolved hostname, port, and resource path.
 start_test "B-5.4 IPPS Resolve test"
 if test $HAVE_TLS = 1; then
-    $IPPFIND --name "$1" "_ipps._tcp.local." --ls >/dev/null
+    $IPPFIND --name "^${1}$" "_ipps._tcp.local." --ls >/dev/null
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
 	else
 		fail=`expr $fail + 1`
 		echo "<key>Errors</key><array>" >>"$PLIST"
-	    $IPPFIND --name "$1" "_ipps._tcp.local." --ls | awk '{ print "<string>" $0 "</string>" }' >>"$PLIST"
+	    $IPPFIND --name "^${1}$" "_ipps._tcp.local." --ls | awk '{ print "<string>" $0 "</string>" }' >>"$PLIST"
 		echo "</array>" >>"$PLIST"
 		end_test FAIL
 	fi
@@ -301,13 +308,13 @@ fi
 # B-5.5 IPPS TXT values test: The TXT record values for IPPS match the reported IPPS attribute values.
 start_test "B-5.5 IPPS TXT values test"
 if test $HAVE_TLS = 1; then
-    $IPPFIND --name "$1" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
+    $IPPFIND --name "^${1}$" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
 	else
 		fail=`expr $fail + 1`
-	    $IPPFIND --name "$1" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.5 \;
+	    $IPPFIND --name "^${1}$" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.5 "${PLIST}" \;
 	fi
 else
 	skip=`expr $skip + 1`
@@ -343,7 +350,7 @@ echo "Score: ${score}%"
 test `which plutil` && plutil -lint -s "$PLIST"
 
 # generate a JSON equivalent to make reading easier
-test `which plutil` && plutil -convert json -e "json" "$PLIST"
+#test `which plutil` && plutil -convert json -e "json" "$PLIST"
 
 #
 # End of "$Id: bonjour-tests.sh 12897 2015-10-09 19:18:39Z msweet $".
