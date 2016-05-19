@@ -1241,17 +1241,139 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 }
 
 
-
 ################################
-# Test Cancel-My-Jobs
+# Test Cancel-My-Jobs Without "job-ids"
 #
 # 0. Get-Printer-Attributes to check for "Cancel-My-Jobs"
-# 1. Create a few jobs putting each in a "pending-held" state
-# 2. Perform a "Cancel-My-Jobs" operation
-# 3. Confirm that the jobs were all cancelled.
+# 1. Create a job using Create-Job (but do not do a Close-Job - that will set the job-state to 'completed')
+# 2. Check the Job with Get-Job-Status
+# 3. Perform a Cancel-My-Jobs operation with no "job-ids" attribute
+# 4. Confirm that the job was cancelled by doing a Cancel-Job
 #
 
+
 {
+
+    SKIP-IF-DEFINED HAS_CANCEL_MY_JOBS
+
+    NAME "I-29.15. Get-Printer-Attributes Operation (check operations-supported)"
+    OPERATION Get-Printer-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri printer-uri $uri
+    ATTR name requesting-user-name $user
+    ATTR keyword requested-attributes operations-supported
+
+    STATUS successful-ok
+
+    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0005  # Create-Job
+    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0008  # Cancel-Job
+    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0009  # Get-Job-Attributes
+    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0039  # Cancel-My-Jobs
+    
+    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0039 DEFINE-MATCH HAS_CANCEL_MY_JOBS
+}
+
+{
+    SKIP-IF-NOT-DEFINED HAS_CANCEL_MY_JOBS
+
+    NAME "I-29.16. Create-Job to make a Job"
+    OPERATION Create-Job
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri printer-uri $uri
+    ATTR name requesting-user-name $user
+    ATTR name job-name "Cancel My Jobs Test Job 4"
+    ATTR boolean ipp-attribute-fidelity false
+    
+    STATUS successful-ok
+    STATUS server-error-job-canceled
+    STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+    EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+    EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+    EXPECT job-id DEFINE-VALUE CLOSE_JOB_TEST_SINGLE_JOB_ID
+    EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
+    EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+    EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+{
+    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_SINGLE_JOB_ID
+
+    NAME "I-29.18. Get-Job-Attributes (Job ID: $CLOSE_JOB_TEST_SINGLE_JOB_ID)"
+    OPERATION Get-Job-Attributes
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri printer-uri $uri
+    ATTR integer job-id $CLOSE_JOB_TEST_SINGLE_JOB_ID
+    ATTR name requesting-user-name $user
+
+    STATUS successful-ok
+    EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
+
+}
+
+
+############ Cancel the Job ###############
+
+{
+    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_SINGLE_JOB_ID
+
+    NAME "I-29.22. Cancel-My-Jobs - no job-ids attribute"
+    OPERATION Cancel-My-Jobs
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri printer-uri $uri
+    ATTR name requesting-user-name $user
+    ATTR text message "IPP Everywhere Testing: Cancel Jobs $CLOSE_JOB_TEST_SINGLE_JOB_ID, operator!"
+
+    STATUS successful-ok
+    STATUS successful-ok-ignored-or-substituted-attributes
+    STATUS server-error-job-canceled
+    STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+}
+
+
+#####################
+
+
+{
+    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_SINGLE_JOB_ID
+
+    NAME "I-29.23. Cancel-Job (Job ID: $CLOSE_JOB_TEST_SINGLE_JOB_ID)"
+    OPERATION Cancel-Job
+    GROUP operation-attributes-tag
+    ATTR charset attributes-charset utf-8
+    ATTR naturalLanguage attributes-natural-language en
+    ATTR uri printer-uri $uri
+    ATTR integer job-id $CLOSE_JOB_TEST_SINGLE_JOB_ID
+    ATTR name requesting-user-name $user
+
+    STATUS successful-ok
+    STATUS client-error-not-possible
+}
+
+
+################################
+# Test Cancel-My-Jobs With "job-ids"
+#
+# 0. Get-Printer-Attributes to check for "Cancel-My-Jobs"
+# 1. Create 1 job using "Create-Job" (do NOT use "Close-Job" as that would set its state to 'completed')
+# 2. Check job state with "Get-Job-Status"
+# 3. Perform a "Cancel-My-Jobs" operation with "job-ids" set to the Job ID of the job
+# 4. Confirm that the job was cancelled.
+#
+
+
+{
+    SKIP-IF-DEFINED HAS_CANCEL_MY_JOBS
+
     NAME "I-29.1. Get-Printer-Attributes Operation (check operations-supported)"
     OPERATION Get-Printer-Attributes
     GROUP operation-attributes-tag
@@ -1267,17 +1389,18 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
     EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0008  # Cancel-Job
     EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0009  # Get-Job-Attributes
     EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0039  # Cancel-My-Jobs
-    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x003b  # Close-Job
     
     EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0039 DEFINE-MATCH HAS_CANCEL_MY_JOBS
-    EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x003b DEFINE-MATCH HAS_CLOSE_JOB
 }
+
+
+##########
+
 
 {
     SKIP-IF-NOT-DEFINED HAS_CANCEL_MY_JOBS
-    SKIP-IF-NOT-DEFINED HAS_CLOSE_JOB
 
-    NAME "I-29.2. Create-Job operation to make Cancel My Jobs Test Job 1"
+    NAME "I-29.2. Create-Job to make a Job"
     OPERATION Create-Job
     GROUP operation-attributes-tag
     ATTR charset attributes-charset utf-8
@@ -1302,28 +1425,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 {
     SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
 
-    NAME "I-29.3. Close-Job Operation (Close-Job Test Job Name)"
-    OPERATION Close-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_1_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-    STATUS server-error-job-canceled
-}
-
-
-
-# Test Get-Job-Attributes operation
-#
-# Required by: RFC 2911 section 3.3.4
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
-
-    NAME "I-29.4. Get-Job-Attributes Operation"
+    NAME "I-29.4. Get-Job-Attributes 1 (Job ID: $CLOSE_JOB_TEST_JOB_1_ID)"
     OPERATION Get-Job-Attributes
     GROUP operation-attributes-tag
     ATTR charset attributes-charset utf-8
@@ -1333,144 +1435,17 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
     ATTR name requesting-user-name $user
 
     STATUS successful-ok
-
-}
-
-
-{
-    SKIP-IF-NOT-DEFINED HAS_CANCEL_MY_JOBS
-    SKIP-IF-NOT-DEFINED HAS_CLOSE_JOB
-
-    NAME "I-29.5. Create-Job operation to make Cancel My Jobs Test Job 2"
-    OPERATION Create-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR name requesting-user-name $user
-    ATTR name job-name "Cancel My Jobs Test Job 2"
-    ATTR boolean ipp-attribute-fidelity false
-    
-    STATUS successful-ok
-    STATUS server-error-job-canceled
-    STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
-
-    EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
-    EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-    EXPECT job-id DEFINE-VALUE CLOSE_JOB_TEST_JOB_2_ID
     EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
-    EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
-    EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
-}
-
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_2_ID
-
-    NAME "I-29.6. Close-Job Operation (Close-Job Test Job Name)"
-    OPERATION Close-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_2_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-    STATUS server-error-job-canceled
-}
-
-
-
-# Test Get-Job-Attributes operation
-#
-# Required by: RFC 2911 section 3.3.4
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_2_ID
-
-    NAME "I-29.7. Get-Job-Attributes Operation"
-    OPERATION Get-Job-Attributes
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_2_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
 
 }
 
 
-{
-    SKIP-IF-NOT-DEFINED HAS_CANCEL_MY_JOBS
-    SKIP-IF-NOT-DEFINED HAS_CLOSE_JOB
-
-    NAME "I-29.8. Create-Job operation to make Cancel My Jobs Test Job 2"
-    OPERATION Create-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR name requesting-user-name $user
-    ATTR name job-name "Cancel My Jobs Test Job 3"
-    ATTR boolean ipp-attribute-fidelity false
-    
-    STATUS successful-ok
-    STATUS server-error-job-canceled
-    STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
-
-    EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
-    EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-    EXPECT job-id DEFINE-VALUE CLOSE_JOB_TEST_JOB_3_ID
-    EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
-    EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
-    EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
-}
-
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_3_ID
-
-    NAME "I-29.9. Close-Job Operation (Close-Job Test Job Name)"
-    OPERATION Close-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_3_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-    STATUS server-error-job-canceled
-}
-
-
-
-# Test Get-Job-Attributes operation
-#
-# Required by: RFC 2911 section 3.3.4
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_3_ID
-
-    NAME "I-29.10. Get-Job-Attributes Operation"
-    OPERATION Get-Job-Attributes
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_3_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-
-}
-
+############ Cancel the Job ###############
 
 {
     SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_2_ID
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_3_ID
 
-    NAME "I-29.11. Cancel-My-Jobs Operation (setup 1)"
+    NAME "I-29.11. Cancel-My-Jobs #1 - job-ids: $CLOSE_JOB_TEST_JOB_1_ID"
     OPERATION Cancel-My-Jobs
     GROUP operation-attributes-tag
     ATTR charset attributes-charset utf-8
@@ -1479,60 +1454,32 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
     # I don't know why, but if this line below is left in, what ipptool sends for the
     # value of $CLOSE_JOB_TEST_JOB_1_ID is always 0 (zero) and the test will fail with CUPS 2.1
     # because job 0 is not a valid job ID
-    ATTR integer job-ids $CLOSE_JOB_TEST_JOB_1_ID,$CLOSE_JOB_TEST_JOB_2_ID,$CLOSE_JOB_TEST_JOB_3_ID
+    ATTR integer job-ids $CLOSE_JOB_TEST_JOB_1_ID
     ATTR name requesting-user-name $user
-    ATTR text message "IPP Everywhere Testing: Cancel My 3 Jobs, operator!"
+    ATTR text message "IPP Everywhere Testing: Cancel Jobs $CLOSE_JOB_TEST_JOB_1_ID, operator!"
 
     STATUS successful-ok
+    STATUS successful-ok-ignored-or-substituted-attributes
     STATUS server-error-job-canceled
     STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 }
 
 
-# Try cancelling the jobs individually (they should all be gone)
+#####################
+
+
+# Try cancelling the job individually (they should all be gone)
 {
     SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
 
-    NAME "I-29.12. Cancel-Job Operation cancel job 1"
+    NAME "I-29.12. Cancel-Job 1 (Job ID: $CLOSE_JOB_TEST_JOB_1_ID)"
     OPERATION Cancel-Job
     GROUP operation-attributes-tag
     ATTR charset attributes-charset utf-8
     ATTR naturalLanguage attributes-natural-language en
     ATTR uri printer-uri $uri
     ATTR integer job-id $CLOSE_JOB_TEST_JOB_1_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-    STATUS client-error-not-possible
-}
-
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
-
-    NAME "I-29.13. Cancel-Job Operation cancel job 2"
-    OPERATION Cancel-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_2_ID
-    ATTR name requesting-user-name $user
-
-    STATUS successful-ok
-    STATUS client-error-not-possible
-}
-
-{
-    SKIP-IF-NOT-DEFINED CLOSE_JOB_TEST_JOB_1_ID
-
-    NAME "I-29.14. Cancel-Job Operation cancel job 3"
-    OPERATION Cancel-Job
-    GROUP operation-attributes-tag
-    ATTR charset attributes-charset utf-8
-    ATTR naturalLanguage attributes-natural-language en
-    ATTR uri printer-uri $uri
-    ATTR integer job-id $CLOSE_JOB_TEST_JOB_3_ID
     ATTR name requesting-user-name $user
 
     STATUS successful-ok
