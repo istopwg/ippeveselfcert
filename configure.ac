@@ -2,7 +2,7 @@ dnl
 dnl Configuration script for the IPP Everywhere Printer Self-Certification
 dnl tools.
 dnl
-dnl Copyright 2015 by the ISTO Printer Working Group.
+dnl Copyright 2015-2016 by the ISTO Printer Working Group.
 dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
@@ -17,7 +17,7 @@ dnl We need at least autoconf 2.60...
 AC_PREREQ(2.60)
 
 dnl Package name and version...
-AC_INIT([IPPEVESELFCERT], [20151110], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
+AC_INIT([IPPEVESELFCERT], [20160601], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
 
 dnl IPP Everywhere Printer Self-Certification Manual Version; this is the
 dnl filename prefix...

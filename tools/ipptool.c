@@ -1,9 +1,7 @@
 /*
- * "$Id: ipptool.c 12951 2015-10-28 17:21:45Z msweet $"
- *
  * ipptool command for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -786,7 +784,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
 		temp[1024],		/* Temporary string */
-		buffer[8192],		/* Copy buffer */
+		buffer[131072],		/* Copy buffer */
 		compression[16];	/* COMPRESSION value */
   ipp_t		*request = NULL,	/* IPP request */
 		*response = NULL;	/* IPP response */
@@ -1744,7 +1742,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		    tokenptr = ptr;
 		}
 		else
-		  i = (int)strtol(tokenptr, &tokenptr, 0);
+		  i = (int)strtol(token, &tokenptr, 0);
 
 		values[0] = i;
 
@@ -2662,7 +2660,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      http->error != ETIMEDOUT)
 #endif /* WIN32 */
 	  {
-	    if (httpReconnect(http))
+	    if (httpReconnect2(http, 30000, NULL))
 	      prev_pass = 0;
 	  }
 	  else if (status == HTTP_STATUS_ERROR || status == HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED)
@@ -2689,13 +2687,13 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  http->error != ETIMEDOUT)
 #endif /* WIN32 */
       {
-	if (httpReconnect(http))
+	if (httpReconnect2(http, 30000, NULL))
 	  prev_pass = 0;
       }
       else if (status == HTTP_STATUS_ERROR)
       {
         if (!Cancel)
-          httpReconnect(http);
+          httpReconnect2(http, 30000, NULL);
 
 	prev_pass = 0;
       }
@@ -4400,10 +4398,11 @@ print_attr(FILE            *outfile,	/* I  - Output file */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-      case IPP_TAG_CHARSET :
       case IPP_TAG_URI :
-      case IPP_TAG_MIMETYPE :
+      case IPP_TAG_URISCHEME :
+      case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
+      case IPP_TAG_MIMETYPE :
 	  for (i = 0; i < attr->num_values; i ++)
 	    print_xml_string(outfile, "string", attr->values[i].string.text);
 	  break;
@@ -4442,7 +4441,7 @@ print_attr(FILE            *outfile,	/* I  - Output file */
   }
   else
   {
-    char	buffer[8192];		/* Value buffer */
+    char	buffer[131072];		/* Value buffer */
 
     if (format == _CUPS_OUTPUT_TEST)
     {
@@ -5803,7 +5802,7 @@ with_value(FILE            *outfile,	/* I - Output file */
     case IPP_TAG_BOOLEAN :
 	for (i = 0; i < attr->num_values; i ++)
 	{
-          if (!strcmp(value, "true") == attr->values[i].boolean)
+          if ((!strcmp(value, "true")) == attr->values[i].boolean)
           {
             if (!matchbuf[0])
 	      strlcpy(matchbuf, value, matchlen);
@@ -6198,8 +6197,3 @@ with_value_from(
 
   return (0);
 }
-
-
-/*
- * End of "$Id: ipptool.c 12951 2015-10-28 17:21:45Z msweet $".
- */

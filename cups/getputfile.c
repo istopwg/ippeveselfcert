@@ -1,6 +1,4 @@
 /*
- * "$Id: getputfile.c 11558 2014-02-06 18:33:34Z msweet $"
- *
  * Get/put file functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -53,8 +51,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {
@@ -276,8 +273,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {
@@ -508,8 +504,3 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
 
   return (status);
 }
-
-
-/*
- * End of "$Id: getputfile.c 11558 2014-02-06 18:33:34Z msweet $".
- */

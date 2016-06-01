@@ -1,6 +1,4 @@
 /*
- * "$Id: array.c 12031 2014-07-15 19:57:59Z msweet $"
- *
  * Sorted array routines for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -86,7 +84,7 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayAdd(cups_array_t *a,		/* I - Array */
              void         *e)		/* I - Element */
 {
-  DEBUG_printf(("2cupsArrayAdd(a=%p, e=%p)", a, e));
+  DEBUG_printf(("2cupsArrayAdd(a=%p, e=%p)", (void *)a, e));
 
  /*
   * Range check input...
@@ -125,8 +123,7 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
   int		status = 1;		/* Status of add */
 
 
-  DEBUG_printf(("_cupsArrayAddStrings(a=%p, s=\"%s\", delim='%c')", a, s,
-                delim));
+  DEBUG_printf(("_cupsArrayAddStrings(a=%p, s=\"%s\", delim='%c')", (void *)a, s, delim));
 
   if (!a || !s || !*s)
   {
@@ -624,7 +621,7 @@ int					/* O - 0 on failure, 1 on success */
 cupsArrayInsert(cups_array_t *a,	/* I - Array */
 		void         *e)	/* I - Element */
 {
-  DEBUG_printf(("2cupsArrayInsert(a=%p, e=%p)", a, e));
+  DEBUG_printf(("2cupsArrayInsert(a=%p, e=%p)", (void *)a, e));
 
  /*
   * Range check input...
@@ -1027,7 +1024,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
   int		diff;			/* Comparison with current element */
 
 
-  DEBUG_printf(("7cups_array_add(a=%p, e=%p, insert=%d)", a, e, insert));
+  DEBUG_printf(("7cups_array_add(a=%p, e=%p, insert=%d)", (void *)a, e, insert));
 
  /*
   * Verify we have room for the new element...
@@ -1207,8 +1204,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("7cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)", a, e, prev,
-                rdiff));
+  DEBUG_printf(("7cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)", (void *)a, e, prev, (void *)rdiff));
 
   if (a->compare)
   {
@@ -1327,8 +1323,3 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
   return (current);
 }
-
-
-/*
- * End of "$Id: array.c 12031 2014-07-15 19:57:59Z msweet $".
- */

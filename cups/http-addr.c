@@ -1,6 +1,4 @@
 /*
- * "$Id: http-addr.c 12129 2014-08-28 19:26:31Z msweet $"
- *
  * HTTP address routines for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -19,7 +17,6 @@
  * Include necessary headers...
  */
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "cups-private.h"
 #include <sys/stat.h>
 #ifdef HAVE_RESOLV_H
@@ -326,8 +323,7 @@ httpAddrLookup(
 					/* Global data */
 
 
-  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)", addr, name,
-		namelen));
+  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)", (void *)addr, (void *)name, namelen));
 
  /*
   * Range check input...
@@ -504,7 +500,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
                char              *s,	/* I - String buffer */
 	       int               slen)	/* I - Length of string */
 {
-  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)", addr, s, slen));
+  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)", (void *)addr, (void *)s, slen));
 
  /*
   * Range check input...
@@ -922,8 +918,3 @@ httpResolveHostname(http_t *http,	/* I - HTTP connection */
   else
     return (http->hostname);
 }
-
-
-/*
- * End of "$Id: http-addr.c 12129 2014-08-28 19:26:31Z msweet $".
- */

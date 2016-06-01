@@ -1,7 +1,6 @@
 /*
  * Private definitions for CUPS.
  *
- * Copyright 2015 by the ISTO Printer Working Group.
  * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
@@ -61,10 +60,29 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
   /* Multiple places... */
   const char		*cups_datadir,	/* CUPS_DATADIR environment var */
+			*cups_serverbin,/* CUPS_SERVERBIN environment var */
 			*cups_serverroot,
 					/* CUPS_SERVERROOT environment var */
 			*cups_statedir,	/* CUPS_STATEDIR environment var */
 			*localedir;	/* LOCALDIR environment var */
+
+  /* adminutil.c */
+  time_t		cupsd_update;	/* Last time we got or set cupsd.conf */
+  char			cupsd_hostname[HTTP_MAX_HOST];
+					/* Hostname for connection */
+  int			cupsd_num_settings;
+					/* Number of server settings */
+  cups_option_t		*cupsd_settings;/* Server settings */
+
+  /* auth.c */
+#  ifdef HAVE_GSSAPI
+  char			gss_service_name[32];
+  					/* Kerberos service name */
+#  endif /* HAVE_GSSAPI */
+
+  /* backend.c */
+  char			resolved_uri[1024];
+					/* Buffer for cupsBackendDeviceURI */
 
   /* debug.c */
 #  ifdef DEBUG
@@ -114,6 +132,11 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			*last_status_message;
 					/* Last IPP status-message */
 
+  /* snmp.c */
+  char			snmp_community[255];
+					/* Default SNMP community name */
+  int			snmp_debug;	/* Log SNMP IO to stderr? */
+
   /* tempfile.c */
   char			tempfile[1024];	/* cupsTempFd/File buffer */
 
@@ -135,9 +158,14 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   void			*server_cert_data;
 					/* Server certificate user data */
   int			server_version,	/* Server IPP version */
+			trust_first,	/* Trust on first use? */
 			any_root,	/* Allow any (e.g., self-signed) root */
 			expired_certs,	/* Allow expired certs */
 			validate_certs;	/* Validate certificates */
+
+  /* util.c */
+  char			def_printer[256];
+					/* Default printer */
 } _cups_globals_t;
 
 typedef struct _cups_media_db_s		/* Media database */
@@ -207,6 +235,7 @@ extern char		*_cupsBufferGet(size_t size);
 extern void		_cupsBufferRelease(char *b);
 
 extern http_t		*_cupsConnect(void);
+extern char		*_cupsCreateDest(const char *name, const char *info, const char *device_id, const char *device_uri, char *uri, size_t urisize);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
 extern const char	*_cupsGetDestResource(cups_dest_t *dest, char *resource,
@@ -218,11 +247,19 @@ extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsGlobalUnlock(void);
+#  ifdef HAVE_GSSAPI
+extern const char	*_cupsGSSServiceName(void);
+#  endif /* HAVE_GSSAPI */
 extern int		_cupsNextDelay(int current, int *previous);
 extern void		_cupsSetDefaults(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
+#  ifdef HAVE_GSSAPI
+extern int		_cupsSetNegotiateAuthString(http_t *http,
+			                            const char *method,
+						    const char *resource);
+#  endif /* HAVE_GSSAPI */
 extern char		*_cupsUserDefault(char *name, size_t namesize);
 
 

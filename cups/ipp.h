@@ -1,6 +1,4 @@
 /*
- * "$Id: ipp.h 12666 2015-05-25 19:38:09Z msweet $"
- *
  * Internet Printing Protocol definitions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -330,12 +328,13 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_CUPS_ACCEPT_JOBS,		/* Accept new jobs on a printer */
   IPP_OP_CUPS_REJECT_JOBS,		/* Reject new jobs on a printer */
   IPP_OP_CUPS_SET_DEFAULT,		/* Set the default printer */
-  IPP_OP_CUPS_GET_DEVICES,		/* Get a list of supported devices */
-  IPP_OP_CUPS_GET_PPDS,			/* Get a list of supported drivers */
+  IPP_OP_CUPS_GET_DEVICES,		/* Get a list of supported devices @deprecated@ */
+  IPP_OP_CUPS_GET_PPDS,			/* Get a list of supported drivers @deprecated@ */
   IPP_OP_CUPS_MOVE_JOB,			/* Move a job to a different printer */
   IPP_OP_CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/OS X 10.5@ */
-  IPP_OP_CUPS_GET_PPD,			/* Get a PPD file @since CUPS 1.3/OS X 10.5@ */
-  IPP_OP_CUPS_GET_DOCUMENT = 0x4027	/* Get a document file @since CUPS 1.4/OS X 10.6@ */
+  IPP_OP_CUPS_GET_PPD,			/* Get a PPD file @deprecated@ */
+  IPP_OP_CUPS_GET_DOCUMENT = 0x4027,	/* Get a document file @since CUPS 1.4/OS X 10.6@ */
+  IPP_OP_CUPS_CREATE_LOCAL_PRINTER	/* Create a local (temporary) printer @since CUPS 2.2 */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_PRINT_JOB			IPP_OP_PRINT_JOB
@@ -1033,7 +1032,3 @@ extern const char	*ippStateString(ipp_state_t state) _CUPS_API_2_0;
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_IPP_H_ */
-
-/*
- * End of "$Id: ipp.h 12666 2015-05-25 19:38:09Z msweet $".
- */
