@@ -19,9 +19,22 @@
 
 if test $# -ne 1; then
     echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo "Usage: ${0} \"Printer IPP URI\""
     echo ""
     exit 1
+else
+    TARGET="${1}"
+    # check to see if the argument $1 is a URI or a service name
+    echo "${1}" | grep -q 'ipp://'
+    if test $? -eq 0; then
+        TARGET_IS_URI=1
+        TARGETNAME=`echo -n "${TARGET}" | cut -d '/' -f 3`
+    else
+        TARGET_IS_URI=0
+        TARGETNAME="${TARGET}"
+    fi
 fi
+
 
 if test -x ../test/ippfind-static; then
 	IPPFIND="../test/ippfind-static"
@@ -45,10 +58,17 @@ for file in color.jpg; do
 	fi
 done
 
-PLIST="$1 IPP Results $(date +'%Y%m%d%H%M').plist"
-${IPPFIND} --name "^${1}$" "_ipp._tcp.local." -x "${IPPTOOL}" -P "${PLIST}" -I '{}' ipp-tests.test \;
 
-# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
+PLIST="${TARGETNAME} IPP Results $(date +'%Y%m%d%H%M').plist"
+
+
+if test ${TARGET_IS_URI} -eq 1; then
+    "${IPPTOOL}" -P "${PLIST}" -I "${TARGET}" ipp-tests.test
+else
+    "${IPPFIND}" --name "^${TARGET}\$" "_ipp._tcp.local." -x "${IPPTOOL}" -P "${PLIST}" -I '{}' ipp-tests.test \;
+fi
+
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
 test `which plutil` && plutil -lint -s "${PLIST}"
 
 
