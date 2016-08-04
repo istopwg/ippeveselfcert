@@ -18,8 +18,16 @@
 #
 # Usage:
 #
-#   ./document-tests.sh "Printer Name"
+#   ./document-tests.sh "Printer NamePrinter DNS-SD Service Instance Name"
 #
+
+if test $# -ne 1; then
+    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo ""
+    exit 1
+else
+    TARGET="${1}"
+fi
 
 if test -x ../test/ippfind-static; then
 	IPPFIND="../test/ippfind-static"
@@ -54,8 +62,11 @@ if test "`ls -d pwg-raster-samples-*dpi-20150616 2>/dev/null`" = ""; then
 	exit 1
 fi
 
-$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 Document Results.plist" -I '{}' document-tests.test \;
 
-#
-# End of "$Id: document-tests.sh 12897 2015-10-09 19:18:39Z msweet $".
-#
+PLIST="${TARGET} Document Results.plist"
+
+$IPPFIND --name "^${TARGET}\$" "_ipp._tcp.local." -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
+
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
+test `which plutil` && plutil -lint -s "${PLIST}"
+
