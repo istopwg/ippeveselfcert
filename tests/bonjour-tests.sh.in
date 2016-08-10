@@ -352,6 +352,6 @@ score=`expr 100 \* $score / $total`
 echo "Summary: $total tests, $pass passed, $fail failed, $skip skipped"
 echo "Score: ${score}%"
 
-# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X)
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
 test `which plutil` && plutil -lint -s "$PLIST"
 
