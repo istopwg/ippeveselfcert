@@ -1,4 +1,6 @@
 /*
+ * "$Id: ippserver.c 12946 2015-10-28 15:20:59Z msweet $"
+ *
  * Sample IPP Everywhere server for CUPS.
  *
  * Copyright 2010-2015 by Apple Inc.
@@ -678,7 +680,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef WIN32
     if ((tmpdir = getenv("TEMP")) == NULL)
       tmpdir = "C:/TEMP";
-#elif defined(__APPLE__) && !TARGET_OS_IOS
+#elif defined(__APPLE__)
     if ((tmpdir = getenv("TMPDIR")) == NULL)
       tmpdir = "/private/tmp";
 #else
@@ -7386,3 +7388,8 @@ valid_job_attributes(
 
   return (valid);
 }
+
+
+/*
+ * End of "$Id: ippserver.c 12946 2015-10-28 15:20:59Z msweet $".
+ */

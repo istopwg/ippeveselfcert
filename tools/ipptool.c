@@ -860,7 +860,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
   * Loop on tests...
   */
 
-  CUPS_SRAND(time(NULL));
+  CUPS_SRAND((unsigned)time(NULL));
 
   errors     = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup,
                              (cups_afree_func_t)free);
@@ -4900,7 +4900,7 @@ timeout_cb(http_t *http,		/* I - Connection to server */
   * buffer is empty...
   */
 
-#ifdef SO_NWRITE			/* OS X and some versions of Linux */
+#ifdef SO_NWRITE			/* macOS and some versions of Linux */
   socklen_t len = sizeof(buffered);	/* Size of return value */
 
   if (getsockopt(httpGetFd(http), SOL_SOCKET, SO_NWRITE, &buffered, &len))

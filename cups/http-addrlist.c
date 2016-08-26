@@ -32,7 +32,7 @@
 /*
  * 'httpAddrConnect()' - Connect to any of the addresses in the list.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */
@@ -50,7 +50,7 @@ httpAddrConnect(
  * 'httpAddrConnect2()' - Connect to any of the addresses in the list with a
  *                        timeout and optional cancel.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */
@@ -61,20 +61,25 @@ httpAddrConnect2(
     int             *cancel)		/* I - Pointer to "cancel" variable */
 {
   int			val;		/* Socket option value */
-#ifdef O_NONBLOCK
-  int			flags,		/* Socket flags */
-			remaining;	/* Remaining timeout */
+#ifndef WIN32
+  int			flags;		/* Socket flags */
+#endif /* !WIN32 */
+  int			remaining;	/* Remaining timeout */
   int			i,		/* Looping var */
 			nfds,		/* Number of file descriptors */
 			fds[100],	/* Socket file descriptors */
 			result;		/* Result from select() or poll() */
   http_addrlist_t	*addrs[100];	/* Addresses */
+#ifndef HAVE_POLL
+  int			max_fd = -1;	/* Highest file descriptor */
+#endif /* !HAVE_POLL */
+#ifdef O_NONBLOCK
 #  ifdef HAVE_POLL
   struct pollfd		pfds[100];	/* Polled file descriptors */
 #  else
-  int			max_fd = -1;	/* Highest file descriptor */
   fd_set		input_set,	/* select() input set */
-			output_set;	/* select() output set */
+			output_set,	/* select() output set */
+			error_set;	/* select() error set */
   struct timeval	timeout;	/* Timeout */
 #  endif /* HAVE_POLL */
 #endif /* O_NONBLOCK */
@@ -220,7 +225,9 @@ httpAddrConnect2(
 	continue;
       }
 
+#ifndef WIN32
       fcntl(fds[nfds], F_SETFL, flags);
+#endif /* !WIN32 */
 
 #ifndef HAVE_POLL
       if (fds[nfds] > max_fd)
@@ -276,11 +283,12 @@ httpAddrConnect2(
       for (i = 0; i < nfds; i ++)
 	FD_SET(fds[i], &input_set);
       output_set = input_set;
+      error_set  = input_set;
 
       timeout.tv_sec  = 0;
       timeout.tv_usec = (addrlist ? 100 : remaining > 250 ? 250 : remaining) * 1000;
 
-      result = select(max_fd + 1, &input_set, &output_set, NULL, &timeout);
+      result = select(max_fd + 1, &input_set, &output_set, &error_set, &timeout);
 
       DEBUG_printf(("1httpAddrConnect2: select() returned %d (%d)", result, errno));
 #  endif /* HAVE_POLL */
@@ -297,9 +305,9 @@ httpAddrConnect2(
       {
 #  ifdef HAVE_POLL
 	DEBUG_printf(("pfds[%d].revents=%x\n", i, pfds[i].revents));
-	if (pfds[i].revents)
+	if (pfds[i].revents && !(pfds[i].revents & (POLLERR | POLLHUP)))
 #  else
-	if (FD_ISSET(fds[i], &input))
+	if (FD_ISSET(fds[i], &input) && !FD_ISSET(fds[i], &error))
 #  endif /* HAVE_POLL */
 	{
 	  *sock    = fds[i];
@@ -344,7 +352,7 @@ httpAddrConnect2(
 /*
  * 'httpAddrCopyList()' - Copy an address list.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 http_addrlist_t	*			/* O - New address list or @code NULL@ on error */
@@ -393,7 +401,7 @@ httpAddrCopyList(
 /*
  * 'httpAddrFreeList()' - Free an address list.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -421,7 +429,7 @@ httpAddrFreeList(
 /*
  * 'httpAddrGetList()' - Get a list of addresses for a hostname.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 http_addrlist_t	*			/* O - List of addresses or NULL */
