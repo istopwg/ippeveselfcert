@@ -1071,7 +1071,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 #
 # Required by: RFC 2911 section 3.2.1
 {
-	PAUSE "Remove media from printer."
+	PAUSE "Remove media from printer until this test run is complete."
 
 	NAME "I-26. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
