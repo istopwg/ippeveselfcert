@@ -18,8 +18,17 @@
 #
 # Usage:
 #
-#   ./ipp-tests.sh "Printer Name"
+#   ./ipp-tests.sh "Printer DNS-SD Service Instance Name"
 #
+
+if test $# -ne 1; then
+    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo ""
+    exit 1
+else
+    TARGET="${1}"
+fi
+
 
 if test -x ../test/ippfind-static; then
 	IPPFIND="../test/ippfind-static"
@@ -43,8 +52,11 @@ for file in color.jpg; do
 	fi
 done
 
-$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 IPP Results.plist" -I '{}' ipp-tests.test \;
 
-#
-# End of "$Id: ipp-tests.sh 12897 2015-10-09 19:18:39Z msweet $".
-#
+PLIST="${TARGET} IPP Results.plist"
+
+"${IPPFIND}" --name "^${TARGET}\$" "_ipp._tcp.local." -x "${IPPTOOL}" -P "${PLIST}" -I '{}' ipp-tests.test \;
+
+# confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
+test `which plutil` && plutil -lint -s "${PLIST}"
+
