@@ -1,9 +1,7 @@
 /*
- * "$Id: string-private.h 11889 2014-05-22 13:54:15Z msweet $"
- *
  * Private string definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -43,6 +41,13 @@
 #  ifdef HAVE_BSTRING_H
 #    include <bstring.h>
 #  endif /* HAVE_BSTRING_H */
+
+#  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#    define __CUPS_SSIZE_T_DEFINED
+#    include <stddef.h>
+/* Windows does not support the ssize_t type, so map it to long... */
+typedef long ssize_t;			/* @private@ */
+#  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 
 /*
@@ -147,6 +152,7 @@ extern int _cups_toupper(int ch);
  * Prototypes...
  */
 
+extern ssize_t	_cups_safe_vsnprintf(char *, size_t, const char *, va_list);
 extern void	_cups_strcpy(char *dst, const char *src);
 
 #  ifndef HAVE_STRDUP
@@ -216,7 +222,3 @@ extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval);
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_STRING_H_ */
-
-/*
- * End of "$Id: string-private.h 11889 2014-05-22 13:54:15Z msweet $".
- */

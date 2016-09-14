@@ -1,9 +1,7 @@
 #
-# "$Id: ipp-tests.test 12897 2015-10-09 19:18:39Z msweet $"
-#
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
-# Copyright 2014-2015 by The Printer Working Group.
+# Copyright 2014-2016 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -590,9 +588,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT ?compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -676,9 +674,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document-color.jpg"
@@ -760,9 +758,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -900,9 +898,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document2-color.jpg"
@@ -1024,9 +1022,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document3-color.jpg"
@@ -1071,7 +1069,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 #
 # Required by: RFC 2911 section 3.2.1
 {
-	PAUSE "Remove media from printer."
+	PAUSE "Remove media from printer until this test run is complete."
 
 	NAME "I-26. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
@@ -1133,8 +1131,3 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/"
 	EXPECT !printer-state
 }
-
-
-#
-# End of "$Id: ipp-tests.test 12897 2015-10-09 19:18:39Z msweet $".
-#

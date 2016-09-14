@@ -1,6 +1,4 @@
 dnl
-dnl "$Id: cups-compiler.m4 12742 2015-06-23 14:48:53Z msweet $"
-dnl
 dnl Compiler stuff for CUPS.
 dnl
 dnl Copyright 2007-2014 by Apple Inc.
@@ -100,11 +98,6 @@ if test -n "$GCC"; then
 		else
 			OPTIM="$with_optim $OPTIM"
 		fi
-	fi
-
-	# Generate position-independent code as needed...
-	if test $PICFLAG = 1; then
-    		OPTIM="-fPIC $OPTIM"
 	fi
 
 	# The -fstack-protector option is available with some versions of
@@ -244,7 +237,3 @@ case $uname in
 		OPTIM="$OPTIM -D_GNU_SOURCE"
 		;;
 esac
-
-dnl
-dnl End of "$Id: cups-compiler.m4 12742 2015-06-23 14:48:53Z msweet $".
-dnl
