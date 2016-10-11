@@ -355,7 +355,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?printer-charge-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 DEFINE-MATCH HAVE_CHARGE_INFO
 	EXPECT printer-charge-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_CHARGE_INFO
 
-	EXPECT printer-config-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-config-change-date-time OF-TYPE dateTime|no-value|unknown IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT printer-config-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
 
@@ -398,7 +398,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 
-	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-state-change-date-time OF-TYPE dateTime|no-value|unknown IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
 
@@ -590,9 +590,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT ?compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -676,9 +676,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document-color.jpg"
@@ -760,9 +760,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -900,9 +900,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document2-color.jpg"
@@ -1024,9 +1024,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
-	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document3-color.jpg"
