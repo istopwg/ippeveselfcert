@@ -10,6 +10,11 @@ if test $# != 1; then
 	exit 1
 fi
 
+if test ! -f tests/color.jpg; then
+	echo "Run this script from the root source directory."
+	exit 1
+fi
+
 case "$1" in
 	*dpi)
 		resolution="$1"
@@ -21,7 +26,7 @@ case "$1" in
 esac
 
 # The PPD to use for all of the tests...
-PPD=pwg-raster.ppd; export PPD
+PPD=scripts/pwg-raster.ppd; export PPD
 
 # The output format...
 FINAL_CONTENT_TYPE="image/pwg-raster"; export FINAL_CONTENT_TYPE
@@ -60,7 +65,7 @@ test -d $dir && rm -rf $dir
 
 mkdir -p $dir/originals
 for file in $files; do
-	cp $file $dir/originals
+	cp tests/$file $dir/originals
 done
 
 lastmedia=""
@@ -97,7 +102,7 @@ for file in $files; do
 		output="$base-$mode-$resolution.pwg"
 
 		echo "$output: \c"
-		$pdftoraster job user title 1 "ColorModel=$mode PageSize=$media Resolution=$resolution" "$file" >"$dir/$mode/$output" 2>>"$log"
+		$pdftoraster job user title 1 "ColorModel=$mode PageSize=$media Resolution=$resolution" "tests/$file" >"$dir/$mode/$output" 2>>"$log"
 		ls -l "$dir/$mode/$output" | awk '{if ($5 > 1048575) printf "%.1fMiB\n", $5 / 1048576; else printf "%.0fkiB\n", $5 / 1024;}'
 	done
 done
