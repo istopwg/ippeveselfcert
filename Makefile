@@ -1,7 +1,7 @@
 #
 # Top-level Makefile for IPP Everywhere Printer Self-Certification tools.
 #
-# Copyright 2015 by the ISTO Printer Working Group.
+# Copyright 2015-2016 by the ISTO Printer Working Group.
 # Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -81,8 +81,3 @@ dist:	all
 #
 
 .NOTPARALLEL:
-
-
-#
-# End of "$Id: Makefile 12414 2015-01-21 00:02:04Z msweet $".
-#

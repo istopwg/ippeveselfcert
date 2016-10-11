@@ -2234,7 +2234,6 @@ case "$uname" in
 esac
 
 
-
 ac_config_headers="$ac_config_headers config.h"
 
 
@@ -4729,7 +4728,6 @@ case $uname in
 esac
 
 
-
 ac_fn_c_check_header_compile "$LINENO" "resolv.h" "ac_cv_header_resolv_h" "
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -5374,7 +5372,6 @@ fi
 
 
 
-
 ac_fn_c_check_func "$LINENO" "poll" "ac_cv_func_poll"
 if test "x$ac_cv_func_poll" = xyes; then :
   $as_echo "#define HAVE_POLL 1" >>confdefs.h
@@ -5392,7 +5389,6 @@ if test "x$ac_cv_func_kqueue" = xyes; then :
   $as_echo "#define HAVE_KQUEUE 1" >>confdefs.h
 
 fi
-
 
 
 
@@ -5454,7 +5450,6 @@ $as_echo "$have_pthread" >&6; }
 		done
 	fi
 fi
-
 
 
 
@@ -5823,7 +5818,6 @@ EXPORT_SSLLIBS="$SSLLIBS"
 
 
 
-
 # Check whether --enable-largefile was given.
 if test "${enable_largefile+set}" = set; then :
   enableval=$enable_largefile;
@@ -6080,7 +6074,6 @@ fi
 
 
 
-
 # Check whether --enable-avahi was given.
 if test "${enable_avahi+set}" = set; then :
   enableval=$enable_avahi;
@@ -6187,7 +6180,6 @@ fi
 
 
 fi
-
 
 
 

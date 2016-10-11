@@ -18,7 +18,7 @@ You'll need the Avahi and GNU TLS developer packages to provide DNS-SD and TLS s
     ./configure
     make
 
-## OS X
+## macOS
 
 You'll need the current Xcode software and command-line tools to build things. Run the following to compile the tools:
 
@@ -34,7 +34,7 @@ Open the "ippeveselfcert.sln" file in the "vcnet" subdirectory and build the ins
 
 # Running/Testing
 
-## Linux and OS X
+## Linux and macOS
 
 The "runtests.sh" script can be used to run any of the test scripts using the locally-built tools. For example:
 
@@ -73,7 +73,7 @@ Run:
 A tar.gz file will be placed in the current directory.
 
 
-## OS X
+## macOS
 
 You'll need the PWG code signing certificate (available from the PWG officers for official use only) or your own certificate loaded into your login keychain.  Then run:
 
@@ -86,6 +86,6 @@ If you built the installer target, you'll find the package in a MSI file in the 
 
 # Legal Stuff
 
-These tools are Copyright 2014-2015 by The Printer Working Group and Copyright 2007-2015 by Apple Inc. CUPS and the CUPS logo are trademarks of Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
+These tools are Copyright 2014-2016 by The Printer Working Group and Copyright 2007-2016 by Apple Inc. CUPS and the CUPS logo are trademarks of Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
 
 The tools are provided under the terms of version 2 of the GNU General Public License and GNU Library General Public License. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the file "LICENSE.txt" for more information.

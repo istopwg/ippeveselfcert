@@ -1,6 +1,4 @@
 dnl
-dnl "$Id: cups-common.m4 12852 2015-08-28 13:29:21Z msweet $"
-dnl
 dnl Common configuration stuff for CUPS.
 dnl
 dnl Copyright 2015 by the ISTO Printer Working Group.
