@@ -291,7 +291,7 @@ cupsSetServerCredentials(
  * 'httpCopyCredentials()' - Copy the credentials associated with the peer in
  *                           an encrypted connection.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -435,10 +435,16 @@ httpCredentialsGetTrust(
 
 
   if (!common_name)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No common name specified."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create credentials from array."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if (cg->any_root < 0)
   {
@@ -473,14 +479,27 @@ httpCredentialsGetTrust(
         * Do not trust certificates on first use...
 	*/
 
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+
         trust = HTTP_TRUST_INVALID;
       }
-      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) || !httpCredentialsAreValidForName(credentials, common_name))
+      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds))
       {
        /*
-        * Either the new credentials are not newly issued, or the common name
-	* does not match the issued certificate...
+        * The new credentials are not newly issued...
 	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are older than stored credentials."), 1);
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (!httpCredentialsAreValidForName(credentials, common_name))
+      {
+       /*
+        * The common name does not match the issued certificate...
+	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are not valid for name."), 1);
 
         trust = HTTP_TRUST_INVALID;
       }
@@ -499,7 +518,15 @@ httpCredentialsGetTrust(
     httpFreeCredentials(tcreds);
   }
   else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No stored credentials, not valid for name."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
+  else if (!cg->trust_first)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+    trust = HTTP_TRUST_INVALID;
+  }
 
   if (trust == HTTP_TRUST_OK && !cg->expired_certs)
   {
@@ -508,11 +535,17 @@ httpCredentialsGetTrust(
     time(&curtime);
     if (curtime < gnutls_x509_crt_get_activation_time(cert) ||
         curtime > gnutls_x509_crt_get_expiration_time(cert))
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Credentials have expired."), 1);
       trust = HTTP_TRUST_EXPIRED;
+    }
   }
 
   if (trust == HTTP_TRUST_OK && !cg->any_root && cupsArrayCount(credentials) == 1)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Self-signed credentials are blocked."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
 
   gnutls_x509_crt_deinit(cert);
 
@@ -621,6 +654,8 @@ httpLoadCredentials(
   size_t		alloc_data = 0,	/* Bytes allocated */
 			num_data = 0;	/* Bytes used */
   int			decoded;	/* Bytes decoded */
+  int			in_certificate = 0;
+					/* In a certificate? */
 
 
   if (!credentials || !common_name)
@@ -640,7 +675,7 @@ httpLoadCredentials(
   {
     if (!strcmp(line, "-----BEGIN CERTIFICATE-----"))
     {
-      if (num_data)
+      if (in_certificate)
       {
        /*
 	* Missing END CERTIFICATE...
@@ -650,10 +685,12 @@ httpLoadCredentials(
 	*credentials = NULL;
         break;
       }
+
+      in_certificate = 1;
     }
     else if (!strcmp(line, "-----END CERTIFICATE-----"))
     {
-      if (!num_data)
+      if (!in_certificate || !num_data)
       {
        /*
 	* Missing data...
@@ -674,9 +711,10 @@ httpLoadCredentials(
         break;
       }
 
-      num_data = 0;
+      num_data       = 0;
+      in_certificate = 0;
     }
-    else
+    else if (in_certificate)
     {
       if (alloc_data == 0)
       {
@@ -710,7 +748,7 @@ httpLoadCredentials(
 
   cupsFileClose(fp);
 
-  if (num_data)
+  if (in_certificate)
   {
    /*
     * Missing END CERTIFICATE...
@@ -1294,17 +1332,73 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     if (hostname[0])
     {
-      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
-      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
+     /*
+      * First look for CA certs...
+      */
 
-      have_creds = !access(crtfile, 0) && !access(keyfile, 0);
+      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostname);
+      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostname);
+
+      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(hostname, '.')) != NULL)
+      {
+       /*
+        * Try just domain name...
+	*/
+
+        hostptr ++;
+	if (strchr(hostptr, '.'))
+	{
+	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+	}
+      }
+
+      if (access(crtfile, R_OK) || access(keyfile, R_OK))
+      {
+       /*
+        * Then look in the CUPS keystore...
+	*/
+
+	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
+	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
+      }
+
+      have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);
     }
     else if (tls_common_name)
     {
-      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
-      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
+     /*
+      * First look for CA certs...
+      */
 
-      have_creds = !access(crtfile, 0) && !access(keyfile, 0);
+      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", tls_common_name);
+      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", tls_common_name);
+
+      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(tls_common_name, '.')) != NULL)
+      {
+       /*
+        * Try just domain name...
+	*/
+
+        hostptr ++;
+	if (strchr(hostptr, '.'))
+	{
+	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+	}
+      }
+
+      if (access(crtfile, R_OK) || access(keyfile, R_OK))
+      {
+       /*
+        * Then look in the CUPS keystore...
+	*/
+
+	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
+	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
+      }
+
+      have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);
     }
 
     if (!have_creds && tls_auto_create && (hostname[0] || tls_common_name))
@@ -1324,7 +1418,8 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     DEBUG_printf(("4_httpTLSStart: Using certificate \"%s\" and private key \"%s\".", crtfile, keyfile));
 
-    status = gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
+    if (!status)
+      status = gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
   }
 
   if (!status)
