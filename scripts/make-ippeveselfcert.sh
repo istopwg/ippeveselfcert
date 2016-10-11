@@ -2,7 +2,7 @@
 #
 # Make an IPP Everywhere Printer self-certification package.
 #
-# Copyright 2014-2015 by the ISTO Printer Working Group.
+# Copyright 2014-2016 by the ISTO Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -22,19 +22,23 @@ if test ! -f scripts/make-ippeveselfcert.sh; then
         exit 1
 fi
 
-if test $# -lt 2 -o $# -gt 3; then
-	echo "Usage: everywhere/make-ippeveselfcert.sh name version [platform]"
+if test $# -gt 2; then
+	echo "Usage: everywhere/make-ippeveselfcert.sh [yyyymmdd] [platform]"
 	exit 1
 fi
 
-pkgname="$1"
-fileversion="$2"
-if test $# = 3; then
-	platform="$3"
+pkgname="ippeveselfcert10"
+if test $# -gt 0; then
+	fileversion="$1"
+else
+	fileversion="`date +%Y%m%d`"
+fi
+if test $# = 2; then
+	platform="$2"
 else
 	case `uname` in
 		Darwin)
-			platform="osx"
+			platform="macos"
 			;;
 
 		Linux)
