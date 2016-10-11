@@ -102,11 +102,6 @@ if test -n "$GCC"; then
 		fi
 	fi
 
-	# Generate position-independent code as needed...
-	if test $PICFLAG = 1; then
-    		OPTIM="-fPIC $OPTIM"
-	fi
-
 	# The -fstack-protector option is available with some versions of
 	# GCC and adds "stack canaries" which detect when the return address
 	# has been overwritten, preventing many types of exploit attacks.
