@@ -1,9 +1,7 @@
 #
-# "$Id: document-tests.test 12897 2015-10-09 19:18:39Z msweet $"
-#
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
 #
-# Copyright 2014-2015 by The Printer Working Group.
+# Copyright 2014-2016 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -23,8 +21,8 @@
 #
 # The ZIP files should be extracted in the same directory as the test files,
 # for example the 600dpi files will exist in a directory called
-# "pwg-raster-samples-${RASTER_RESOLUTION}-20150616".  The script used to generate the raster
-# data is available in the "everywhere" subdirectory of the CUPS source code.
+# "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@".  The script used to generate the raster
+# data is available in the "scripts" subdirectory of the source code.
 #
 
 FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
@@ -65,7 +63,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -80,7 +78,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -95,7 +93,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -110,7 +108,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -130,7 +128,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -148,7 +146,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -166,7 +164,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -184,7 +182,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -204,7 +202,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -222,7 +220,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -240,7 +238,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -258,7 +256,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -275,7 +273,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, black_1"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/black-1/document-a4-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/black-1/document-a4-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -290,7 +288,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, sgray_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/sgray-8/document-a4-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/sgray-8/document-a4-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -305,7 +303,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, srgb_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/srgb-8/document-a4-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/srgb-8/document-a4-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -320,7 +318,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, cmyk_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/cmyk-8/document-a4-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/cmyk-8/document-a4-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -337,7 +335,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, black_1"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/black-1/document-letter-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/black-1/document-letter-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -352,7 +350,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, sgray_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/sgray-8/document-letter-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/sgray-8/document-letter-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -367,7 +365,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, srgb_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/srgb-8/document-letter-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/srgb-8/document-letter-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -382,7 +380,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	ATTR name requesting-user-name $user
 	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, cmyk_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20150616/cmyk-8/document-letter-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-@PWGRASTER_VERSION@/cmyk-8/document-letter-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -612,7 +610,3 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
-
-#
-# End of "$Id: document-tests.test 12897 2015-10-09 19:18:39Z msweet $".
-#

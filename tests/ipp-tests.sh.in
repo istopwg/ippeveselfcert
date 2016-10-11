@@ -1,10 +1,8 @@
 #!/bin/sh
 #
-#  "$Id: ipp-tests.sh 12897 2015-10-09 19:18:39Z msweet $"
-#
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
-# Copyright 2014-2015 by The Printer Working Group.
+# Copyright 2014-2016 by The Printer Working Group.
 #
 # This program may be copied and furnished to others, and derivative works
 # that comment on, or otherwise explain it or assist in its implementation may
@@ -59,4 +57,3 @@ PLIST="${TARGET} IPP Results.plist"
 
 # confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
 test `which plutil` && plutil -lint -s "${PLIST}"
-

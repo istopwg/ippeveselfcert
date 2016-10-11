@@ -1,10 +1,8 @@
 @echo off
 ::
-::  "$Id: bonjour-tests.bat 12897 2015-10-09 19:18:39Z msweet $"
-::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 ::
-:: Copyright 2014-2015 by The Printer Working Group.
+:: Copyright 2014-2016 by The Printer Working Group.
 ::
 :: This program may be copied and furnished to others, and derivative works
 :: that comment on, or otherwise explain it or assist in its implementation may
@@ -387,7 +385,3 @@ set /a score=%pass% + %skip%
 set /a score=100 * %score% / %total%
 echo Summary: %total% tests, %pass% passed, %fail% failed, %skip% skipped
 echo Score: %score%%%
-
-::
-:: End of "$Id: bonjour-tests.bat 12897 2015-10-09 19:18:39Z msweet $".
-::
