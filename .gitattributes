@@ -1,10 +1,12 @@
 * text=auto
+*.ac text
 *.bat eol=crlf
 *.c text
 *.cxx text
 *.h text
 *.in text
 *.jpg binary
+*.m4 text
 *.pdf binary
 *.png binary
 *.sh text
