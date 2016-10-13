@@ -1,0 +1,12 @@
+* text=auto
+*.bat eol=crlf
+*.c text
+*.cxx text
+*.h text
+*.in text
+*.jpg binary
+*.pdf binary
+*.png binary
+*.sh text
+*.sln eol=crlf
+*.test text
