@@ -308,12 +308,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	# operations-supported tested above for required operations
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6,7
+	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "orientation-requested-supported"
 	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6,7
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "output-bin-supported"
 	EXPECT output-bin-default DEFINE-VALUE DEFAULT_OUTPUT_BIN
 	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
 
@@ -327,23 +325,19 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT pages-per-minute-color OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_COLOR
 	EXPECT !pages-per-minute-color IF-NOT-DEFINED HAVE_COLOR
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
+	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-color-mode-supported"
 	EXPECT print-color-mode-default DEFINE-VALUE DEFAULT_PRINT_COLOR_MODE
 	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|graphic|photo|text|text-and-graphic)$/"
+	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-content-optimize-supported"
 	EXPECT print-content-optimize-default DEFINE-VALUE DEFAULT_PRINT_CONTENT_OPTIMIZE
 	EXPECT print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)$/"
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
+	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-rendering-intent-supported"
 	EXPECT print-rendering-intent-default DEFINE-VALUE DEFAULT_PRINT_RENDERING_INTENT
 	EXPECT print-rendering-intent-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-quality-supported"
 	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
 	EXPECT print-quality-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5
 
@@ -353,9 +347,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?printer-charge-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 DEFINE-MATCH HAVE_CHARGE_INFO
 	EXPECT printer-charge-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_CHARGE_INFO
 
-	EXPECT printer-config-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-config-change-date-time OF-TYPE dateTime|unknown|no-value IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT printer-config-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	EXPECT printer-current-time OF-TYPE dateTime|unknown|no-value IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT printer-device-id OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^([-A-Za-z ]+:[^;]*;)+$/"
 
@@ -389,14 +385,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT printer-organizational-unit OF-TYPE text IN-GROUP printer-attributes-tag
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT printer-resolution-default OF-TYPE resolution IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-resolution-default OF-TYPE resolution IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "printer-resolution-supported"
 	EXPECT printer-resolution-default DEFINE-VALUE DEFAULT_PRINTER_RESOLUTION
 	EXPECT printer-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
 
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 
-	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-state-change-date-time OF-TYPE dateTime|unknown|no-value IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
 
@@ -427,8 +422,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 
-	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
-	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "sides-supported"
 	EXPECT sides-default DEFINE-VALUE DEFAULT_SIDES
 	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
 
@@ -589,7 +583,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT ?compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
@@ -675,7 +669,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
@@ -759,7 +753,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
@@ -899,7 +893,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
@@ -1023,7 +1017,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	# PWG 5100.14 - Table 9 - Job Description attributes
 	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT date-time-at-creation OF-TYPE dateTime|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
