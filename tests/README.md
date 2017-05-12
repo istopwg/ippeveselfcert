@@ -1,4 +1,4 @@
-README.txt - 2015-10-09
+README.md - 2017-04-28
 -----------------------
 
 INTRODUCTION
@@ -34,9 +34,9 @@ CONTENTS
 
     Documentation:
 
-      LICENSE.txt         CUPS software license
-      man-*.html          HTML documentation for the tools
-      README.txt          This README file
+      LICENSE.md         CUPS software license
+      man-*.html         HTML documentation for the tools
+      README.md          This README file
 
 
 GETTING SUPPORT AND OTHER RESOURCES

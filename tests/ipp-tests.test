@@ -315,8 +315,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT output-bin-default DEFINE-VALUE DEFAULT_OUTPUT_BIN
 	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
 
-	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number" IF-DEFINED HAVE_PDF
-	EXPECT overrides-supported WITH-VALUE "pages" IF-DEFINED HAVE_PDF
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-numbers" IF-DEFINED HAVE_PDF
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "pages" IF-DEFINED HAVE_PDF
 
 	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true IF-DEFINED HAVE_PDF
 
