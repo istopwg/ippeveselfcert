@@ -1109,7 +1109,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test 'media-needed' reason
 {
-	DELAY 10
+	DELAY 5
 
 	NAME "I-27. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
 	OPERATION Get-Printer-Attributes
@@ -1122,6 +1122,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	STATUS successful-ok
 
-	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/"
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24
 	EXPECT !printer-state
 }
