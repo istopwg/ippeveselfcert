@@ -62,10 +62,9 @@ test -d $pkgdir && rm -r $pkgdir
 mkdir $pkgdir || exit 1
 
 echo Copying package files
-cp LICENSE.txt $pkgdir
+cp LICENSE.md $pkgdir
 cp doc/man-ipp*.html $pkgdir
 cp tests/README.md $pkgdir
-cp tests/LICENSE.md $pkgdir
 cp tests/*.jpg $pkgdir
 cp tests/*.pdf $pkgdir
 cp tests/*.sh $pkgdir
