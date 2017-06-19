@@ -1,8 +1,8 @@
 /*
  * Configuration file for the IPP Everywhere Printer Self-Certification tools.
  *
- * Copyright 2015-2016 by the ISTO Printer Working Group.
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2015-2017 by the ISTO Printer Working Group.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -259,6 +259,13 @@
 
 
 /*
+ * Do we have getifaddrs()?
+ */
+
+#undef HAVE_GETIFADDRS
+
+
+/*
  * Do we have hstrerror()?
  */
 
@@ -389,7 +396,7 @@
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
 #undef CUPS_BUNDLEDIR
