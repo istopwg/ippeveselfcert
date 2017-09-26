@@ -21,12 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_036AE63A18BF49D8B441C629285D09E4"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1F3F26B49093480A8D0EE26F55CA1F0E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -34,6 +28,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2948DCE5D1F64050B95FE58125614CA5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_30D5C852F1B549BE8031F40855D9980F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -105,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_C809484DB89A4C3B8792DC193AFF346C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CBC57311E8C544C888B3D7A5A165EB8B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -118,12 +124,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E3C6C5A7FDD94965B68960844461D5EA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -273,26 +273,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_036AE63A18BF49D8B441C629285D09E4"
-            {
-            "SourcePath" = "8:..\\tests\\README.txt"
-            "TargetName" = "8:README.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F3F26B49093480A8D0EE26F55CA1F0E"
             {
             "SourcePath" = "8:..\\tests\\document-a4.pdf"
@@ -319,6 +299,26 @@
             "TargetName" = "8:bonjour-value-tests.test"
             "Tag" = "8:"
             "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_30D5C852F1B549BE8031F40855D9980F"
+            {
+            "SourcePath" = "8:..\\tests\\README.md"
+            "TargetName" = "8:README.md"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -513,6 +513,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C809484DB89A4C3B8792DC193AFF346C"
+            {
+            "SourcePath" = "8:..\\LICENSE.md"
+            "TargetName" = "8:LICENSE.md"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CBC57311E8C544C888B3D7A5A165EB8B"
             {
             "SourcePath" = "8:..\\tests\\document-tests.bat"
@@ -539,26 +559,6 @@
             "TargetName" = "8:document-letter.pdf"
             "Tag" = "8:"
             "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E3C6C5A7FDD94965B68960844461D5EA"
-            {
-            "SourcePath" = "8:..\\LICENSE.txt"
-            "TargetName" = "8:LICENSE.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -845,20 +845,6 @@
             "Icon" = "8:"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_63715171338D40FFBC5B47A1418B4814"
-            {
-            "Name" = "8:README"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_036AE63A18BF49D8B441C629285D09E4"
-            "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
-            "WorkingFolder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_70CF74DB997A408DBBFD48AB10F92321"
             {
             "Name" = "8:ipptool Documentation"
@@ -868,6 +854,20 @@
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_0155E33E1B9642D490B4553466EEB1CC"
+            "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
+            "WorkingFolder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8FCB9524BA094F8AAA9142DC615BB876"
+            {
+            "Name" = "8:README"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_30D5C852F1B549BE8031F40855D9980F"
             "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
             "WorkingFolder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Icon" = "8:"
@@ -1302,7 +1302,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_466C1CF41795452A8B76425F8D05D8B8"
             {
-            "SourcePath" = "8:Win32\\Release\\ippserver.exe"
+            "SourcePath" = "8:Win32\\Debug\\ippserver.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1330,7 +1330,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_58DC0E72F0944BEFB927AED718CD1660"
             {
-            "SourcePath" = "8:Win32\\Release\\ippfind.exe"
+            "SourcePath" = "8:Win32\\Debug\\ippfind.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1358,7 +1358,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Win32\\Release\\regex.dll"
+            "SourcePath" = "8:Win32\\Debug\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1386,7 +1386,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:Win32\\Release\\ipptool.exe"
+            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1414,7 +1414,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Win32\\Release\\libcups2.dll"
+            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
