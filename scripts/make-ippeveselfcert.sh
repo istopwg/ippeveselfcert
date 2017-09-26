@@ -87,7 +87,7 @@ if test x$platform = xmacos; then
 	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ipptool
 
 	# Make ZIP archive...
-	pkgfile="$pkgdir-osx.zip"
+	pkgfile="$pkgdir-macos.zip"
 	echo Creating ZIP file $pkgfile...
 	test -f $pkgfile && rm $pkgfile
 	zip -r9 $pkgfile $pkgdir || exit 1
