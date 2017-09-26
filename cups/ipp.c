@@ -1509,6 +1509,16 @@ ippCopyAttribute(
         dstattr = ippAddSeparator(dst);
 	break;
 
+    case IPP_TAG_UNSUPPORTED_VALUE :
+    case IPP_TAG_DEFAULT :
+    case IPP_TAG_UNKNOWN :
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_NOTSETTABLE :
+    case IPP_TAG_DELETEATTR :
+    case IPP_TAG_ADMINDEFINE :
+        dstattr = ippAddOutOfBand(dst, srcattr->group_tag, srcattr->value_tag & ~IPP_TAG_CUPS_CONST, srcattr->name);
+        break;
+
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
         dstattr = ippAddIntegers(dst, srcattr->group_tag, srcattr->value_tag,
@@ -1828,11 +1838,18 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
 
   ipp->use --;
   if (ipp->use > 0)
+  {
+    DEBUG_printf(("4debug_retain: %p IPP message (use=%d)", (void *)ipp, ipp->use));
     return;
+  }
+
+  DEBUG_printf(("4debug_free: %p IPP message", (void *)ipp));
 
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
     next = attr->next;
+
+    DEBUG_printf(("4debug_free: %p %s %s%s (%d values)", (void *)attr, attr->name, attr->num_values > 1 ? "1setOf " : "", ippTagString(attr->value_tag), attr->num_values));
 
     ipp_free_values(attr, 0, attr->num_values);
 
@@ -1869,6 +1886,8 @@ ippDeleteAttribute(
 
   if (!attr)
     return;
+
+  DEBUG_printf(("4debug_free: %p %s %s%s (%d values)", (void *)attr, attr->name, attr->num_values > 1 ? "1setOf " : "", ippTagString(attr->value_tag), attr->num_values));
 
  /*
   * Find the attribute in the list...
@@ -2704,6 +2723,8 @@ ippNew(void)
    /*
     * Set default version - usually 2.0...
     */
+
+    DEBUG_printf(("4debug_alloc: %p IPP message", (void *)temp));
 
     if (cg->server_version == 0)
       _cupsSetDefaults();
@@ -6402,6 +6423,8 @@ ipp_add_attr(ipp_t      *ipp,		/* I - IPP message */
     * Initialize attribute...
     */
 
+    DEBUG_printf(("4debug_alloc: %p %s %s%s (%d values)", (void *)attr, name, num_values > 1 ? "1setOf " : "", ippTagString(value_tag), num_values));
+
     if (name)
       attr->name = _cupsStrAlloc(name);
 
@@ -6957,6 +6980,9 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
    /*
     * Reset pointers in the list...
     */
+
+    DEBUG_printf(("4debug_free: %p %s %s%s (%d)", (void *)*attr, (*attr)->name, (*attr)->num_values > 1 ? "1setOf " : "", ippTagString((*attr)->value_tag), (*attr)->num_values));
+    DEBUG_printf(("4debug_alloc: %p %s %s%s (%d)", (void *)temp, temp->name, temp->num_values > 1 ? "1setOf " : "", ippTagString(temp->value_tag), temp->num_values));
 
     if (ipp->current == *attr && ipp->prev)
     {

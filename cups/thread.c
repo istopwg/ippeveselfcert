@@ -1,7 +1,7 @@
 /*
  * Threading primitives for CUPS.
  *
- * Copyright 2009-2016 by Apple Inc.
+ * Copyright 2009-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -173,6 +173,17 @@ _cupsThreadCreate(
 
 
 /*
+ * '_cupsThreadDetach()' - Tell the OS that the thread is running independently.
+ */
+
+void
+_cupsThreadDetach(_cups_thread_t thread)/* I - Thread ID */
+{
+  pthread_detach(thread);
+}
+
+
+/*
  * '_cupsThreadWait()' - Wait for a thread to exit.
  */
 
@@ -340,6 +351,18 @@ _cupsThreadCreate(
     void                *arg)		/* I - Entry point context */
 {
   return (_beginthreadex(NULL, 0, (LPTHREAD_START_ROUTINE)func, arg, 0, NULL));
+}
+
+
+/*
+ * '_cupsThreadDetach()' - Tell the OS that the thread is running independently.
+ */
+
+void
+_cupsThreadDetach(_cups_thread_t thread)/* I - Thread ID */
+{
+  // TODO: Implement me
+  (void)thread;
 }
 
 

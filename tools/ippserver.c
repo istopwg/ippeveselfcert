@@ -1,7 +1,7 @@
 /*
  * Sample IPP Everywhere server for CUPS.
  *
- * Copyright 2010-2015 by Apple Inc.
+ * Copyright 2010-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -1019,7 +1019,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
     * Only accept a single job at a time...
     */
 
-    _cupsRWLockWrite(&(client->printer->rwlock));
+    _cupsRWUnlock(&(client->printer->rwlock));
     return (NULL);
   }
 
@@ -3763,6 +3763,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 			buffer[4096];	/* Copy buffer */
   ssize_t		bytes;		/* Bytes read */
   cups_array_t		*ra;		/* Attributes to send in response */
+  _cups_thread_t        t;              /* Thread */
 
 
  /*
@@ -3873,7 +3874,13 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Process the job...
   */
 
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
+  t = _cupsThreadCreate((_cups_thread_func_t)process_job, job);
+
+  if (t)
+  {
+    _cupsThreadDetach(t);
+  }
+  else
   {
     job->state = IPP_JSTATE_ABORTED;
     respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
@@ -4180,17 +4187,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
   * Process the job...
   */
 
-#if 0
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
-#else
   process_job(job);
-#endif /* 0 */
 
  /*
   * Return the job info...
@@ -4382,17 +4379,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   * Process the job...
   */
 
-#if 0
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
-#else
   process_job(job);
-#endif /* 0 */
 
  /*
   * Return the job info...
@@ -4751,17 +4738,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   * Process the job...
   */
 
-#if 0
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
-#else
   process_job(job);
-#endif /* 0 */
 
  /*
   * Return the job info...
@@ -5007,7 +4984,6 @@ load_attributes(const char *filename,	/* I - File to load */
 		break;
 
 	      ippSetCollection(attrs, &attrptr, ippGetCount(attrptr), col);
-	      lastcol = attrptr;
 	    }
 	    while (!strcmp(token, "{"));
 	    break;
@@ -6829,7 +6805,13 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
     {
       if ((client = create_client(printer, printer->ipv4)) != NULL)
       {
-	if (!_cupsThreadCreate((_cups_thread_func_t)process_client, client))
+        _cups_thread_t t = _cupsThreadCreate((_cups_thread_func_t)process_client, client);
+
+        if (t)
+        {
+          _cupsThreadDetach(t);
+        }
+        else
 	{
 	  perror("Unable to create client thread");
 	  delete_client(client);
@@ -6841,7 +6823,13 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
     {
       if ((client = create_client(printer, printer->ipv6)) != NULL)
       {
-	if (!_cupsThreadCreate((_cups_thread_func_t)process_client, client))
+        _cups_thread_t t = _cupsThreadCreate((_cups_thread_func_t)process_client, client);
+
+        if (t)
+        {
+          _cupsThreadDetach(t);
+        }
+        else
 	{
 	  perror("Unable to create client thread");
 	  delete_client(client);
@@ -7015,7 +7003,7 @@ valid_doc_attributes(
     attr = ippAddString(client->request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, format);
   }
 
-  if (!strcmp(format, "application/octet-stream") && (ippGetOperation(client->request) == IPP_OP_PRINT_JOB || ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
+  if (format && !strcmp(format, "application/octet-stream") && (ippGetOperation(client->request) == IPP_OP_PRINT_JOB || ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
   {
    /*
     * Auto-type the file using the first 8 bytes of the file...

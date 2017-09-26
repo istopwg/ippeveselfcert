@@ -1,7 +1,7 @@
 /*
  * IPP utilities for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -144,45 +144,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   */
 
   if (infile >= 0)
-  {
-    if (fstat(infile, &fileinfo))
-    {
-     /*
-      * Can't get file information!
-      */
-
-      _cupsSetError(errno == EBADF ? IPP_STATUS_ERROR_NOT_FOUND : IPP_STATUS_ERROR_NOT_AUTHORIZED,
-                    NULL, 0);
-
-      ippDelete(request);
-
-      return (NULL);
-    }
-
-#ifdef WIN32
-    if (fileinfo.st_mode & _S_IFDIR)
-#else
-    if (S_ISDIR(fileinfo.st_mode))
-#endif /* WIN32 */
-    {
-     /*
-      * Can't send a directory...
-      */
-
-      ippDelete(request);
-
-      _cupsSetError(IPP_STATUS_ERROR_NOT_POSSIBLE, strerror(EISDIR), 0);
-
-      return (NULL);
-    }
-
-#ifndef WIN32
-    if (!S_ISREG(fileinfo.st_mode))
-      length = 0;			/* Chunk when piping */
-    else
-#endif /* !WIN32 */
-    length = ippLength(request) + (size_t)fileinfo.st_size;
-  }
+    length = 0;
   else
     length = ippLength(request);
 
@@ -596,6 +558,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   int			got_status;	/* Did we get the status? */
   ipp_state_t		state;		/* State of IPP processing */
   http_status_t		expect;		/* Expect: header to use */
+  char                  date[256];      /* Date: header value */
 
 
   DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", length=" CUPS_LLFMT ")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, CUPS_LLCAST length));
@@ -685,6 +648,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     httpClearFields(http);
     httpSetExpect(http, expect);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+    httpSetField(http, HTTP_FIELD_DATE, httpGetDateString2(time(NULL), date, (int)sizeof(date)));
     httpSetLength(http, length);
 
 #ifdef HAVE_GSSAPI
@@ -996,7 +960,11 @@ _cupsConnect(void)
     */
 
     if (strcmp(cg->http->hostname, cg->server) ||
+#ifdef AF_LOCAL
+        (httpAddrFamily(cg->http->hostaddr) != AF_LOCAL && cg->ipp_port != httpAddrPort(cg->http->hostaddr)) ||
+#else
         cg->ipp_port != httpAddrPort(cg->http->hostaddr) ||
+#endif /* AF_LOCAL */
         (cg->http->encryption != cg->encryption &&
 	 cg->http->encryption == HTTP_ENCRYPTION_NEVER))
     {
