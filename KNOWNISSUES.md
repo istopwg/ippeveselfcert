@@ -1,5 +1,23 @@
 # Known Issues
 
+## v1.0 Update 2 (September 26, 2017)
+
+There are no known issues in this release.
+
+
+## v1.0 Update 1 (December 13, 2016)
+
+The following is a list of the known issues in the December 13, 2016 release of
+the self-certification tools:
+
+1. The repeat limit of 30 is sometimes inadequate for test I-16.
+
+2. The 10 second delay is sometimes inadequate for test I-27.
+
+3. The "overrides-supported" test incorrectly looked for the "document-number"
+   member attribute instead of "document-numbers".
+
+
 ## v1.0 (November 10, 2015)
 
 The following is a list of the known issues in the November 10, 2015 release of the self-certification tools:
