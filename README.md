@@ -9,8 +9,17 @@ The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere Prin
 
 Issues found in the tools should be reported using the [Github issues page](https://github.com/istopwg/ippeveselfcert).
 
+Note: Tests are intended to be run on an isolated network, or at least when no
+other users are printing using the target printer.  Otherwise the test scripts
+will fail randomly.
 
-# Compiling and Packaging
+
+# Compiling
+
+Note: Self-certification results submitted to the PWG IPP Everywhere™ portal
+MUST be generated using the tools provides on the PWG web site.  The following
+instructions are provided for developers to build and test using unofficial
+builds.
 
 ## Linux
 
@@ -33,7 +42,7 @@ You'll need the current Visual Studio C++ as well as the code signing tools and 
 Open the "ippeveselfcert.sln" file in the "vcnet" subdirectory and build the installer project.
 
 
-# Running/Testing
+# Running/Testing with Local Builds
 
 ## Linux and macOS
 
