@@ -2,7 +2,7 @@
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 ::
-:: Copyright 2014-2016 by The Printer Working Group.
+:: Copyright 2014-2018 by The Printer Working Group.
 ::
 :: This program may be copied and furnished to others, and derivative works
 :: that comment on, or otherwise explain it or assist in its implementation may
@@ -21,4 +21,4 @@
 
 set name=%1
 set name=%name:~1,-1%
-ippfind "%name%._ipp._tcp.local." -x ipptool -P "\"%name% IPP Results.plist\"" -I "{}" ipp-tests.test ";"
+ippfind --literal-name "%name%" -x ipptool -P "\"%name% IPP Results.plist\"" -I "{}" ipp-tests.test ";"
