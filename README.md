@@ -1,12 +1,13 @@
-# IPP Everywhere Printer Self-Certification Tools
+# IPP Everywhere™ v1.0 Printer Self-Certification Tools
 
-The IPP Everywhere Printer self-certification tools are used to test the conformance of printers to PWG Candidate Standard 5100.14-2013: IPP Everywhere. The testing and submission procedures are defined in the draft IPP Everywhere Printer Self-Certification Manual.
+The IPP Everywhere™ Printer self-certification tools are used to test the conformance of printers to PWG Candidate Standard 5100.14-2013: IPP Everywhere™. The testing and submission procedures are defined in PWG Candidate Standard
+5100.20-2016: IPP Everywhere™ v1.0 Printer Self-Certification Manual.
 
-The [IPP Everywhere home page](http://www.pwg.org/ipp/everywhere.html) provides access to all information relevant to IPP Eveywhere. Sample PWG Raster files (needed for the document tests) can be downloaded from [the PWG FTP server](http://ftp.pwg.org/pub/pwg/ipp/examples] - only the files dated June 16, 2015 (20150616) can be used.
+The [IPP Everywhere™ home page](http://www.pwg.org/ipp/everywhere.html) provides access to all information relevant to IPP Everywhere™. Sample PWG Raster files (needed for the document tests) can be downloaded from [the PWG FTP server](https://ftp.pwg.org/pub/pwg/ipp/examples] - only the files dated June 16, 2015 (20150616) can be used.
 
 The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere Printer Self-Certification. You can subscribe at [https://www.pwg.org/mailman/listinfo/ippeveselfcert](https://www.pwg.org/mailman/listinfo/ippeveselfcert).
 
-Issues found in the tools should be reported using the [Github issues page](http://github.com/istopwg/ippeveselfcert).
+Issues found in the tools should be reported using the [Github issues page](https://github.com/istopwg/ippeveselfcert).
 
 
 # Compiling and Packaging
@@ -86,6 +87,6 @@ If you built the installer target, you'll find the package in a MSI file in the 
 
 # Legal Stuff
 
-These tools are Copyright 2014-2016 by The Printer Working Group and Copyright 2007-2016 by Apple Inc. CUPS and the CUPS logo are trademarks of Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
+These tools are Copyright 2014-2018 by The Printer Working Group and Copyright 2007-2018 by Apple Inc. CUPS and the CUPS logo are trademarks of Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
 
 The tools are provided under the terms of version 2 of the GNU General Public License and GNU Library General Public License. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the file "LICENSE.txt" for more information.

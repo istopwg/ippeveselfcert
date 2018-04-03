@@ -1,6 +1,12 @@
 # Changes
 
-## v1.0 Update 2 (Month DD, 2017)
+## v1.0 Update 3 (April 4, 2018)
+
+- Issue #22: Print service names could match multiple printers.
+- Issue #24: Updated IPP tools to CUPS v2.2.8.
+
+
+## v1.0 Update 2 (September 26, 2017)
 
 - Issue #15: ipp-tests.test: "document-number" member of "overrides-supported"
   should be "document-numbers"

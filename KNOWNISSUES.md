@@ -1,8 +1,18 @@
 # Known Issues
 
-## v1.0 Update 2 (September 26, 2017)
+## v1.0 Update 3 (April 4, 2018)
 
 There are no known issues in this release.
+
+
+## v1.0 Update 2 (September 26, 2017)
+
+The following is a list of the known issues in the September 26, 2016 release of
+the self-certification tools:
+
+1. Printer service names incorrectly match substrings.
+
+2. The Windows tools depend on DLLs supplied with Visual Studio.
 
 
 ## v1.0 Update 1 (December 13, 2016)
