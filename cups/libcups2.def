@@ -23,9 +23,6 @@ _cupsLangPrintError
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString
-_cupsMD5Append
-_cupsMD5Finish
-_cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
@@ -193,6 +190,7 @@ cupsGetPassword2
 cupsGetPrinters
 cupsGetResponse
 cupsHashData
+cupsHashString
 cupsLangDefault
 cupsLangEncoding
 cupsLangFlush

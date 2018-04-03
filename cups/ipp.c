@@ -4306,18 +4306,22 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
 {
   char		*temp;			/* Temporary string */
   _ipp_value_t	*value;			/* Current value */
+  ipp_tag_t	value_tag;		/* Value tag */
 
 
  /*
   * Range check input...
   */
 
+  if (attr && *attr)
+    value_tag = (*attr)->value_tag & IPP_TAG_CUPS_MASK;
+  else
+    value_tag = IPP_TAG_ZERO;
+
   if (!ipp || !attr || !*attr ||
-      ((*attr)->value_tag != IPP_TAG_TEXTLANG &&
-      (*attr)->value_tag != IPP_TAG_NAMELANG &&
-       ((*attr)->value_tag < IPP_TAG_TEXT ||
-        (*attr)->value_tag > IPP_TAG_MIMETYPE)) ||
-      element < 0 || element > (*attr)->num_values || !strvalue)
+      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
+       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
+      !strvalue)
     return (0);
 
  /*
@@ -6981,7 +6985,7 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
     * Reset pointers in the list...
     */
 
-    DEBUG_printf(("4debug_free: %p %s %s%s (%d)", (void *)*attr, (*attr)->name, (*attr)->num_values > 1 ? "1setOf " : "", ippTagString((*attr)->value_tag), (*attr)->num_values));
+    DEBUG_printf(("4debug_free: %p %s", (void *)*attr, temp->name));
     DEBUG_printf(("4debug_alloc: %p %s %s%s (%d)", (void *)temp, temp->name, temp->num_values > 1 ? "1setOf " : "", ippTagString(temp->value_tag), temp->num_values));
 
     if (ipp->current == *attr && ipp->prev)
