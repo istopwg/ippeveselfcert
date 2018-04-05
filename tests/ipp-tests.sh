@@ -28,16 +28,16 @@ else
 fi
 
 
-if test -x ../test/ippfind-static; then
-	IPPFIND="../test/ippfind-static"
+if test -x ../tools/ippfind; then
+	IPPFIND="../tools/ippfind"
 elif test -x ./ippfind; then
 	IPPFIND="./ippfind"
 else
 	IPPFIND="ippfind"
 fi
 
-if test -x ../test/ipptool-static; then
-	IPPTOOL="../test/ipptool-static"
+if test -x ../tools/ipptool; then
+	IPPTOOL="../tools/ipptool"
 elif test -x ./ipptool; then
 	IPPTOOL="./ipptool"
 else

@@ -27,16 +27,16 @@ else
     TARGET="${1}"
 fi
 
-if test -x ../test/ippfind-static; then
-	IPPFIND="../test/ippfind-static"
+if test -x ../tools/ippfind; then
+	IPPFIND="../tools/ippfind"
 elif test -x ./ippfind; then
 	IPPFIND="./ippfind"
 else
 	IPPFIND="ippfind"
 fi
 
-if test -x ../test/ipptool-static; then
-	IPPTOOL="../test/ipptool-static"
+if test -x ../tools/ipptool; then
+	IPPTOOL="../tools/ipptool"
 elif test -x ./ipptool; then
 	IPPTOOL="./ipptool"
 else
@@ -181,7 +181,7 @@ end_test() {
 
 # B-1. IPP Browse test: Printers appear in a search for "_ipp._tcp,_print" services?
 start_test "B-1. IPP Browse test"
-$IPPFIND --literal-name "${TARGET}" "_ipp.tcp,_print.local." --quiet
+$IPPFIND --literal-name "${TARGET}" "_ipp._tcp,_print.local." --quiet
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
