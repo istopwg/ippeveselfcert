@@ -262,14 +262,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT media-col-default/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
 	EXPECT media-col-default/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
 
-	# TODO: Use EXPECT-ALL (STR #4469)
 	EXPECT media-col-ready OF-TYPE collection|no-value IN-GROUP printer-attributes-tag
-	EXPECT media-col-ready/media-size OF-TYPE collection COUNT 1
-	EXPECT media-col-ready/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-ready/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
-	EXPECT ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
-	EXPECT media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+	EXPECT-ALL media-col-ready/media-size OF-TYPE collection COUNT 1
+	EXPECT-ALL media-col-ready/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-ready/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT-ALL ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
+	EXPECT-ALL media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
 
 	EXPECT media-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT media-col-supported WITH-VALUE "media-size"
@@ -286,9 +285,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT media-right-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
 
 	EXPECT media-size-supported OF-TYPE collection IN-GROUP printer-attributes-tag
-	# TODO: Use EXPECT-ALL (STR #4469)
-	EXPECT media-size-supported/x-dimension OF-TYPE integer|rangeOfInteger
-	EXPECT media-size-supported/y-dimension OF-TYPE integer|rangeOfInteger
+	EXPECT-ALL media-size-supported/x-dimension OF-TYPE integer|rangeOfInteger
+	EXPECT-ALL media-size-supported/y-dimension OF-TYPE integer|rangeOfInteger
 
 	# media-source-supported tests above to set HAVE_MEDIA_SOURCE
 
@@ -359,10 +357,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT printer-get-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-format"
 
-	# TODO: Use EXPECT-ALL syntax
 	EXPECT printer-icc-profiles-supported OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_ICC_PROFILES
-	EXPECT printer-icc-profiles-supported/profile-name OF-TYPE name COUNT 1 IF-DEFINED HAVE_ICC_PROFILES
-	EXPECT printer-icc-profiles-supported/profile-uri OF-TYPE uri COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME" IF-DEFINED HAVE_ICC_PROFILES
+	EXPECT-ALL printer-icc-profiles-supported/profile-name OF-TYPE name COUNT 1 IF-DEFINED HAVE_ICC_PROFILES
+	EXPECT-ALL printer-icc-profiles-supported/profile-uri OF-TYPE uri COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME" IF-DEFINED HAVE_ICC_PROFILES
 
 	EXPECT printer-icons OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$HTTP_URI_SCHEME"
 	EXPECT printer-icons OF-TYPE uri WITH-ALL-HOSTNAMES "$hostname"
@@ -450,14 +447,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	STATUS successful-ok
 
-	# TODO: Use EXPECT-ALL (STR #4469)
 	EXPECT media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
-	EXPECT media-col-database/media-size OF-TYPE collection COUNT 1
-	EXPECT media-col-database/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-database/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-database/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
-	EXPECT ?media-col-database/media-source-properties OF-TYPE collection COUNT 1
-	EXPECT media-col-database/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+	EXPECT-ALL media-col-database/media-size OF-TYPE collection COUNT 1
+	EXPECT-ALL media-col-database/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-database/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL ?media-col-database/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT-ALL ?media-col-database/media-source-properties OF-TYPE collection COUNT 1
+	EXPECT-ALL ?media-col-database/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
 
 	EXPECT !printer-name
 	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
@@ -1011,7 +1007,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
-	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6 REPEAT-NO-MATCH REPEAT-LIMIT 30
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH REPEAT-LIMIT 30
 	DISPLAY job-state
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
