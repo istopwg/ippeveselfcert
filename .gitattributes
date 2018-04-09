@@ -12,3 +12,5 @@
 *.sh text
 *.sln eol=crlf
 *.test text
+.cups-upstream export-ignore
+.git* export-ignore
