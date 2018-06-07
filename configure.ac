@@ -17,18 +17,12 @@ dnl We need at least autoconf 2.60...
 AC_PREREQ(2.60)
 
 dnl Package name and version...
-AC_INIT([IPPEVESELFCERT], [20180412], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
+AC_INIT([IPPEVESELFCERT], [20180607], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
 
 dnl IPP Everywhere Printer Self-Certification Manual Version; this is the
 dnl filename prefix...
 IPPEVESELFCERT_VERSION="ippeveselfcert10"
 AC_SUBST(IPPEVESELFCERT_VERSION)
-
-dnl PWG Raster Sample File Date/Version; this comes from:
-dnl
-dnl     http://ftp.pwg.org/pub/pwg/ipp/examples
-PWGRASTER_VERSION="20150616"
-AC_SUBST(PWGRASTER_VERSION)
 
 dnl Include common configuration scripts...
 sinclude(config-scripts/cups-opsys.m4)
