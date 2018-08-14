@@ -1,6 +1,6 @@
 * text=auto
 *.ac text
-*.bat eol=crlf
+*.bat text eol=crlf
 *.c text
 *.cxx text
 *.h text
