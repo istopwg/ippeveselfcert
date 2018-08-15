@@ -1,9 +1,10 @@
-# IPP Everywhere™ v1.0 Printer Self-Certification Tools
+# IPP Everywhere™ v1.1 Printer Self-Certification Tools
 
-The IPP Everywhere™ Printer self-certification tools are used to test the conformance of printers to PWG Candidate Standard 5100.14-2013: IPP Everywhere™. The testing and submission procedures are defined in PWG Candidate Standard
-5100.20-2016: IPP Everywhere™ v1.0 Printer Self-Certification Manual.
+The IPP Everywhere™ Printer self-certification tools are used to test the conformance of printers to PWG Candidate Standard 5100.14-201x: IPP Everywhere™
+v1.1. The testing and submission procedures are defined in PWG Candidate
+Standard 5100.20-201x: IPP Everywhere™ v1.1 Printer Self-Certification Manual.
 
-The [IPP Everywhere™ home page](http://www.pwg.org/ipp/everywhere.html) provides access to all information relevant to IPP Everywhere™. Sample PWG Raster files (needed for the document tests) can be downloaded from [the PWG FTP server](https://ftp.pwg.org/pub/pwg/ipp/examples] - only the files dated June 16, 2015 (20150616) can be used.
+The [IPP Everywhere™ home page](http://www.pwg.org/ipp/everywhere.html) provides access to all information relevant to IPP Everywhere™. Sample PWG Raster files (needed for the document tests) can be downloaded from [the PWG FTP server](https://ftp.pwg.org/pub/pwg/ipp/examples].
 
 The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere Printer Self-Certification. You can subscribe at [https://www.pwg.org/mailman/listinfo/ippeveselfcert](https://www.pwg.org/mailman/listinfo/ippeveselfcert).
 
