@@ -15,8 +15,20 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0110E2DCAA880239E800F175464324BF"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0155E33E1B9642D490B4553466EEB1CC"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_16782E4B54474057D57C356EDBC52A85"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -45,6 +57,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4AE36A70CB3BA4F63A80344A9E89AB72"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_552987AAAD871382FD9389DD42050A6C"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -57,8 +81,26 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_98DE3654AC4DC23DE76B8341C5A84EA4"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9A9068DFA02B49028B79AD6A7E1A6E39"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9E0591024C9F852B6313ABBFB5B02C56"
+        "OwnerKey" = "8:_466C1CF41795452A8B76425F8D05D8B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A1AB03590EAB23894770DFDB61FD2D1E"
+        "OwnerKey" = "8:_466C1CF41795452A8B76425F8D05D8B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -247,6 +289,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0110E2DCAA880239E800F175464324BF"
+            {
+            "SourcePath" = "8:api-ms-win-crt-string-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-string-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0155E33E1B9642D490B4553466EEB1CC"
             {
             "SourcePath" = "8:..\\doc\\man-ipptool.html"
@@ -265,6 +327,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_16782E4B54474057D57C356EDBC52A85"
+            {
+            "SourcePath" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F3F26B49093480A8D0EE26F55CA1F0E"
@@ -327,6 +409,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AE36A70CB3BA4F63A80344A9E89AB72"
+            {
+            "SourcePath" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_552987AAAD871382FD9389DD42050A6C"
+            {
+            "SourcePath" = "8:api-ms-win-crt-heap-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-heap-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_94D4E75BB463424FB623DEBFD2EA3871"
             {
             "SourcePath" = "8:..\\tests\\ipp-tests.test"
@@ -347,6 +469,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_98DE3654AC4DC23DE76B8341C5A84EA4"
+            {
+            "SourcePath" = "8:VCRUNTIME140.dll"
+            "TargetName" = "8:VCRUNTIME140.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9A9068DFA02B49028B79AD6A7E1A6E39"
             {
             "SourcePath" = "8:..\\doc\\man-ippserver.html"
@@ -365,6 +507,46 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9E0591024C9F852B6313ABBFB5B02C56"
+            {
+            "SourcePath" = "8:regex.dll"
+            "TargetName" = "8:regex.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1AB03590EAB23894770DFDB61FD2D1E"
+            {
+            "SourcePath" = "8:libcups2.dll"
+            "TargetName" = "8:libcups2.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A25BC716EE67465C9E718C0F10B00832"
@@ -677,7 +859,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:IPP Everywhere Printer Self-Certification Tools"
         "ProductCode" = "8:{60089BEE-6B93-4F77-B637-00F844D2736B}"
-        "PackageCode" = "8:{E4B367DB-54A9-4B1F-8330-53E0D48CC3C4}"
+        "PackageCode" = "8:{B4B91553-0482-484E-9A50-3F6105D9F0DB}"
         "UpgradeCode" = "8:{604C5A1F-FEFF-4165-96A5-D88C3DA48BEB}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1276,7 +1458,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_466C1CF41795452A8B76425F8D05D8B8"
             {
-            "SourcePath" = "8:Win32\\Release\\ippserver.exe"
+            "SourcePath" = "8:Release\\x64\\ippserver\\ippserver.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1304,7 +1486,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_58DC0E72F0944BEFB927AED718CD1660"
             {
-            "SourcePath" = "8:Release\\ippfind.exe"
+            "SourcePath" = "8:Release\\x64\\ippfind\\ippfind.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1332,7 +1514,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Release\\regex.dll"
+            "SourcePath" = "8:Release\\x64\\regex\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1360,7 +1542,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:Release\\ipptool.exe"
+            "SourcePath" = "8:Release\\x64\\ipptool\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1388,7 +1570,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Release\\libcups2.dll"
+            "SourcePath" = "8:Release\\x64\\libcups2\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
