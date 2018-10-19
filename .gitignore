@@ -12,5 +12,6 @@ tools/ippfind
 tools/ippserver
 tools/ipptool
 vcnet/.vs
+vcnet/sw-ippeveselfcert-cache
 vcnet/packages
 vcnet/x64

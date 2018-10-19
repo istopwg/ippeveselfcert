@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="15.3" Modules="simple" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippserver.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ipptool.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_libcups2.dll" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe" Value="ippfind.exe"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippserver.exe" Value="ippserver.exe"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe" Value="ipptool.exe"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll" Value="libcups2.dll"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="The IPP Everywhere Printer self-certification tools allow you to test the conformance of a printer against the IPP Everywhere specification." ValueLocId="*"/>
+    <ROW Property="ARPCONTACT" Value="ippeveselfcert@pwg.org"/>
+    <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPPRODUCTICON" Value="ippeverywhere.ico" Type="8"/>
+    <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
+    <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
+    <ROW Property="ProductCode" Value="1033:{6CE50C1A-7DB9-43EF-8001-C583535C9C34} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="IPP Everywhere v1.0 Printer Self-Certification Tools"/>
+    <ROW Property="ProductVersion" Value="1.0.3" Type="32"/>
+    <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
+    <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT" MultiBuildValue="DefaultBuild:Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNTDisplay" MultiBuildValue="DefaultBuild:32-bit Windows versions" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="NewFolder_Dir" Directory_Parent="APPDIR" DefaultDir="doc"/>
+    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="tests_Dir" Directory_Parent="APPDIR" DefaultDir="tests"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="ProductInformation" ComponentId="{2B162345-0F11-4BDE-BC54-01E42FFAC42B}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
+    <ROW Component="README.md" ComponentId="{C464C0F0-8E05-4611-9998-6066E0D52917}" Directory_="APPDIR" Attributes="0" KeyPath="README.md" Type="0"/>
+    <ROW Component="SHORTCUTDIR" ComponentId="{377395B3-B0EE-47CC-B6A9-1266192D5368}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="bonjouraccesstests.test" ComponentId="{572BEDCF-2C6D-4C50-BFDA-ACE413F6EDA8}" Directory_="tests_Dir" Attributes="0" KeyPath="bonjouraccesstests.test" Type="0"/>
+    <ROW Component="ippfind_PrimaryOutput" ComponentId="{61AB74A9-1B77-45B9-B09E-B66A5508A818}" Directory_="APPDIR" Attributes="256" KeyPath="ippfind.exe"/>
+    <ROW Component="ippserver_PrimaryOutput" ComponentId="{0E94B345-160F-4DC9-A15A-2127BC4FF91B}" Directory_="APPDIR" Attributes="256" KeyPath="ippserver.exe"/>
+    <ROW Component="ipptool_PrimaryOutput" ComponentId="{E9A26042-462B-4E7D-B1C4-AF1B5D7DFC65}" Directory_="APPDIR" Attributes="256" KeyPath="ipptool.exe"/>
+    <ROW Component="libcups2_PrimaryOutput" ComponentId="{7BA0107B-BF98-47AF-BEA9-D545E9FE679C}" Directory_="APPDIR" Attributes="256" KeyPath="libcups2.dll"/>
+    <ROW Component="manippfind.html" ComponentId="{1510BA19-C5A5-417B-9E0E-FC5A6D283F49}" Directory_="NewFolder_Dir" Attributes="0" KeyPath="manippfind.html" Type="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="ProductInformation README.md SHORTCUTDIR bonjouraccesstests.test ippfind_PrimaryOutput ippserver_PrimaryOutput ipptool_PrimaryOutput libcups2_PrimaryOutput manippfind.html"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="LICENSE.md" Component_="README.md" FileName="LICENSE.md" Attributes="0" SourcePath="..\LICENSE.md" SelfReg="false" NextFile="setdebug.bat"/>
+    <ROW File="README.md" Component_="README.md" FileName="README.md" Attributes="0" SourcePath="..\tests\README.md" SelfReg="false" NextFile="LICENSE.md"/>
+    <ROW File="bonjouraccesstests.test" Component_="bonjouraccesstests.test" FileName="BONJOU~1.TES|bonjour-access-tests.test" Attributes="0" SourcePath="..\tests\bonjour-access-tests.test" SelfReg="false" NextFile="bonjourtests.bat"/>
+    <ROW File="bonjourtests.bat" Component_="bonjouraccesstests.test" FileName="BONJOU~1.BAT|bonjour-tests.bat" Attributes="0" SourcePath="..\tests\bonjour-tests.bat" SelfReg="false" NextFile="bonjourvaluetests.test"/>
+    <ROW File="bonjourvaluetests.test" Component_="bonjouraccesstests.test" FileName="BONJOU~2.TES|bonjour-value-tests.test" Attributes="0" SourcePath="..\tests\bonjour-value-tests.test" SelfReg="false" NextFile="color.jpg"/>
+    <ROW File="color.jpg" Component_="bonjouraccesstests.test" FileName="color.jpg" Attributes="0" SourcePath="..\tests\color.jpg" SelfReg="false" NextFile="color.jpg4x6.pdf"/>
+    <ROW File="color.jpg4x6.pdf" Component_="bonjouraccesstests.test" FileName="COLORJ~1.PDF|color.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\color.jpg-4x6.pdf" SelfReg="false" NextFile="documenta4.pdf"/>
+    <ROW File="documenta4.pdf" Component_="bonjouraccesstests.test" FileName="DOCUME~1.PDF|document-a4.pdf" Attributes="0" SourcePath="..\tests\document-a4.pdf" SelfReg="false" NextFile="documentletter.pdf"/>
+    <ROW File="documentletter.pdf" Component_="bonjouraccesstests.test" FileName="DOCUME~2.PDF|document-letter.pdf" Attributes="0" SourcePath="..\tests\document-letter.pdf" SelfReg="false" NextFile="documenttests.bat"/>
+    <ROW File="documenttests.bat" Component_="bonjouraccesstests.test" FileName="DOCUME~1.BAT|document-tests.bat" Attributes="0" SourcePath="..\tests\document-tests.bat" SelfReg="false" NextFile="documenttests.test"/>
+    <ROW File="documenttests.test" Component_="bonjouraccesstests.test" FileName="DOCUME~1.TES|document-tests.test" Attributes="0" SourcePath="..\tests\document-tests.test" SelfReg="false" NextFile="gray.jpg"/>
+    <ROW File="gray.jpg" Component_="bonjouraccesstests.test" FileName="gray.jpg" Attributes="0" SourcePath="..\tests\gray.jpg" SelfReg="false" NextFile="gray.jpg4x6.pdf"/>
+    <ROW File="gray.jpg4x6.pdf" Component_="bonjouraccesstests.test" FileName="GRAYJP~1.PDF|gray.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\gray.jpg-4x6.pdf" SelfReg="false" NextFile="ipptests.bat"/>
+    <ROW File="ippfind.exe" Component_="ippfind_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippfind.exe&gt;" SelfReg="false" NextFile="ippserver.exe" DigSign="true"/>
+    <ROW File="ippserver.exe" Component_="ippserver_PrimaryOutput" FileName="IPPSER~1.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_ippserver.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippserver.exe&gt;" SelfReg="false" NextFile="ipptool.exe" DigSign="true"/>
+    <ROW File="ipptests.bat" Component_="bonjouraccesstests.test" FileName="IPP-TE~1.BAT|ipp-tests.bat" Attributes="0" SourcePath="..\tests\ipp-tests.bat" SelfReg="false" NextFile="ipptests.test"/>
+    <ROW File="ipptests.test" Component_="bonjouraccesstests.test" FileName="IPP-TE~1.TES|ipp-tests.test" Attributes="0" SourcePath="..\tests\ipp-tests.test" SelfReg="false" NextFile="onepagea4.pdf"/>
+    <ROW File="ipptool.exe" Component_="ipptool_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ipptool.exe&gt;" SelfReg="false" NextFile="libcups2.dll" DigSign="true"/>
+    <ROW File="libcups2.dll" Component_="libcups2_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libcups2.dll&gt;" SelfReg="false" NextFile="manippfind.html"/>
+    <ROW File="manippfind.html" Component_="manippfind.html" FileName="MAN-IP~1.HTM|man-ippfind.html" Attributes="0" SourcePath="..\doc\man-ippfind.html" SelfReg="false" NextFile="manippserver.html"/>
+    <ROW File="manippserver.html" Component_="manippfind.html" FileName="MAN-IP~2.HTM|man-ippserver.html" Attributes="0" SourcePath="..\doc\man-ippserver.html" SelfReg="false" NextFile="manipptool.html"/>
+    <ROW File="manipptool.html" Component_="manippfind.html" FileName="MAN-IP~3.HTM|man-ipptool.html" Attributes="0" SourcePath="..\doc\man-ipptool.html" SelfReg="false" NextFile="manipptoolfile.html"/>
+    <ROW File="manipptoolfile.html" Component_="manippfind.html" FileName="MAN-IP~4.HTM|man-ipptoolfile.html" Attributes="0" SourcePath="..\doc\man-ipptoolfile.html" SelfReg="false" NextFile="bonjouraccesstests.test"/>
+    <ROW File="onepagea4.pdf" Component_="bonjouraccesstests.test" FileName="ONEPAG~1.PDF|onepage-a4.pdf" Attributes="0" SourcePath="..\tests\onepage-a4.pdf" SelfReg="false" NextFile="onepageletter.pdf"/>
+    <ROW File="onepageletter.pdf" Component_="bonjouraccesstests.test" FileName="ONEPAG~2.PDF|onepage-letter.pdf" Attributes="0" SourcePath="..\tests\onepage-letter.pdf" SelfReg="false" NextFile="README.md"/>
+    <ROW File="setdebug.bat" Component_="README.md" FileName="setdebug.bat" Attributes="0" SourcePath="setdebug.bat" SelfReg="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AppPathsComponent">
+    <ROW Name="AI_APPPATH_PERBUILD_ippfind.exe" Path="[|AI_PROPPATH_DIR_PERBUILD_ippfind.exe]\[|AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_ippserver.exe" Path="[|AI_PROPPATH_DIR_PERBUILD_ippserver.exe]\[|AI_PROPPATH_FILENAME_PERBUILD_ippserver.exe]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_ipptool.exe" Path="[|AI_PROPPATH_DIR_PERBUILD_ipptool.exe]\[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_libcups2.dll" Path="[|AI_PROPPATH_DIR_PERBUILD_libcups2.dll]\[|AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll]" Type="2" Content="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="sw-ippeveselfcert10-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
+    <ROW Name="ippeverywhere.ico" SourcePath="ipp-everywhere.ico" Index="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="( Version9X OR VersionNT64 )" Description="[ProductName] cannot be installed on [WindowsTypeNTDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT64 OR ((VersionNT &lt;&gt; 501) OR (ServicePackLevel = 3))) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel = 2))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiMergeModsComponent">
+    <ROW Module="Microsoft_VC140_CRT_x64.msm" Path="..\..\..\..\..\Program Files (x86)\Common Files\Merge modules\Microsoft_VC140_CRT_x64.msm" Feature="MainFeature" Directory="APPDIR" Order="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="Path" Root="2" Key="Software\cups.org" Name="installdir" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Version" Root="2" Key="Software\cups.org" Name="version" Value="[ProductVersion]" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="ippfind" Directory_="SHORTCUTDIR" Name="ippfind" Component_="ippfind_PrimaryOutput" Target="[#ippfind.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="ippserver" Directory_="SHORTCUTDIR" Name="IPPSER~1|ippserver" Component_="ippserver_PrimaryOutput" Target="[#ippserver.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="ipptool" Directory_="SHORTCUTDIR" Name="ipptool" Component_="ipptool_PrimaryOutput" Target="[#ipptool.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.VsProjectComponent">
+    <ROW ProjectId="{b484da0c-62c8-4c32-83b6-cceb58968b85}" ProjectName="ippfind" OutputGroup="PrimaryOutput" OutputFile="ippfind.exe" OutputFileShortcut="ippfind"/>
+    <ROW ProjectId="{82a03bc7-0746-4b85-8908-3c7a3faa58a9}" ProjectName="ippserver" OutputGroup="PrimaryOutput" OutputFile="ippserver.exe" OutputFileShortcut="ippserver"/>
+    <ROW ProjectId="{b246d91e-61f2-4433-bfd2-6c2a96fbd4d4}" ProjectName="ipptool" OutputGroup="PrimaryOutput" OutputFile="ipptool.exe" OutputFileShortcut="ipptool"/>
+    <ROW ProjectId="{cb4aa6f2-3e84-45be-b505-95cd375e8be3}" ProjectName="libcups2" OutputGroup="PrimaryOutput" OutputFile="libcups2.dll"/>
+  </COMPONENT>
+</DOCUMENT>
