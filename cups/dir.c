@@ -26,7 +26,7 @@
  * Windows implementation...
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <windows.h>
 
 /*
@@ -145,7 +145,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 cups_dentry_t *				/* O - Directory entry or @code NULL@ if there are no more */
 cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 {
-  WIN32_FIND_DATA	entry;		/* Directory entry data */
+  WIN32_FIND_DATAA	entry;		/* Directory entry data */
 
 
  /*
@@ -165,11 +165,11 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
     * No, find the first file...
     */
 
-    dp->dir = FindFirstFile(dp->directory, &entry);
+    dp->dir = FindFirstFileA(dp->directory, &entry);
     if (dp->dir == INVALID_HANDLE_VALUE)
       return (NULL);
   }
-  else if (!FindNextFile(dp->dir, &entry))
+  else if (!FindNextFileA(dp->dir, &entry))
     return (NULL);
 
  /*
@@ -422,4 +422,4 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 
   rewinddir(dp->dir);
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */

@@ -30,7 +30,7 @@
 #  endif /* __sun */
 
 #  include <limits.h>
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #    include <winsock2.h>
 #    define CUPS_SOCAST (const char *)
@@ -39,7 +39,7 @@
 #    include <fcntl.h>
 #    include <sys/socket.h>
 #    define CUPS_SOCAST
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 #  ifdef HAVE_GSSAPI
 #    ifdef HAVE_GSS_GSSAPI_H
@@ -140,7 +140,7 @@ extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificate
 #    include <sspi.h>
 #  endif /* HAVE_GNUTLS */
 
-#  ifndef WIN32
+#  ifndef _WIN32
 #    include <net/if.h>
 #    include <resolv.h>
 #    ifdef HAVE_GETIFADDRS
@@ -151,11 +151,7 @@ extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificate
 #        include <sys/sockio.h>
 #      endif /* HAVE_SYS_SOCKIO_H */
 #    endif /* HAVE_GETIFADDRS */
-#  endif /* !WIN32 */
-
-#  ifdef HAVE_LIBZ
-#    include <zlib.h>
-#  endif /* HAVE_LIBZ */
+#  endif /* !_WIN32 */
 
 
 /*
@@ -364,9 +360,20 @@ struct _http_s				/**** HTTP connection structure ****/
 					/* Default field values */
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
-  z_stream		stream;		/* (De)compression stream */
-  Bytef			*sbuffer;	/* (De)compression buffer */
+  void			*stream;	/* (De)compression stream */
+  unsigned char		*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
+
+  /**** New in CUPS 2.2.9 ****/
+  char			*authentication_info,
+					/* Authentication-Info header */
+			algorithm[65],	/* Algorithm from WWW-Authenticate */
+			nextnonce[HTTP_MAX_VALUE],
+					/* Next nonce value from Authentication-Info */
+			opaque[HTTP_MAX_VALUE],
+					/* Opaque value from WWW-Authenticate */
+			realm[HTTP_MAX_VALUE];
+					/* Realm from WWW-Authenticate */
 };
 #  endif /* !_HTTP_NO_PRIVATE */
 
@@ -385,7 +392,7 @@ extern const char *_cups_hstrerror(int error);
  * Some OS's don't have getifaddrs() and freeifaddrs()...
  */
 
-#  if !defined(WIN32) && !defined(HAVE_GETIFADDRS)
+#  if !defined(_WIN32) && !defined(HAVE_GETIFADDRS)
 #    ifdef ifa_dstaddr
 #      undef ifa_dstaddr
 #    endif /* ifa_dstaddr */
@@ -420,7 +427,7 @@ extern int	_cups_getifaddrs(struct ifaddrs **addrs);
 #    define getifaddrs _cups_getifaddrs
 extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #    define freeifaddrs _cups_freeifaddrs
-#  endif /* !WIN32 && !HAVE_GETIFADDRS */
+#  endif /* !_WIN32 && !HAVE_GETIFADDRS */
 
 
 /*
@@ -440,6 +447,7 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
+extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource);
 extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
 extern void		_httpTLSInitialize(void);
 extern size_t		_httpTLSPending(http_t *http);

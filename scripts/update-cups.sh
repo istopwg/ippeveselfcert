@@ -16,5 +16,5 @@ fi
 oldrev=`cat .cups-upstream`
 newrev=`cd ../cups-2.2; git show | head -1 | awk '{print $2}'`
 
-(cd ../cups-2.2; git diff $oldrev cups ':!cups/Dependencies' ':!cups/Makefile' ':!cups/libcups2.def' ':!cups/ppd*' ':!cups/test*') >$newrev.patch
+(cd ../cups-2.2; git diff $oldrev cups ':!cups/Dependencies' ':!cups/Makefile' ':!cups/adminutil.*' ':!cups/api*' ':!cups/backchannel.*' ':!cups/libcups2.def' ':!cups/ppd*' ':!cups/sidechannel.*' ':!cups/snmp*' ':!cups/test*' ':!cups/tlscheck.c') >$newrev.patch
 git apply $newrev.patch && (echo $newrev >.cups-upstream)
