@@ -96,9 +96,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\ipptool.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="libcups2.vcxproj">
       <Project>{cb4aa6f2-3e84-45be-b505-95cd375e8be3}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -107,6 +104,9 @@
       <Project>{18950a1b-d37a-40c7-b2df-c12986c0526e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tools\ipptool.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

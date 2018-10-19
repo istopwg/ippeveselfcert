@@ -1,5 +1,5 @@
 LIBRARY libcups2
-VERSION 2.12
+VERSION 2.13
 EXPORTS
 _cupsArrayAddStrings
 _cupsArrayNewStrings
@@ -35,8 +35,6 @@ _cupsRWInit
 _cupsRWLockRead
 _cupsRWLockWrite
 _cupsRWUnlock
-_cupsRasterAddError
-_cupsRasterClearError
 _cupsSetDefaults
 _cupsSetError
 _cupsSetHTTPError
@@ -211,17 +209,6 @@ cupsPrintFiles
 cupsPrintFiles2
 cupsPutFd
 cupsPutFile
-cupsRasterClose
-cupsRasterErrorString
-cupsRasterInitPWGHeader
-cupsRasterOpen
-cupsRasterOpenIO
-cupsRasterReadHeader
-cupsRasterReadHeader2
-cupsRasterReadPixels
-cupsRasterWriteHeader
-cupsRasterWriteHeader2
-cupsRasterWritePixels
 cupsReadResponseData
 cupsRemoveDest
 cupsRemoveOption

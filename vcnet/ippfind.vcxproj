@@ -98,9 +98,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\ippfind.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="dnssdstub.vcxproj">
       <Project>{c0899b3a-43e7-4bc3-a785-659e1fd2ea83}</Project>
     </ProjectReference>
@@ -111,6 +108,9 @@
     <ProjectReference Include="regex.vcxproj">
       <Project>{18950a1b-d37a-40c7-b2df-c12986c0526e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tools\ippfind.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

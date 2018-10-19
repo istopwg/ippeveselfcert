@@ -112,7 +112,6 @@ xcopy /I/Y "$(TargetPath)"                                                      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\cups\adminutil.c" />
     <ClCompile Include="..\cups\array.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -141,7 +140,6 @@ xcopy /I/Y "$(TargetPath)"                                                      
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\cups\getdevices.c" />
     <ClCompile Include="..\cups\getputfile.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -196,19 +194,6 @@ xcopy /I/Y "$(TargetPath)"                                                      
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\cups\ppd-attr.c" />
-    <ClCompile Include="..\cups\ppd-cache.c" />
-    <ClCompile Include="..\cups\ppd-conflicts.c" />
-    <ClCompile Include="..\cups\ppd-custom.c" />
-    <ClCompile Include="..\cups\ppd-emit.c" />
-    <ClCompile Include="..\cups\ppd-localize.c" />
-    <ClCompile Include="..\cups\ppd-mark.c" />
-    <ClCompile Include="..\cups\ppd-page.c" />
-    <ClCompile Include="..\cups\ppd-util.c" />
-    <ClCompile Include="..\cups\ppd.c">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="..\cups\pwg-media.c" />
     <ClCompile Include="..\cups\request.c" />
     <ClCompile Include="..\cups\snprintf.c">
@@ -243,7 +228,6 @@ xcopy /I/Y "$(TargetPath)"                                                      
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\cups\adminutil.h" />
     <ClInclude Include="..\cups\array-private.h" />
     <ClInclude Include="..\cups\array.h" />
     <ClInclude Include="..\cups\backend.h" />
@@ -261,8 +245,6 @@ xcopy /I/Y "$(TargetPath)"                                                      
     <ClInclude Include="..\cups\language-private.h" />
     <ClInclude Include="..\cups\language.h" />
     <ClInclude Include="..\cups\md5-private.h" />
-    <ClInclude Include="..\cups\ppd-private.h" />
-    <ClInclude Include="..\cups\ppd.h" />
     <ClInclude Include="..\cups\pwg-private.h" />
     <ClInclude Include="..\cups\pwg.h" />
     <ClInclude Include="..\cups\string-private.h" />
