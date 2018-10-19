@@ -194,6 +194,10 @@ if test -n "$GCC"; then
 			# -mmacosx-version-min=10.10 tells the compiler to
 			# build for macOS 10.10 or later.
 			CFLAGS="$CFLAGS -mmacosx-version-min=10.10"
+
+			# -macosx_version_min 10.10 tells the linker to
+			# link for macOS 10.10 or later.
+			LDFLAGS="$LDFLAGS -Wl,-macosx_version_min,10.10"
 			;;
 
 		Linux*)
