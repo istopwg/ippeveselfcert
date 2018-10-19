@@ -177,7 +177,7 @@ if test -n "$GCC"; then
 		CFLAGS="$OLDCFLAGS"
 
 		# Additional warning options for development testing...
-		if test -d .svn; then
+		if test -d .git; then
 			OPTIM="-Werror $OPTIM"
 		fi
 	fi
@@ -190,6 +190,10 @@ if test -n "$GCC"; then
 			# CUPS since we already use buffer-limited calls, but
 			# this will catch any additions that are broken.
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+
+			# -mmacosx-version-min=10.10 tells the compiler to
+			# build for macOS 10.10 or later.
+			CFLAGS="$CFLAGS -mmacosx-version-min=10.10"
 			;;
 
 		Linux*)

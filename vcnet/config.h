@@ -3,7 +3,7 @@
  * on Windows.
  *
  * Copyright 2015-2018 by the ISTO Printer Working Group.
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -54,8 +54,8 @@
 
 
 /*
- * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
- * and strnicmp() functions...
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32
+ * _stricmp() and _strnicmp() functions...
  */
 
 #define strcasecmp	_stricmp
@@ -96,8 +96,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "IPPEVESELFCERT v20180814"
-#define CUPS_MINIMAL "IPPEVESELFCERT/20180814"
+#define CUPS_SVERSION "IPPEVESELFCERT v20181019"
+#define CUPS_MINIMAL "IPPEVESELFCERT/20181019"
 
 
 /*
@@ -231,8 +231,8 @@ typedef unsigned long useconds_t;
 
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
-#define HAVE_SSPISSL
-#define HAVE_SSL
+#define HAVE_SSPISSL 1
+#define HAVE_SSL 1
 
 
 /*
@@ -283,6 +283,13 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_SECKEYCHAINOPEN */
+
+
+/*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+/* #undef HAVE_SSLSETENABLEDCIPHERS */
 
 
 /*
@@ -425,7 +432,7 @@ typedef unsigned long useconds_t;
 
 #ifdef HAVE_ARC4RANDOM
 #  define CUPS_RAND() arc4random()
-#  define CUPS_SRAND(v) arc4random_stir()
+#  define CUPS_SRAND(v)
 #elif defined(HAVE_RANDOM)
 #  define CUPS_RAND() random()
 #  define CUPS_SRAND(v) srandom(v)

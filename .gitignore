@@ -1,3 +1,5 @@
+*.o
+*Results.plist
 Makedefs
 autom4te.cache
 config.h
@@ -9,5 +11,6 @@ tests/pwg-raster-samples-*
 tools/ippfind
 tools/ippserver
 tools/ipptool
-*.o
-*Results.plist
+vcnet/.vs
+vcnet/packages
+vcnet/x64
