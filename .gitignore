@@ -14,4 +14,5 @@ tools/ipptool
 vcnet/.vs
 vcnet/sw-ippeveselfcert-cache
 vcnet/packages
+vcnet/sw-ippeveselfcert.back.aip
 vcnet/x64
