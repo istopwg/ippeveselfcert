@@ -1,7 +1,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
 #
-# Copyright 2014-2016 by The Printer Working Group.
+# Copyright 2014-2018 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -54,61 +54,61 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 #### 1.1 NO COMPRESSION ####
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
-	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black_1"
+	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, black_1"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, black_1"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
-	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray_8"
+	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
-	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb_8"
+	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, srgb_8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
-	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8"
+	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8"
 	ATTR mimeMediaType document-format "image/pwg-raster"
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -117,72 +117,72 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black_1, deflate"
+	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, black_1, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1\, deflate"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, black_1\, deflate"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, deflate"
+	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8\, deflate"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8\, deflate"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb_8, deflate"
+	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, srgb_8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8\, deflate"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8\, deflate"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, deflate"
+	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8\, deflate"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8\, deflate"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression deflate
 	COMPRESSION deflate
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
@@ -191,72 +191,72 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black_1, gzip"
+	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, black_1, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1\, gzip"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, black_1\, gzip"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/black-1/color-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, gzip"
+	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8\, gzip"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, sgray_8\, gzip"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color.jpg-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb_8, gzip"
+	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, srgb_8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8\, gzip"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, srgb_8\, gzip"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color.jpg-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/srgb-8/color-4x6-srgb-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, gzip"
+	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8\, gzip"
+	ATTR name job-name "color-4x6.pwg @ $RASTER_RESOLUTION\, cmyk_8\, gzip"
 	ATTR mimeMediaType document-format "image/pwg-raster"
 	ATTR keyword compression gzip
 	COMPRESSION gzip
-	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color.jpg-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
