@@ -37,10 +37,10 @@ sinclude(config-scripts/cups-dnssd.m4)
 
 dnl Generate a bunch of files...
 AC_OUTPUT(Makedefs
-	  tests/bonjour-access-tests.test
-	  tests/bonjour-tests.bat
-	  tests/bonjour-tests.sh
-	  tests/bonjour-value-tests.test
+	  tests/dnssd-access-tests.test
+	  tests/dnssd-tests.bat
+	  tests/dnssd-tests.sh
+	  tests/dnssd-value-tests.test
 	  tests/document-tests.bat
 	  tests/document-tests.sh
 	  tests/document-tests.test
