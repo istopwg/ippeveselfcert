@@ -25,7 +25,7 @@
 # data is available in the "scripts" subdirectory of the source code.
 #
 
-FILE-ID "org.pwg.ippeveselfcert10.document"
+FILE-ID "org.pwg.ippeveselfcert11.document"
 
 {
 	NAME "D-1. PWG Raster Format Tests (mandatory)"

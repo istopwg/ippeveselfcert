@@ -16,7 +16,7 @@
 #   ./ipptool -tI printer-uri bonjour-access-tests.test
 #
 
-FILE-ID "org.pwg.ippeveselfcert10.bonjour"
+FILE-ID "org.pwg.ippeveselfcert11.bonjour"
 
 {
 	# The name of the test...

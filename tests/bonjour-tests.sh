@@ -163,7 +163,7 @@ start_test() {
 	total=`expr $total + 1`
 	echo $ac_n "$1: $ac_c"
 	echo "<dict><key>Name</key><string>$1</string>" >>"$PLIST"
-	echo "<key>FileId</key><string>org.pwg.ippeveselfcert10.bonjour</string>" >>"$PLIST"
+	echo "<key>FileId</key><string>org.pwg.ippeveselfcert11.bonjour</string>" >>"$PLIST"
 }
 # end_test PASS/FAIL/SKIP
 end_test() {
