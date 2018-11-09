@@ -1,6 +1,6 @@
 # Known Issues
 
-## v1.0 Update 3 (April 4, 2018)
+## v1.0 Update 3 (November 9, 2018)
 
 There are no known issues in this release.
 
