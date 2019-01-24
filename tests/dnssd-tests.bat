@@ -1,6 +1,6 @@
 @echo off
 ::
-:: IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
+:: IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: DNS-SD Tests.
 ::
 :: Copyright 2014-2018 by The Printer Working Group.
 ::
@@ -16,12 +16,12 @@
 ::
 :: Usage:
 ::
-::   bonjour-tests.bat 'Printer Name'
+::   dnssd-tests.bat 'Printer Name'
 ::
 
 set name=%1
 set name=%name:~1,-1%
-set PLIST=%name% Bonjour Results.plist
+set PLIST=%name% DNS-SD Results.plist
 echo Sending output to "%PLIST%"...
 
 :: Write the standard XML plist header...
@@ -40,7 +40,7 @@ set skip=0
 set /a total+=1
 set <NUL /p="B-1. IPP Browse test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-1. IPP Browse test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ippeveselfcert11.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ippeveselfcert11.dnssd^</string^> >>"%PLIST%"
 
 set result=FAIL
 ippfind _ipp._tcp,_print.local. --literal-name "%name%" --quiet && set result=PASS
@@ -62,7 +62,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-2. IPP TXT keys test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-2. IPP TXT keys test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=FAIL
 ippfind "%name%._ipp._tcp.local." --txt adminurl --txt pdl --txt rp --txt UUID --quiet && set result=PASS
@@ -95,7 +95,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-3. IPP Resolve test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-3. IPP Resolve test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=FAIL
 (ippfind "%name%._ipp._tcp.local." --ls && set result=PASS) >nul:
@@ -120,10 +120,10 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-4. IPP TXT values test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-4. IPP TXT values test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=FAIL
-ippfind "%name%._ipp._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q -d "ADMINURL={txt_adminurl}" -d "UUID={txt_uuid}" "{}" bonjour-value-tests.test ";" && set result=PASS
+ippfind "%name%._ipp._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q -d "ADMINURL={txt_adminurl}" -d "UUID={txt_uuid}" "{}" dnssd-value-tests.test ";" && set result=PASS
 if "%result%" == "PASS" (
 	set /a pass+=1
 ) else (
@@ -133,7 +133,7 @@ if "%result%" == "PASS" (
 	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";" >>"%PLIST%"
 	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
 	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST%"
 	echo ^</string^>^</array^> >>"%PLIST%"
 )
 
@@ -145,7 +145,7 @@ if "%result%" == "FAIL" (
 	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";"
 	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";"
 	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";"
-	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]:
+	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]:
 ) else (
 	echo ^<key^>Successful^</key^>^<true /^> >>"%PLIST%"
 )
@@ -155,7 +155,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5. TLS tests: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5. TLS tests^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=SKIP
 ippfind "%name%._ipp._tcp.local." --txt tls --quiet && set result=PASS
@@ -180,17 +180,17 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5.1 HTTP Upgrade test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5.1 HTTP Upgrade test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
-	ippfind "%name%._ipp._tcp.local." -x ipptool -E -q "{}" bonjour-access-tests.test ";" && set result=PASS
+	ippfind "%name%._ipp._tcp.local." -x ipptool -E -q "{}" dnssd-access-tests.test ";" && set result=PASS
 	if "%result%" == "PASS" (
 		set /a pass+=1
 	) else (
 		set /a fail+=1
 		echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST"
-		ippfind "%name%._ipp._tcp.local." -x ipptool -E -q "{}" bonjour-access-tests.test ";" >>"%PLIST%"
+		ippfind "%name%._ipp._tcp.local." -x ipptool -E -q "{}" dnssd-access-tests.test ";" >>"%PLIST%"
 		echo ^</string^>^</array^> >>"%PLIST%"
 	)
 ) else (
@@ -215,7 +215,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5.2 IPPS Browse test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5.2 IPPS Browse test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
@@ -247,7 +247,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5.3 IPPS TXT keys test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5.3 IPPS TXT keys test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
@@ -292,7 +292,7 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5.4 IPPS Resolve test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5.4 IPPS Resolve test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
@@ -327,11 +327,11 @@ echo ^</dict^> >>"%PLIST%"
 set /a total+=1
 set <NUL /p="B-5.5 IPPS TXT values test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-5.5 IPPS TXT values test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
-	ippfind "%name%._ipps._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q "{}" bonjour-value-tests.test ";" && set result=PASS
+	ippfind "%name%._ipps._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q "{}" dnssd-value-tests.test ";" && set result=PASS
 	if "%result%" == "PASS" (
 		set /a pass+=1
 	) else (
@@ -342,7 +342,7 @@ if "%HAVE_TLS%" == "1" (
 	        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
 	        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";" >>"%PLIST%"
 	        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
-		ippfind "%name%._ipps._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST"
+		ippfind "%name%._ipps._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST"
 	        echo ^</string^>^</array^> >>"%PLIST%"
 	)
 ) else (
@@ -359,7 +359,7 @@ if "%result%" == "FAIL" (
         ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";"
         ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";"
         ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";"
-	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]:
+	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]:
 ) else (
 	if "%result%" == "SKIP" (
 		echo ^<key^>Successful^</key^>^<true /^> >>"%PLIST%"

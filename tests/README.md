@@ -17,8 +17,8 @@ CONTENTS
 
     Scripts for running the self-certification tests:
 
-      bonjour-tests.bat   Bonjour Tests for Windows
-      bonjour-tests.sh    Bonjour Tests for Linux and OS X
+      dnssd-tests.bat     DNS-SD Tests for Windows
+      dnssd-tests.sh      DNS-SD Tests for Linux and OS X
 
       ipp-tests.bat       IPP Tests for Windows
       ipp-tests.sh        IPP Tests for Linux and OS X
@@ -28,15 +28,15 @@ CONTENTS
 
     Tools:
 
-      ippfind             Tool for finding printers with Bonjour/DNS-SD
+      ippfind             Tool for finding printers with DNS-SD (Bonjour)
       ippserver           Sample IPP server, useful for testing
       ipptool             IPP test tool
 
     Documentation:
 
-      LICENSE.md         CUPS software license
-      man-*.html         HTML documentation for the tools
-      README.md          This README file
+      LICENSE.md          CUPS software license
+      man-*.html          HTML documentation for the tools
+      README.md           This README file
 
 
 GETTING SUPPORT AND OTHER RESOURCES

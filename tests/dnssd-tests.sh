@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: DNS-SD Tests.
 #
 # Copyright 2014-2018 by The Printer Working Group.
 #
@@ -16,7 +16,7 @@
 #
 # Usage:
 #
-#   ./bonjour-tests.sh "Printer DNS-SD Service Instance Name"
+#   ./dnssd-tests.sh "Printer DNS-SD Service Instance Name"
 #
 
 if test $# -lt 1; then
@@ -47,7 +47,7 @@ fi
 if test -f "$3"; then
     PLIST="${3}"
 else
-    PLIST="${TARGET} Bonjour Results.plist"
+    PLIST="${TARGET} DNS-SD Results.plist"
 fi
 
 #
@@ -132,8 +132,8 @@ if test "$2" = _fail2 -o "$2" = _fail4 -o "$2" = _fail5.3 -o "$2" = _fail5.5; th
 	fi
 
 	if test "$2" = _fail4 -o "$2" = _fail5.5; then
-		$IPPTOOL -t $IPPFIND_SERVICE_URI bonjour-value-tests.test
-		$IPPTOOL -t $IPPFIND_SERVICE_URI bonjour-value-tests.test | egrep '(GOT|EXPECTED):' | sed -e '1,$s/^[ 	]*//' | awk '{print "<string>" $0 "</string>" }' >>"$PLIST"
+		$IPPTOOL -t $IPPFIND_SERVICE_URI dnssd-value-tests.test
+		$IPPTOOL -t $IPPFIND_SERVICE_URI dnssd-value-tests.test | egrep '(GOT|EXPECTED):' | sed -e '1,$s/^[ 	]*//' | awk '{print "<string>" $0 "</string>" }' >>"$PLIST"
 	fi
 
 	echo "</array>" >>"$PLIST"
@@ -163,7 +163,7 @@ start_test() {
 	total=`expr $total + 1`
 	echo $ac_n "$1: $ac_c"
 	echo "<dict><key>Name</key><string>$1</string>" >>"$PLIST"
-	echo "<key>FileId</key><string>org.pwg.ippeveselfcert11.bonjour</string>" >>"$PLIST"
+	echo "<key>FileId</key><string>org.pwg.ippeveselfcert11.dnssd</string>" >>"$PLIST"
 }
 # end_test PASS/FAIL/SKIP
 end_test() {
@@ -198,7 +198,7 @@ if test $? = 0; then
 	end_test PASS
 else
 	fail=`expr $fail + 1`
-	$IPPFIND --literal-name "${TARGET}" -x ./bonjour-tests.sh '{service_name}' _fail2 "${PLIST}" \;
+	$IPPFIND --literal-name "${TARGET}" -x ./dnssd-tests.sh '{service_name}' _fail2 "${PLIST}" \;
 fi
 
 # B-3. IPP Resolve test: Printer responds to an IPP Get-Printer-Attributes request using the resolved hostname, port, and resource path.
@@ -217,13 +217,13 @@ fi
 
 # B-4. IPP TXT values test: The IPP TXT record values match the reported IPP attribute values.
 start_test "B-4. IPP TXT values test"
-$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
+$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
 else
 	fail=`expr $fail + 1`
-    $IPPFIND --literal-name "${TARGET}" -x ./bonjour-tests.sh '{service_name}' _fail4 "${PLIST}" \;
+    $IPPFIND --literal-name "${TARGET}" -x ./dnssd-tests.sh '{service_name}' _fail4 "${PLIST}" \;
 fi
 
 # B-5. TLS tests: Performed only if TLS is supported
@@ -242,7 +242,7 @@ fi
 # B-5.1 HTTP Upgrade test: Printer responds to an IPP Get-Printer-Attributes request after doing an HTTP Upgrade to TLS.
 start_test "B-5.1 HTTP Upgrade test"
 if test $HAVE_TLS = 1; then
-	error=`$IPPFIND --literal-name "${TARGET}" -x $IPPTOOL -E -q '{}' bonjour-access-tests.test \; 2>&1`
+	error=`$IPPFIND --literal-name "${TARGET}" -x $IPPTOOL -E -q '{}' dnssd-access-tests.test \; 2>&1`
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
@@ -283,7 +283,7 @@ if test $HAVE_TLS = 1; then
 		end_test PASS
 	else
 		fail=`expr $fail + 1`
-	    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.3 "${PLIST}" \;
+	    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./dnssd-tests.sh '{service_name}' _fail5.3 "${PLIST}" \;
 	fi
 else
 	skip=`expr $skip + 1`
@@ -312,13 +312,13 @@ fi
 # B-5.5 IPPS TXT values test: The TXT record values for IPPS match the reported IPPS attribute values.
 start_test "B-5.5 IPPS TXT values test"
 if test $HAVE_TLS = 1; then
-    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
+    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
 	else
 		fail=`expr $fail + 1`
-	    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail5.5 "${PLIST}" \;
+	    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./dnssd-tests.sh '{service_name}' _fail5.5 "${PLIST}" \;
 	fi
 else
 	skip=`expr $skip + 1`

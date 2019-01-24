@@ -295,8 +295,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2948DCE5D1F64050B95FE58125614CA5"
             {
-            "SourcePath" = "8:..\\tests\\bonjour-value-tests.test"
-            "TargetName" = "8:bonjour-value-tests.test"
+            "SourcePath" = "8:..\\tests\\dnssd-value-tests.test"
+            "TargetName" = "8:dnssd-value-tests.test"
             "Tag" = "8:"
             "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
             "Condition" = "8:"
@@ -395,8 +395,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A25BC716EE67465C9E718C0F10B00832"
             {
-            "SourcePath" = "8:..\\tests\\bonjour-access-tests.test"
-            "TargetName" = "8:bonjour-access-tests.test"
+            "SourcePath" = "8:..\\tests\\dnssd-access-tests.test"
+            "TargetName" = "8:dnssd-access-tests.test"
             "Tag" = "8:"
             "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
             "Condition" = "8:"
@@ -575,8 +575,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE341BD4CC184E8CAA2CCA8FFBEF99DB"
             {
-            "SourcePath" = "8:..\\tests\\bonjour-tests.bat"
-            "TargetName" = "8:bonjour-tests.bat"
+            "SourcePath" = "8:..\\tests\\dnssd-tests.bat"
+            "TargetName" = "8:dnssd-tests.bat"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Condition" = "8:"

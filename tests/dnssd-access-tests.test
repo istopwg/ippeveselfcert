@@ -1,5 +1,5 @@
 #
-# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: DNS-SD Tests.
 #
 # Copyright 2014-2016 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
@@ -13,10 +13,10 @@
 #
 # Usage:
 #
-#   ./ipptool -tI printer-uri bonjour-access-tests.test
+#   ./ipptool -tI printer-uri dnssd-access-tests.test
 #
 
-FILE-ID "org.pwg.ippeveselfcert11.bonjour"
+FILE-ID "org.pwg.ippeveselfcert11.dnssd"
 
 {
 	# The name of the test...

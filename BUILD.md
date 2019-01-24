@@ -24,7 +24,7 @@ support "include".
 
 Besides these tools you'll want the following libraries:
 
-- Avahi (Linux) or mDNSResponder (all others) for Bonjour (DNS-SD) support
+- Avahi (Linux) or mDNSResponder (all others) for DNS-SD (Bonjour) support
 - GNU TLS for encryption support on platforms other than iOS, macOS, or Windows
 - ZLIB for compression support
 
@@ -82,7 +82,7 @@ Running Tests
 The `runtests.sh` script can be used to run any of the IPP Everywhere Printer
 Self-Certification Manual tests using the locally-built tools.  For example:
 
-    ./runtests.sh bonjour-tests.sh 'My Printer'
+    ./runtests.sh dnssd-tests.sh 'My Printer'
     ./runtests.sh ipp-tests.sh 'My Printer'
     ./runtests.sh document-tests.sh 'My Printer'
 
