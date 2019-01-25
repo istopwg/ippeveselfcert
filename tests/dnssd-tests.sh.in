@@ -101,6 +101,15 @@ if test "$2" = _fail2 -o "$2" = _fail4 -o "$2" = _fail5.3 -o "$2" = _fail5.5; th
 				echo "<string>pdl is missing image/pwg-raster: '$IPPFIND_TXT_PDL'.</string>" >>"$PLIST"
 				;;
 		esac
+	elif test "$2" = _fail4.1 -o "$2" = _fail5.5.1; then
+		case "$IPPFIND_TXT_PDL" in
+			*image/pwg-raster*)
+				;;
+			*)
+				echo "   pdl is missing image/pwg-raster: '$IPPFIND_TXT_PDL'"
+				echo "<string>pdl is missing image/pwg-raster: '$IPPFIND_TXT_PDL'.</string>" >>"$PLIST"
+				;;
+		esac
 	fi
 
 	if test "${IPPFIND_TXT_RP:-NOTSET}" = NOTSET; then
@@ -217,15 +226,29 @@ fi
 
 # B-4. IPP TXT values test: The IPP TXT record values match the reported IPP attribute values.
 start_test "B-4. IPP TXT values test"
-$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
+$IPPFIND --literal-name "${TARGET}" --txt-Color 'T'
 if test $? = 0; then
-	pass=`expr $pass + 1`
-	end_test PASS
+    # color printer - image/jpeg is required
+    $IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' -d txt-adminurl='{txt_adminurl}' -d txt-pdl='{txt_pdl}' -d txt-UUID='{txt_UUID}' -d txt-Color='{txt_Color}' dnssd-value-tests.test \;
+    if test $? = 0; then
+	    pass=`expr $pass + 1`
+	    end_test PASS
+    else
+	    fail=`expr $fail + 1`
+        $IPPFIND --literal-name "${TARGET}" -x ./dnssd-tests.sh '{service_name}' _fail4 "${PLIST}" \;
+    fi
 else
-	fail=`expr $fail + 1`
-    $IPPFIND --literal-name "${TARGET}" -x ./dnssd-tests.sh '{service_name}' _fail4 "${PLIST}" \;
+    # monochrome printer - image/jpeg is NOT REQUIRED
+    $IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' -d txt-adminurl='{txt_adminurl}' -d txt-pdl='{txt_pdl}' -d txt-UUID='{txt_UUID}' -d txt-Color='{txt_Color}' dnssd-value-tests.test \;
+    if test $? = 0; then
+	    pass=`expr $pass + 1`
+	    end_test PASS
+    else
+	    fail=`expr $fail + 1`
+        $IPPFIND --literal-name "${TARGET}" -x ./dnssd-tests.sh '{service_name}' _fail4.1 "${PLIST}" \;
+    fi
 fi
-
+    
 # B-5. TLS tests: Performed only if TLS is supported
 start_test "B-5. TLS tests"
 $IPPFIND --literal-name "${TARGET}" --txt tls --quiet
@@ -311,18 +334,37 @@ fi
 
 # B-5.5 IPPS TXT values test: The TXT record values for IPPS match the reported IPPS attribute values.
 start_test "B-5.5 IPPS TXT values test"
-if test $HAVE_TLS = 1; then
-    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
-	if test $? = 0; then
-		pass=`expr $pass + 1`
-		end_test PASS
-	else
-		fail=`expr $fail + 1`
-	    $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./dnssd-tests.sh '{service_name}' _fail5.5 "${PLIST}" \;
-	fi
+$IPPFIND --literal-name "${TARGET}" --txt-Color 'T'
+if test $? = 0; then
+    # color printer - image/jpeg required
+    if test $HAVE_TLS = 1; then
+        $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
+	    if test $? = 0; then
+		    pass=`expr $pass + 1`
+		    end_test PASS
+	    else
+		    fail=`expr $fail + 1`
+	        $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./dnssd-tests.sh '{service_name}' _fail5.5 "${PLIST}" \;
+	    fi
+    else
+	    skip=`expr $skip + 1`
+	    end_test SKIP
+    fi
 else
-	skip=`expr $skip + 1`
-	end_test SKIP
+    # monochrome printer - image/jpeg is NOT REQUIRED
+    if test $HAVE_TLS = 1; then
+        $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
+	    if test $? = 0; then
+		    pass=`expr $pass + 1`
+		    end_test PASS
+	    else
+		    fail=`expr $fail + 1`
+	        $IPPFIND --literal-name "${TARGET}" "_ipps._tcp.local." -x ./dnssd-tests.sh '{service_name}' _fail5.5.1 "${PLIST}" \;
+	    fi
+    else
+	    skip=`expr $skip + 1`
+	    end_test SKIP
+    fi
 fi
 
 # Finish up...
