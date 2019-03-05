@@ -57,9 +57,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test that a request-id value of 0 is not accepted.
 #
-# Required by: RFC 2911 section 3.1.1
+# Required by: RFC 8011 section 4.1.1
 {
-	NAME "I-1. RFC 2911 section 3.1.1: Bad request-id value 0"
+	NAME "I-1. RFC 8011 section 4.1.1: Bad request-id value 0"
 	REQUEST-ID 0
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -75,9 +75,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 # Test that the first two attributes must be attributes-charset and
 # attributes-natural-language.
 #
-# Required by: RFC 2911 section 3.1.4
+# Required by: RFC 8011 section 4.1.4
 {
-	NAME "I-2. RFC 2911 section 3.1.4: No Operation Attributes"
+	NAME "I-2. RFC 8011 section 4.1.4: No Operation Attributes"
 	REQUEST-ID random
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -86,7 +86,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "I-3. RFC 2911 section 3.1.4: attributes-charset"
+	NAME "I-3. RFC 8011 section 4.1.4: attributes-charset"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -96,7 +96,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "I-4. RFC 2911 section 3.1.4: attributes-natural-language"
+	NAME "I-4. RFC 8011 section 4.1.4: attributes-natural-language"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR naturalLanguage attributes-natural-language en
@@ -106,7 +106,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "I-5. RFC 2911 section 3.1.4: attributes-natural-language + attributes-charset"
+	NAME "I-5. RFC 8011 section 4.1.4: attributes-natural-language + attributes-charset"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR naturalLanguage attributes-natural-language en
@@ -117,7 +117,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "I-6. RFC 2911 section 3.1.4: attributes-charset + attributes-natural-language"
+	NAME "I-6. RFC 8011 section 4.1.4: attributes-charset + attributes-natural-language"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -131,10 +131,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test that bad IPP versions are not supported.
 #
-# Required by: RFC 2911 section 3.1.8
+# Required by: RFC 8011 section 4.1.8
 {
 	# The name of the test...
-	NAME "I-7. RFC 2911 section 3.1.8: Unsupported IPP version 0.0"
+	NAME "I-7. RFC 8011 section 4.1.8: Unsupported IPP version 0.0"
 	VERSION 0.0
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -149,9 +149,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test that printer operations require the printer-uri operation attribute.
 #
-# Required by: RFC 2911 section 3.2
+# Required by: RFC 8011 section 4.2
 {
-	NAME "I-8. RFC 2911 section 3.2: No printer-uri operation attribute"
+	NAME "I-8. RFC 8011 section 4.2: No printer-uri operation attribute"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -205,8 +205,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
 
 	EXPECT document-format-default OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
 	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg" IF-DEFINED HAVE_COLOR # New for IPP Everywhere v1.1
 	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
 
 	EXPECT document-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_PDF
@@ -238,9 +238,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true
 
-	# TODO: Make job-password-xxx conditionally required
-	EXPECT ?job-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT ?job-password-encryption-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	# TODO: Make job-password-xxx conditionally required if the printer supports "Print to a Recipient" (???)
+	EXPECT job-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 DEFINE-MATCH PRINT_TO_A_RECIPIENT
+	EXPECT job-password-encryption-supported OF-TYPE keyword IN-GROUP printer-attributes-tag IF-DEFINED PRINT_TO_A_RECIPIENT
 
 	EXPECT preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 
@@ -412,9 +412,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
 
 	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
-
 	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/"
-
 	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
@@ -434,7 +432,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Printer-Attributes operation with requested-attributes
 #
-# Required by: RFC 2911 section 3.2.5, PWG 5100.11 (JPS2)
+# Required by: RFC 8011 section 4.2.5, PWG 5100.11 (JPS2)
 {
 	NAME "I-10. Get-Printer-Attributes Operation (requested-attributes)"
 	OPERATION Get-Printer-Attributes
@@ -459,23 +457,50 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
 }
 
+# Test support for PWG Raster
+#
+# Required by IPP Everywhere v1.0
+{
+	NAME "I-11. PWG Raster Format Tests (mandatory)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
+
+	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag DEFINE-VALUE RASTER_RESOLUTION
+
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "black_1" DEFINE-MATCH HAVE_BLACK
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "sgray_8" DEFINE-MATCH HAVE_SGRAY
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "srgb_8" DEFINE-MATCH HAVE_SRGB
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "cmyk_8" DEFINE-MATCH HAVE_CMYK
+}
+
 
 # Test Validate-Job operation
 #
-# Required by: RFC 2911 section 3.2.3
+# Required by: RFC 8011 section 4.2.3
 {
-	NAME "I-11 Validate-Job Operation"
+	NAME "I-12 Validate-Job Operation"
 	OPERATION Validate-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "color.jpg"
+	ATTR name job-name "IPP-Validate-Job-test-color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "color.jpg"
+	ATTR name document-name "color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR mimeMediaType document-format "image/pwg-raster"
 
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
@@ -492,9 +517,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Print-Job operation
 #
-# Required by: RFC 2911 section 3.2.1
+# Required by: RFC 8011 section 4.2.1
 {
-	NAME "I-12. Print-Job Operation (color.jpg)"
+	NAME "I-13. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -538,11 +563,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Jobs operation
 #
-# Required by: RFC 2911 section 3.2.6
+# Required by: RFC 8011 section 4.2.6
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-13. Get-Jobs Operation (default)"
+	NAME "I-14. Get-Jobs Operation (default)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -561,11 +586,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Jobs operation
 #
-# Required by: RFC 2911 section 3.2.6
+# Required by: RFC 8011 section 4.2.6
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-14. Get-Jobs Operation (requested-attributes)"
+	NAME "I-15. Get-Jobs Operation (requested-attributes)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -623,11 +648,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Jobs operation
 #
-# Required by: RFC 2911 section 3.2.6
+# Required by: RFC 8011 section 4.2.6
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-15. Get-Jobs Operation (which-jobs=not-completed)"
+	NAME "I-16. Get-Jobs Operation (which-jobs=not-completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -649,7 +674,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB_ID
 
-	NAME "I-16. Get-Job-Attributes Until Job Complete"
+	NAME "I-17. Get-Job-Attributes Until Job Complete"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -709,9 +734,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Jobs operation
 #
-# Required by: RFC 2911 section 3.2.6
+# Required by: RFC 8011 section 4.2.6
 {
-	NAME "I-17. Get-Jobs Operation (which-jobs=completed)"
+	NAME "I-18. Get-Jobs Operation (which-jobs=completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -732,9 +757,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Jobs operation
 #
-# Required by: RFC 2911 section 3.2.6
+# Required by: RFC 8011 section 4.2.6
 {
-	NAME "I-18. Get-Jobs Operation (which-jobs, requested-attributes)"
+	NAME "I-19. Get-Jobs Operation (which-jobs, requested-attributes)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -793,9 +818,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Cancel-Job operation
 #
-# Required by: RFC 2911 section 3.3.3
+# Required by: RFC 8011 section 4.3.3
 {
-	NAME "I-19. Cancel-Job Operation (completed job)"
+	NAME "I-20. Cancel-Job Operation (completed job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -810,9 +835,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Print-Job operation
 #
-# Required by: RFC 2911 section 3.2.1
+# Required by: RFC 8011 section 4.2.1
 {
-	NAME "I-20. Print-Job Operation (color.jpg)"
+	NAME "I-21. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -855,9 +880,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Cancel-Job operation
 #
-# Required by: RFC 2911 section 3.3.3
+# Required by: RFC 8011 section 4.3.3
 {
-	NAME "I-21. Cancel-Job Operation (pending/processing job)"
+	NAME "I-22. Cancel-Job Operation (pending/processing job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -873,9 +898,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Get-Job-Attributes operation
 #
-# Required by: RFC 2911 section 3.3.4
+# Required by: RFC 8011 section 4.3.4
 {
-	NAME "I-22. Get-Job-Attributes Operation"
+	NAME "I-23. Get-Job-Attributes Operation"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -933,9 +958,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Create-Job and Send-Document operations
 #
-# Defined by: RFC 2911 section 3.2.4 and 3.3.1
+# Defined by: RFC 8011 section 4.2.4 and 4.3.1
 {
-	NAME "I-23. Create-Job Operation"
+	NAME "I-24. Create-Job Operation"
 	OPERATION Create-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -973,7 +998,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
 
-	NAME "I-24. Send-Document Operation (color.jpg)"
+	NAME "I-25. Send-Document Operation (color.jpg)"
 	OPERATION Send-Document
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -997,7 +1022,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
 
-	NAME "I-25. Get-Job-Attributes Until Job Complete"
+	NAME "I-26. Get-Job-Attributes Until Job Complete"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1058,11 +1083,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 # Test Print-Job operation
 #
-# Required by: RFC 2911 section 3.2.1
+# Required by: RFC 8011 section 4.2.1
 {
 	PAUSE "Remove media from printer until this test run is complete."
 
-	NAME "I-26. Print-Job Operation (color.jpg)"
+	NAME "I-27. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1108,7 +1133,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 {
 	DELAY 5
 
-	NAME "I-27. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
+	NAME "I-28. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
