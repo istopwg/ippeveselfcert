@@ -1,23 +1,17 @@
 /*
  * Sample IPP Everywhere server for CUPS.
  *
- * Copyright 2010-2017 by Apple Inc.
+ * Copyright © 2010-2018 by Apple Inc.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
- *
- * This file is subject to the Apple OS-Developed Software exception.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
- * Disable private and deprecated stuff so we can verify that the public API
- * is sufficient to implement a server.
+ * Disable deprecated stuff so we can verify that the public API is sufficient
+ * to implement a server.
  */
 
-#define _IPP_PRIVATE_STRUCTURES 0	/* Disable private IPP stuff */
 #define _CUPS_NO_DEPRECATED 1		/* Disable deprecated stuff */
 
 
@@ -37,7 +31,7 @@
 #include <limits.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <fcntl.h>
 #  include <io.h>
 #  include <process.h>
@@ -51,7 +45,7 @@ extern char **environ;
 #  include <sys/fcntl.h>
 #  include <sys/wait.h>
 #  include <poll.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -411,8 +405,7 @@ static void		html_escape(_ipp_client_t *client, const char *s,
 static void		html_footer(_ipp_client_t *client);
 static void		html_header(_ipp_client_t *client, const char *title);
 static void		html_printf(_ipp_client_t *client, const char *format,
-			            ...) __attribute__((__format__(__printf__,
-			                                           2, 3)));
+			            ...) _CUPS_FORMAT(2, 3);
 static void		ipp_cancel_job(_ipp_client_t *client);
 static void		ipp_close_job(_ipp_client_t *client);
 static void		ipp_create_job(_ipp_client_t *client);
@@ -438,13 +431,12 @@ static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
 				     const char *type, size_t length);
 static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
-			            const char *message, ...)
-			__attribute__ ((__format__ (__printf__, 3, 4)));
+			            const char *message, ...) _CUPS_FORMAT(3, 4);
 static void		respond_unsupported(_ipp_client_t *client,
 			                    ipp_attribute_t *attr);
 static void		run_printer(_ipp_printer_t *printer);
 static char		*time_string(time_t tv, char *buffer, size_t bufsize);
-static void		usage(int status) __attribute__((noreturn));
+static void		usage(int status) _CUPS_NORETURN;
 static int		valid_doc_attributes(_ipp_client_t *client);
 static int		valid_job_attributes(_ipp_client_t *client);
 
@@ -461,6 +453,7 @@ static AvahiClient	*DNSSDClient = NULL;
 #endif /* HAVE_DNSSD */
 
 static int		KeepFiles = 0,
+			MaxVersion = 20,
 			Verbosity = 0;
 
 
@@ -531,6 +524,23 @@ main(int  argc,				/* I - Number of command-line args */
 
           case 'P' : /* -P (PIN printing mode) */
               pin = 1;
+              break;
+
+          case 'V' : /* -V max-version */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+              if (!strcmp(argv[i], "2.2"))
+                MaxVersion = 22;
+	      else if (!strcmp(argv[i], "2.1"))
+                MaxVersion = 21;
+	      else if (!strcmp(argv[i], "2.0"))
+                MaxVersion = 20;
+	      else if (!strcmp(argv[i], "1.1"))
+                MaxVersion = 11;
+	      else
+	        usage(1);
               break;
 
 	  case 'a' : /* -a attributes-file */
@@ -652,7 +662,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!port)
   {
-#ifdef WIN32
+#ifdef _WIN32
    /*
     * Windows is almost always used as a single user system, so use a default
     * port number of 8631.
@@ -666,7 +676,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     port = 8000 + ((int)getuid() % 1000);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     fprintf(stderr, "Listening on port %d.\n", port);
   }
@@ -675,7 +685,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     const char *tmpdir;			/* Temporary directory */
 
-#ifdef WIN32
+#ifdef _WIN32
     if ((tmpdir = getenv("TEMP")) == NULL)
       tmpdir = "C:/TEMP";
 #elif defined(__APPLE__) && !TARGET_OS_IOS
@@ -684,7 +694,7 @@ main(int  argc,				/* I - Number of command-line args */
 #else
     if ((tmpdir = getenv("TMPDIR")) == NULL)
       tmpdir = "/tmp";
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     snprintf(directory, sizeof(directory), "%s/ippserver.%d", tmpdir, (int)getpid());
 
@@ -1280,9 +1290,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 {
   int			i, j;		/* Looping vars */
   _ipp_printer_t	*printer;	/* Printer */
-#ifndef WIN32
+#ifndef _WIN32
   char			path[1024];	/* Full path to command */
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   char			uri[1024],	/* Printer URI */
 #ifdef HAVE_SSL
 			securi[1024],	/* Secure printer URI */
@@ -1324,9 +1334,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   };
   static const char * const versions[] =/* ipp-versions-supported values */
   {
-    "1.0",
     "1.1",
-    "2.0"
+    "2.0",
+    "2.1",
+    "2.2"
   };
   static const char * const features[] =/* ipp-features-supported values */
   {
@@ -1484,7 +1495,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   };
 
 
-#ifndef WIN32
+#ifndef _WIN32
  /*
   * If a command was specified, make sure it exists and is executable...
   */
@@ -1510,7 +1521,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
       command = path;
     }
   }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
  /*
   * Allocate memory for the printer...
@@ -1738,7 +1749,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* ipp-versions-supported */
   if (!ippFindAttribute(printer->attrs, "ipp-versions-supported", IPP_TAG_ZERO))
-    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]), NULL, versions);
+  {
+    int num_versions = MaxVersion == 11 ? 1 : MaxVersion == 20 ? 2 : MaxVersion == 21 ? 3 : 4;
+					/* Number of supported versions */
+
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", num_versions, NULL, versions);
+  }
 
   /* job-account-id-default */
   if (!ippFindAttribute(printer->attrs, "job-account-id-default", IPP_TAG_ZERO))
@@ -2481,9 +2497,9 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
   * Filter attributes as needed...
   */
 
-#ifndef WIN32 /* Avoid MS compiler bug */
+#ifndef _WIN32 /* Avoid MS compiler bug */
   (void)dst;
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
   ipp_tag_t group = ippGetGroupTag(attr);
   const char *name = ippGetName(attr);
@@ -5800,15 +5816,24 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
     * Return an error, since we only support IPP 1.x and 2.x.
     */
 
-    respond_ipp(client, IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED,
-                "Bad request version number %d.%d.", major, minor);
+    respond_ipp(client, IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED, "Bad request version number %d.%d.", major, minor);
+  }
+  else if ((major * 10 + minor) > MaxVersion)
+  {
+    if (httpGetState(client->http) != HTTP_STATE_POST_SEND)
+      httpFlush(client->http);		/* Flush trailing (junk) data */
+
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
+    return (0);
   }
   else if (ippGetRequestId(client->request) <= 0)
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad request-id %d.",
-                ippGetRequestId(client->request));
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad request-id %d.", ippGetRequestId(client->request));
+  }
   else if (!ippFirstAttribute(client->request))
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "No attributes in request.");
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "No attributes in request.");
+  }
   else
   {
    /*
@@ -6032,13 +6057,13 @@ process_job(_ipp_job_t *job)		/* I - Job */
     ipp_attribute_t *attr;		/* Job attribute */
     char	val[1280],		/* IPP_NAME=value */
 		*valptr;		/* Pointer into string */
-#ifndef WIN32
+#ifndef _WIN32
     int		mypipe[2];		/* Pipe for stderr */
     char	line[2048],		/* Line from stderr */
 		*ptr,			/* Pointer into line */
 		*endptr;		/* End of line */
     ssize_t	bytes;			/* Bytes read */
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
     fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
             job->filename);
@@ -6096,7 +6121,7 @@ process_job(_ipp_job_t *job)		/* I - Job */
     * Now run the program...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     status = _spawnvpe(_P_WAIT, job->printer->command, myargv, myenvp);
 
 #else
@@ -6206,20 +6231,20 @@ process_job(_ipp_job_t *job)		/* I - Job */
       while (wait(&status) < 0);
 #  endif /* HAVE_WAITPID */
     }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     if (status)
     {
-#ifndef WIN32
+#ifndef _WIN32
       if (WIFEXITED(status))
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 	fprintf(stderr, "Command \"%s\" exited with status %d.\n",
 		job->printer->command, WEXITSTATUS(status));
-#ifndef WIN32
+#ifndef _WIN32
       else
 	fprintf(stderr, "Command \"%s\" terminated with signal %d.\n",
 		job->printer->command, WTERMSIG(status));
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
       job->state = IPP_JSTATE_ABORTED;
     }
     else if (status < 0)
@@ -6877,8 +6902,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2015 by Apple Inc. All rights "
-         "reserved.");
+    puts(CUPS_SVERSION " - Copyright (c) 2010-2018 by Apple Inc. All rights reserved.");
     puts("");
   }
 
@@ -6888,6 +6912,7 @@ usage(int status)			/* O - Exit status */
   puts("-2                      Supports 2-sided printing (default=1-sided)");
   puts("-M manufacturer         Manufacturer name (default=Test)");
   puts("-P                      PIN printing mode");
+  puts("-V max-version          Set maximum supported IPP version");
   puts("-a attributes-file      Load printer attributes from file");
   puts("-c command              Run command for every print job");
   printf("-d spool-directory      Spool directory "

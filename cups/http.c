@@ -7,13 +7,8 @@
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
- *
- * This file is subject to the Apple OS-Developed Software exception.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -21,18 +16,22 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <fcntl.h>
 #include <math.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <tchar.h>
 #else
 #  include <signal.h>
 #  include <sys/time.h>
 #  include <sys/resource.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
+#  ifdef HAVE_LIBZ
+#    include <zlib.h>
+#  endif /* HAVE_LIBZ */
 
 
 /*
@@ -106,7 +105,8 @@ static const char * const http_fields[] =
 			  "WWW-Authenticate",
 			  "Accept-Encoding",
 			  "Allow",
-			  "Server"
+			  "Server",
+			  "Authentication-Info"
 			};
 
 
@@ -288,11 +288,22 @@ httpClearCookie(http_t *http)		/* I - HTTP connection */
 void
 httpClearFields(http_t *http)		/* I - HTTP connection */
 {
+  http_field_t	field;			/* Current field */
+
+
   DEBUG_printf(("httpClearFields(http=%p)", (void *)http));
 
   if (http)
   {
-    memset(http->fields, 0, sizeof(http->fields));
+    memset(http->_fields, 0, sizeof(http->fields));
+
+    for (field = HTTP_FIELD_ACCEPT_LANGUAGE; field < HTTP_FIELD_MAX; field ++)
+    {
+      if (http->fields[field] && http->fields[field] != http->_fields[field])
+        free(http->fields[field]);
+
+      http->fields[field] = NULL;
+    }
 
     if (http->mode == _HTTP_MODE_CLIENT)
     {
@@ -300,30 +311,6 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
 	httpSetField(http, HTTP_FIELD_HOST, "localhost");
       else
 	httpSetField(http, HTTP_FIELD_HOST, http->hostname);
-    }
-
-    if (http->field_authorization)
-    {
-      free(http->field_authorization);
-      http->field_authorization = NULL;
-    }
-
-    if (http->accept_encoding)
-    {
-      _cupsStrFree(http->accept_encoding);
-      http->accept_encoding = NULL;
-    }
-
-    if (http->allow)
-    {
-      _cupsStrFree(http->allow);
-      http->allow = NULL;
-    }
-
-    if (http->server)
-    {
-      _cupsStrFree(http->server);
-      http->server = NULL;
     }
 
     http->expect = (http_status_t)0;
@@ -816,7 +803,7 @@ const char *				/* O - Content-Coding value or
 httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
 {
 #ifdef HAVE_LIBZ
-  if (http && http->accept_encoding)
+  if (http && http->fields[HTTP_FIELD_ACCEPT_ENCODING])
   {
     int		i;			/* Looping var */
     char	temp[HTTP_MAX_VALUE],	/* Copy of Accepts-Encoding value */
@@ -832,7 +819,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
       "x-gzip"
     };
 
-    strlcpy(temp, http->accept_encoding, sizeof(temp));
+    strlcpy(temp, http->fields[HTTP_FIELD_ACCEPT_ENCODING], sizeof(temp));
 
     for (start = temp; *start; start = end)
     {
@@ -958,32 +945,10 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
-
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        return (http->accept_encoding);
-
-    case HTTP_FIELD_ALLOW :
-        return (http->allow);
-
-    case HTTP_FIELD_SERVER :
-        return (http->server);
-
-    case HTTP_FIELD_AUTHORIZATION :
-        if (http->field_authorization)
-	{
-	 /*
-	  * Special case for WWW-Authenticate: as its contents can be
-	  * longer than HTTP_MAX_VALUE...
-	  */
-
-	  return (http->field_authorization);
-	}
-
-    default :
-        return (http->fields[field]);
-  }
+  else if (http->fields[field])
+    return (http->fields[field]);
+  else
+    return ("");
 }
 
 
@@ -1049,7 +1014,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
   if (!http)
     return (-1);
 
-  if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
+  if (http->fields[HTTP_FIELD_TRANSFER_ENCODING] && !_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
     remaining = 0;
@@ -1064,7 +1029,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
     * after the transfer is complete...
     */
 
-    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH] || !http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
     {
      /*
       * Default content length is 0 for errors and certain types of operations,
@@ -1184,11 +1149,11 @@ httpGets(char   *line,			/* I - Line to read into */
     * Pre-load the buffer as needed...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     WSASetLastError(0);
 #else
     errno = 0;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     while (http->used == 0)
     {
@@ -1202,11 +1167,11 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 
         DEBUG_puts("3httpGets: Timed out!");
-#ifdef WIN32
+#ifdef _WIN32
         http->error = WSAETIMEDOUT;
 #else
         http->error = ETIMEDOUT;
-#endif /* WIN32 */
+#endif /* _WIN32 */
         return (NULL);
       }
 
@@ -1220,7 +1185,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-#ifdef WIN32
+#ifdef _WIN32
         DEBUG_printf(("3httpGets: recv() error %d!", WSAGetLastError()));
 
         if (WSAGetLastError() == WSAEINTR)
@@ -1257,7 +1222,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	  http->error = errno;
 	  continue;
 	}
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
         return (NULL);
       }
@@ -1524,9 +1489,9 @@ void
 httpInitialize(void)
 {
   static int	initialized = 0;	/* Have we been called before? */
-#ifdef WIN32
+#ifdef _WIN32
   WSADATA	winsockdata;		/* WinSock data */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
   _cupsGlobalLock();
@@ -1536,7 +1501,7 @@ httpInitialize(void)
     return;
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   WSAStartup(MAKEWORD(2,2), &winsockdata);
 
 #elif !defined(SO_NOSIGPIPE)
@@ -1558,7 +1523,7 @@ httpInitialize(void)
 #  else
   signal(SIGPIPE, SIG_IGN);
 #  endif /* !SO_NOSIGPIPE */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #  ifdef HAVE_SSL
   _httpTLSInitialize();
@@ -1714,7 +1679,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 #ifdef HAVE_LIBZ
   if (http->used == 0 &&
       (http->coding == _HTTP_CODING_IDENTITY ||
-       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)))
+       (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in == 0)))
 #else
   if (http->used == 0)
 #endif /* HAVE_LIBZ */
@@ -1763,16 +1728,16 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     int		zerr;			/* Decompressor error */
     z_stream	stream;			/* Copy of decompressor stream */
 
-    if (http->used > 0 && http->stream.avail_in < HTTP_MAX_BUFFER)
+    if (http->used > 0 && ((z_stream *)http->stream)->avail_in < HTTP_MAX_BUFFER)
     {
-      size_t buflen = buflen = HTTP_MAX_BUFFER - http->stream.avail_in;
+      size_t buflen = buflen = HTTP_MAX_BUFFER - ((z_stream *)http->stream)->avail_in;
 					/* Number of bytes to copy */
 
-      if (http->stream.avail_in > 0 &&
-	  http->stream.next_in > http->sbuffer)
-        memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
+      if (((z_stream *)http->stream)->avail_in > 0 &&
+	  ((z_stream *)http->stream)->next_in > http->sbuffer)
+        memmove(http->sbuffer, ((z_stream *)http->stream)->next_in, ((z_stream *)http->stream)->avail_in);
 
-      http->stream.next_in = http->sbuffer;
+      ((z_stream *)http->stream)->next_in = http->sbuffer;
 
       if (buflen > (size_t)http->data_remaining)
         buflen = (size_t)http->data_remaining;
@@ -1783,8 +1748,8 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       DEBUG_printf(("1httpPeek: Copying %d more bytes of data into "
 		    "decompression buffer.", (int)buflen));
 
-      memcpy(http->sbuffer + http->stream.avail_in, http->buffer, buflen);
-      http->stream.avail_in += buflen;
+      memcpy(http->sbuffer + ((z_stream *)http->stream)->avail_in, http->buffer, buflen);
+      ((z_stream *)http->stream)->avail_in += buflen;
       http->used            -= (int)buflen;
       http->data_remaining  -= (off_t)buflen;
 
@@ -1793,9 +1758,9 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     }
 
     DEBUG_printf(("2httpPeek: length=%d, avail_in=%d", (int)length,
-                  (int)http->stream.avail_in));
+                  (int)((z_stream *)http->stream)->avail_in));
 
-    if (inflateCopy(&stream, &(http->stream)) != Z_OK)
+    if (inflateCopy(&stream, (z_stream *)http->stream) != Z_OK)
     {
       DEBUG_puts("2httpPeek: Unable to copy decompressor stream.");
       http->error = ENOMEM;
@@ -1812,14 +1777,14 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     {
       DEBUG_printf(("2httpPeek: zerr=%d", zerr));
 #ifdef DEBUG
-      http_debug_hex("2httpPeek", (char *)http->sbuffer, (int)http->stream.avail_in);
+      http_debug_hex("2httpPeek", (char *)http->sbuffer, (int)((z_stream *)http->stream)->avail_in);
 #endif /* DEBUG */
 
       http->error = EIO;
       return (-1);
     }
 
-    bytes = (ssize_t)(length - http->stream.avail_out);
+    bytes = (ssize_t)(length - ((z_stream *)http->stream)->avail_out);
 
 #  else
     DEBUG_puts("2httpPeek: No inflateCopy on this platform, httpPeek does not "
@@ -1846,7 +1811,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
   if (bytes < 0)
   {
-#ifdef WIN32
+#ifdef _WIN32
     if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
       bytes = 0;
     else
@@ -1856,7 +1821,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       bytes = 0;
     else
       http->error = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
   }
   else if (bytes == 0)
   {
@@ -1986,31 +1951,31 @@ httpRead2(http_t *http,			/* I - HTTP connection */
   {
     do
     {
-      if (http->stream.avail_in > 0)
+      if (((z_stream *)http->stream)->avail_in > 0)
       {
 	int	zerr;			/* Decompressor error */
 
 	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d",
-	              (int)http->stream.avail_in, (int)length));
+	              (int)((z_stream *)http->stream)->avail_in, (int)length));
 
-	http->stream.next_out  = (Bytef *)buffer;
-	http->stream.avail_out = (uInt)length;
+	((z_stream *)http->stream)->next_out  = (Bytef *)buffer;
+	((z_stream *)http->stream)->avail_out = (uInt)length;
 
-	if ((zerr = inflate(&(http->stream), Z_SYNC_FLUSH)) < Z_OK)
+	if ((zerr = inflate((z_stream *)http->stream, Z_SYNC_FLUSH)) < Z_OK)
 	{
 	  DEBUG_printf(("2httpRead2: zerr=%d", zerr));
 #ifdef DEBUG
-          http_debug_hex("2httpRead2", (char *)http->sbuffer, (int)http->stream.avail_in);
+          http_debug_hex("2httpRead2", (char *)http->sbuffer, (int)((z_stream *)http->stream)->avail_in);
 #endif /* DEBUG */
 
 	  http->error = EIO;
 	  return (-1);
 	}
 
-	bytes = (ssize_t)(length - http->stream.avail_out);
+	bytes = (ssize_t)(length - ((z_stream *)http->stream)->avail_out);
 
 	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d, bytes=%d",
-		      http->stream.avail_in, http->stream.avail_out,
+		      ((z_stream *)http->stream)->avail_in, ((z_stream *)http->stream)->avail_out,
 		      (int)bytes));
       }
       else
@@ -2018,16 +1983,16 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
       if (bytes == 0)
       {
-        ssize_t buflen = HTTP_MAX_BUFFER - (ssize_t)http->stream.avail_in;
+        ssize_t buflen = HTTP_MAX_BUFFER - (ssize_t)((z_stream *)http->stream)->avail_in;
 					/* Additional bytes for buffer */
 
         if (buflen > 0)
         {
-          if (http->stream.avail_in > 0 &&
-              http->stream.next_in > http->sbuffer)
-            memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
+          if (((z_stream *)http->stream)->avail_in > 0 &&
+              ((z_stream *)http->stream)->next_in > http->sbuffer)
+            memmove(http->sbuffer, ((z_stream *)http->stream)->next_in, ((z_stream *)http->stream)->avail_in);
 
-	  http->stream.next_in = http->sbuffer;
+	  ((z_stream *)http->stream)->next_in = http->sbuffer;
 
           DEBUG_printf(("1httpRead2: Reading up to %d more bytes of data into "
                         "decompression buffer.", (int)buflen));
@@ -2037,10 +2002,10 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 	    if (buflen > http->data_remaining)
 	      buflen = (ssize_t)http->data_remaining;
 
-	    bytes = http_read_buffered(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
+	    bytes = http_read_buffered(http, (char *)http->sbuffer + ((z_stream *)http->stream)->avail_in, (size_t)buflen);
           }
           else if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-            bytes = http_read_chunk(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
+            bytes = http_read_chunk(http, (char *)http->sbuffer + ((z_stream *)http->stream)->avail_in, (size_t)buflen);
           else
             bytes = 0;
 
@@ -2053,7 +2018,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
                         "decompression buffer.", CUPS_LLCAST bytes));
 
           http->data_remaining  -= bytes;
-          http->stream.avail_in += (uInt)bytes;
+          ((z_stream *)http->stream)->avail_in += (uInt)bytes;
 
 	  if (http->data_remaining <= 0 &&
 	      http->data_encoding == HTTP_ENCODING_CHUNKED)
@@ -2132,7 +2097,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
   if (
 #ifdef HAVE_LIBZ
       (http->coding == _HTTP_CODING_IDENTITY ||
-       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)) &&
+       (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in == 0)) &&
 #endif /* HAVE_LIBZ */
       ((http->data_remaining <= 0 &&
         http->data_encoding == HTTP_ENCODING_LENGTH) ||
@@ -2417,11 +2382,11 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
     * Unable to connect...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     http->error  = WSAGetLastError();
 #else
     http->error  = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
     http->status = HTTP_STATUS_ERROR;
 
     DEBUG_printf(("1httpReconnect2: httpAddrConnect failed: %s",
@@ -2589,36 +2554,13 @@ httpSetDefaultField(http_t       *http,	/* I - HTTP connection */
 {
   DEBUG_printf(("httpSetDefaultField(http=%p, field=%d(%s), value=\"%s\")", (void *)http, field, http_fields[field], value));
 
-  if (!http)
+  if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return;
 
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        if (http->default_accept_encoding)
-          _cupsStrFree(http->default_accept_encoding);
+  if (http->default_fields[field])
+    free(http->default_fields[field]);
 
-        http->default_accept_encoding = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    case HTTP_FIELD_SERVER :
-        if (http->default_server)
-          _cupsStrFree(http->default_server);
-
-        http->default_server = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    case HTTP_FIELD_USER_AGENT :
-        if (http->default_user_agent)
-          _cupsStrFree(http->default_user_agent);
-
-        http->default_user_agent = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    default :
-        DEBUG_puts("1httpSetDefaultField: Ignored.");
-	break;
-  }
+  http->default_fields[field] = value ? strdup(value) : NULL;
 }
 
 
@@ -2654,10 +2596,7 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
 {
   DEBUG_printf(("httpSetField(http=%p, field=%d(%s), value=\"%s\")", (void *)http, field, http_fields[field], value));
 
-  if (http == NULL ||
-      field < HTTP_FIELD_ACCEPT_LANGUAGE ||
-      field >= HTTP_FIELD_MAX ||
-      value == NULL)
+  if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX || !value)
     return;
 
   http_add_field(http, field, value, 0);
@@ -2697,15 +2636,17 @@ httpSetLength(http_t *http,		/* I - HTTP connection */
 
   if (!length)
   {
-    strlcpy(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked",
-            HTTP_MAX_VALUE);
-    http->fields[HTTP_FIELD_CONTENT_LENGTH][0] = '\0';
+    httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
+    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, "");
   }
   else
   {
-    http->fields[HTTP_FIELD_TRANSFER_ENCODING][0] = '\0';
-    snprintf(http->fields[HTTP_FIELD_CONTENT_LENGTH], HTTP_MAX_VALUE,
-             CUPS_LLFMT, CUPS_LLCAST length);
+    char len[32];			/* Length string */
+
+
+    snprintf(len, sizeof(len), CUPS_LLFMT, CUPS_LLCAST length);
+    httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "");
+    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, len);
   }
 }
 
@@ -2758,11 +2699,11 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
     _httpTLSStop(http);
 #endif /* HAVE_SSL */
 
-#ifdef WIN32
+#ifdef _WIN32
   shutdown(http->fd, SD_RECEIVE);	/* Microsoft-ism... */
 #else
   shutdown(http->fd, SHUT_RD);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -2938,7 +2879,12 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
       httpSetCookie(http, value);
     }
     else if ((field = httpFieldValue(line)) != HTTP_FIELD_UNKNOWN)
+    {
       http_add_field(http, field, value, 1);
+
+      if (field == HTTP_FIELD_AUTHENTICATION_INFO)
+        httpGetSubField2(http, HTTP_FIELD_AUTHENTICATION_INFO, "nextnonce", http->nextnonce, (int)sizeof(http->nextnonce));
+    }
 #ifdef DEBUG
     else
       DEBUG_printf(("1_httpUpdate: unknown field %s seen!", line));
@@ -3091,12 +3037,12 @@ _httpWait(http_t *http,			/* I - HTTP connection */
 
     DEBUG_printf(("6_httpWait: select() returned %d...", nfds));
   }
-#  ifdef WIN32
+#  ifdef _WIN32
   while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
                       WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
   while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #endif /* HAVE_POLL */
 
   DEBUG_printf(("5_httpWait: returning with nfds=%d, errno=%d...", nfds,
@@ -3132,7 +3078,7 @@ httpWait(http_t *http,			/* I - HTTP connection */
   }
 
 #ifdef HAVE_LIBZ
-  if (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in > 0)
+  if (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in > 0)
   {
     DEBUG_puts("3httpWait: Returning 1 since there is buffered data ready.");
     return (1);
@@ -3228,17 +3174,17 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       size_t	slen;			/* Bytes to write */
       ssize_t	sret;			/* Bytes written */
 
-      http->stream.next_in   = (Bytef *)buffer;
-      http->stream.avail_in  = (uInt)length;
+      ((z_stream *)http->stream)->next_in   = (Bytef *)buffer;
+      ((z_stream *)http->stream)->avail_in  = (uInt)length;
 
-      while (deflate(&(http->stream), Z_NO_FLUSH) == Z_OK)
+      while (deflate((z_stream *)http->stream, Z_NO_FLUSH) == Z_OK)
       {
-        DEBUG_printf(("1httpWrite2: avail_out=%d", http->stream.avail_out));
+        DEBUG_printf(("1httpWrite2: avail_out=%d", ((z_stream *)http->stream)->avail_out));
 
-        if (http->stream.avail_out > 0)
+        if (((z_stream *)http->stream)->avail_out > 0)
 	  continue;
 
-	slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+	slen = _HTTP_MAX_SBUFFER - ((z_stream *)http->stream)->avail_out;
 
         DEBUG_printf(("1httpWrite2: Writing intermediate chunk, len=%d", (int)slen));
 
@@ -3255,8 +3201,8 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 	  return (-1);
 	}
 
-	http->stream.next_out  = (Bytef *)http->sbuffer;
-	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+	((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+	((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
       }
 
       bytes = (ssize_t)length;
@@ -3398,7 +3344,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   * Set the various standard fields if they aren't already...
   */
 
-  if (!http->fields[HTTP_FIELD_DATE][0])
+  if (!http->fields[HTTP_FIELD_DATE])
     httpSetField(http, HTTP_FIELD_DATE, httpGetDateString(time(NULL)));
 
   if (status >= HTTP_STATUS_BAD_REQUEST && http->keep_alive)
@@ -3409,7 +3355,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   if (http->version == HTTP_VERSION_1_1)
   {
-    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+    if (!http->fields[HTTP_FIELD_CONNECTION])
     {
       if (http->keep_alive)
 	httpSetField(http, HTTP_FIELD_CONNECTION, "Keep-Alive");
@@ -3417,7 +3363,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 	httpSetField(http, HTTP_FIELD_CONNECTION, "close");
     }
 
-    if (http->keep_alive && !http->fields[HTTP_FIELD_KEEP_ALIVE][0])
+    if (http->keep_alive && !http->fields[HTTP_FIELD_KEEP_ALIVE])
       httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "timeout=10");
   }
 
@@ -3425,28 +3371,26 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (status == HTTP_STATUS_UPGRADE_REQUIRED ||
       status == HTTP_STATUS_SWITCHING_PROTOCOLS)
   {
-    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+    if (!http->fields[HTTP_FIELD_CONNECTION])
       httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
 
-    if (!http->fields[HTTP_FIELD_UPGRADE][0])
+    if (!http->fields[HTTP_FIELD_UPGRADE])
       httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
 
-    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH])
       httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, "0");
   }
 #endif /* HAVE_SSL */
 
-  if (!http->server)
-    httpSetField(http, HTTP_FIELD_SERVER,
-                 http->default_server ? http->default_server : CUPS_MINIMAL);
+  if (!http->fields[HTTP_FIELD_SERVER])
+    httpSetField(http, HTTP_FIELD_SERVER, http->default_fields[HTTP_FIELD_SERVER] ? http->default_fields[HTTP_FIELD_SERVER] : CUPS_MINIMAL);
 
  /*
   * Set the Accept-Encoding field if it isn't already...
   */
 
-  if (!http->accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
-                 http->default_accept_encoding ? http->default_accept_encoding :
+  if (!http->fields[HTTP_FIELD_ACCEPT_ENCODING])
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, http->default_fields[HTTP_FIELD_ACCEPT_ENCODING] ? http->default_fields[HTTP_FIELD_ACCEPT_ENCODING] :
 #ifdef HAVE_LIBZ
                                                  "gzip, deflate, identity");
 #else
@@ -3461,8 +3405,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   old_remaining       = http->data_remaining;
   http->data_encoding = HTTP_ENCODING_FIELDS;
 
-  if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100,
-                 http->version % 100, (int)status, httpStatus(status)) < 0)
+  if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100, http->version % 100, (int)status, httpStatus(status)) < 0)
   {
     http->status = HTTP_STATUS_ERROR;
     return (-1);
@@ -3602,17 +3545,11 @@ http_add_field(http_t       *http,	/* I - HTTP connection */
                const char   *value,	/* I - Value string */
                int          append)	/* I - Append value? */
 {
-  char		newvalue[1024];		/* New value string */
-  const char 	*oldvalue;		/* Old field value */
+  char		temp[1024];		/* Temporary value string */
+  size_t	fieldlen,		/* Length of existing value */
+		valuelen,		/* Length of value string */
+		total;			/* Total length of string */
 
-
-
- /*
-  * Optionally append the new value to the existing one...
-  */
-
-  if (append && field != HTTP_FIELD_ACCEPT_ENCODING && field != HTTP_FIELD_ACCEPT_LANGUAGE && field != HTTP_FIELD_ACCEPT_RANGES && field != HTTP_FIELD_ALLOW && field != HTTP_FIELD_LINK && field != HTTP_FIELD_TRANSFER_ENCODING && field != HTTP_FIELD_UPGRADE && field != HTTP_FIELD_WWW_AUTHENTICATE)
-    append = 0;
 
   if (field == HTTP_FIELD_HOST)
   {
@@ -3627,77 +3564,106 @@ http_add_field(http_t       *http,	/* I - HTTP connection */
     {
      /*
       * Bracket IPv6 numeric addresses...
+      *
+      * This is slightly inefficient (basically copying twice), but is an edge
+      * case and not worth optimizing...
       */
 
-      snprintf(newvalue, sizeof(newvalue), "[%s]", value);
-      value = newvalue;
+      snprintf(temp, sizeof(temp), "[%s]", value);
+      value = temp;
     }
-    else if (*value && value[strlen(value) - 1] == '.')
+    else if (*value)
     {
      /*
-      * Strip the trailing dot on the hostname...
+      * Check for a trailing dot on the hostname...
       */
 
-      strlcpy(newvalue, value, sizeof(newvalue));
-      newvalue[strlen(newvalue) - 1] = '\0';
-      value = newvalue;
+      strlcpy(temp, value, sizeof(temp));
+      value = temp;
+      ptr   = temp + strlen(temp) - 1;
+
+      if (*ptr == '.')
+	*ptr = '\0';
     }
   }
-  else if (append && *value && (oldvalue = httpGetField(http, field)) != NULL && *oldvalue)
+
+  if (append && field != HTTP_FIELD_ACCEPT_ENCODING && field != HTTP_FIELD_ACCEPT_LANGUAGE && field != HTTP_FIELD_ACCEPT_RANGES && field != HTTP_FIELD_ALLOW && field != HTTP_FIELD_LINK && field != HTTP_FIELD_TRANSFER_ENCODING && field != HTTP_FIELD_UPGRADE && field != HTTP_FIELD_WWW_AUTHENTICATE)
+    append = 0;
+
+  if (!append && http->fields[field])
   {
-    snprintf(newvalue, sizeof(newvalue), "%s, %s", oldvalue, value);
-    value = newvalue;
+    if (http->fields[field] != http->_fields[field])
+      free(http->fields[field]);
+
+    http->fields[field] = NULL;
   }
 
- /*
-  * Save the new value...
-  */
+  valuelen = strlen(value);
 
-  switch (field)
+  if (!valuelen)
   {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        if (http->accept_encoding)
-          _cupsStrFree(http->accept_encoding);
-
-        http->accept_encoding = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_ALLOW :
-        if (http->allow)
-          _cupsStrFree(http->allow);
-
-        http->allow = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_SERVER :
-        if (http->server)
-          _cupsStrFree(http->server);
-
-        http->server = _cupsStrAlloc(value);
-        break;
-
-    default :
-	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
-	break;
+    http->_fields[field][0] = '\0';
+    return;
   }
 
-  if (field == HTTP_FIELD_AUTHORIZATION)
+  if (http->fields[field])
+  {
+    fieldlen = strlen(http->fields[field]);
+    total    = fieldlen + 2 + valuelen;
+  }
+  else
+  {
+    fieldlen = 0;
+    total    = valuelen;
+  }
+
+  if (total < HTTP_MAX_VALUE && field < HTTP_FIELD_ACCEPT_ENCODING)
   {
    /*
-    * Special case for Authorization: as its contents can be
-    * longer than HTTP_MAX_VALUE
+    * Copy short values to legacy char arrays (maintained for binary
+    * compatibility with CUPS 1.2.x and earlier applications...)
     */
 
-    if (http->field_authorization)
-      free(http->field_authorization);
+    if (fieldlen)
+    {
+      char	combined[HTTP_MAX_VALUE];
+					/* Combined value string */
 
-    http->field_authorization = strdup(value);
+      snprintf(combined, sizeof(combined), "%s, %s", http->_fields[field], value);
+      value = combined;
+    }
+
+    strlcpy(http->_fields[field], value, sizeof(http->_fields[field]));
+    http->fields[field] = http->_fields[field];
   }
-#ifdef HAVE_LIBZ
-  else if (field == HTTP_FIELD_CONTENT_ENCODING &&
-           http->data_encoding != HTTP_ENCODING_FIELDS)
+  else if (fieldlen)
   {
-    DEBUG_puts("1http_add_field: Calling http_content_coding_start.");
+   /*
+    * Expand the field value...
+    */
+
+    char	*combined;		/* New value string */
+
+    if ((combined = realloc(http->fields[field], total + 1)) != NULL)
+    {
+      http->fields[field] = combined;
+      strlcat(combined, ", ", total + 1);
+      strlcat(combined, value, total + 1);
+    }
+  }
+  else
+  {
+   /*
+    * Allocate the field value...
+    */
+
+    http->fields[field] = strdup(value);
+  }
+
+#ifdef HAVE_LIBZ
+  if (field == HTTP_FIELD_CONTENT_ENCODING && http->data_encoding != HTTP_ENCODING_FIELDS)
+  {
+    DEBUG_puts("1httpSetField: Calling http_content_coding_start.");
     http_content_coding_start(http, value);
   }
 #endif /* HAVE_LIBZ */
@@ -3725,13 +3691,13 @@ http_content_coding_finish(
   {
     case _HTTP_CODING_DEFLATE :
     case _HTTP_CODING_GZIP :
-        http->stream.next_in  = dummy;
-        http->stream.avail_in = 0;
+        ((z_stream *)http->stream)->next_in  = dummy;
+        ((z_stream *)http->stream)->avail_in = 0;
 
         do
         {
-          zerr  = deflate(&(http->stream), Z_FINISH);
-	  bytes = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+          zerr  = deflate((z_stream *)http->stream, Z_FINISH);
+	  bytes = _HTTP_MAX_SBUFFER - ((z_stream *)http->stream)->avail_out;
 
           if (bytes > 0)
 	  {
@@ -3743,15 +3709,18 @@ http_content_coding_finish(
 	      http_write(http, (char *)http->sbuffer, bytes);
           }
 
-          http->stream.next_out  = (Bytef *)http->sbuffer;
-          http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+          ((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+          ((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
 	}
         while (zerr == Z_OK);
 
-        deflateEnd(&(http->stream));
+        deflateEnd((z_stream *)http->stream);
 
         free(http->sbuffer);
+        free(http->stream);
+
         http->sbuffer = NULL;
+        http->stream  = NULL;
 
         if (http->wused)
           httpFlushWrite(http);
@@ -3759,9 +3728,13 @@ http_content_coding_finish(
 
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
-        inflateEnd(&(http->stream));
+        inflateEnd((z_stream *)http->stream);
+
         free(http->sbuffer);
+        free(http->stream);
+
         http->sbuffer = NULL;
+        http->stream  = NULL;
         break;
 
     default :
@@ -3831,8 +3804,6 @@ http_content_coding_start(
     return;
   }
 
-  memset(&(http->stream), 0, sizeof(http->stream));
-
   switch (coding)
   {
     case _HTTP_CODING_DEFLATE :
@@ -3853,18 +3824,30 @@ http_content_coding_start(
         * documentation.
         */
 
-        if ((zerr = deflateInit2(&(http->stream), Z_DEFAULT_COMPRESSION,
-                                 Z_DEFLATED,
-				 coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7,
-				 Z_DEFAULT_STRATEGY)) < Z_OK)
+	if ((http->stream = calloc(1, sizeof(z_stream))) == NULL)
+	{
+          free(http->sbuffer);
+
+          http->sbuffer = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = errno;
+          return;
+	}
+
+        if ((zerr = deflateInit2((z_stream *)http->stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7, Z_DEFAULT_STRATEGY)) < Z_OK)
         {
-          http->status = HTTP_STATUS_ERROR;
-          http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
+          free(http->sbuffer);
+          free(http->stream);
+
+          http->sbuffer = NULL;
+          http->stream  = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
 
-	http->stream.next_out  = (Bytef *)http->sbuffer;
-	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+	((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+	((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
         break;
 
     case _HTTP_CODING_INFLATE :
@@ -3881,19 +3864,30 @@ http_content_coding_start(
         * -15 is raw inflate, 31 is gunzip, per ZLIB documentation.
         */
 
-        if ((zerr = inflateInit2(&(http->stream),
-                                 coding == _HTTP_CODING_INFLATE ? -15 : 31))
-		< Z_OK)
+	if ((http->stream = calloc(1, sizeof(z_stream))) == NULL)
+	{
+          free(http->sbuffer);
+
+          http->sbuffer = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = errno;
+          return;
+	}
+
+        if ((zerr = inflateInit2((z_stream *)http->stream, coding == _HTTP_CODING_INFLATE ? -15 : 31)) < Z_OK)
         {
           free(http->sbuffer);
+          free(http->stream);
+
           http->sbuffer = NULL;
+          http->stream  = NULL;
           http->status  = HTTP_STATUS_ERROR;
           http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
 
-        http->stream.avail_in = 0;
-        http->stream.next_in  = http->sbuffer;
+        ((z_stream *)http->stream)->avail_in = 0;
+        ((z_stream *)http->stream)->next_in  = http->sbuffer;
         break;
 
     default :
@@ -3959,7 +3953,7 @@ http_create(
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
-    httpAddrFreeList(addrlist);
+    httpAddrFreeList(myaddrlist);
     return (NULL);
   }
 
@@ -4096,7 +4090,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
     if (bytes < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       if (WSAGetLastError() != WSAEINTR)
       {
 	http->error = WSAGetLastError();
@@ -4132,7 +4126,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 	http->error = errno;
 	return (-1);
       }
-#endif /* WIN32 */
+#endif /* _WIN32 */
     }
   }
   while (bytes < 0);
@@ -4146,7 +4140,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
   if (bytes < 0)
   {
-#ifdef WIN32
+#ifdef _WIN32
     if (WSAGetLastError() == WSAEINTR)
       bytes = 0;
     else
@@ -4156,7 +4150,7 @@ http_read(http_t *http,			/* I - HTTP connection */
       bytes = 0;
     else
       http->error = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
   }
   else if (bytes == 0)
   {
@@ -4316,10 +4310,10 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * Set the User-Agent field if it isn't already...
   */
 
-  if (!http->fields[HTTP_FIELD_USER_AGENT][0])
+  if (!http->fields[HTTP_FIELD_USER_AGENT])
   {
-    if (http->default_user_agent)
-      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_user_agent);
+    if (http->default_fields[HTTP_FIELD_USER_AGENT])
+      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_fields[HTTP_FIELD_USER_AGENT]);
     else
       httpSetField(http, HTTP_FIELD_USER_AGENT, cupsUserAgent());
   }
@@ -4328,9 +4322,8 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * Set the Accept-Encoding field if it isn't already...
   */
 
-  if (!http->accept_encoding && http->default_accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
-                 http->default_accept_encoding);
+  if (!http->fields[HTTP_FIELD_ACCEPT_ENCODING] && http->default_fields[HTTP_FIELD_ACCEPT_ENCODING])
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, http->default_fields[HTTP_FIELD_ACCEPT_ENCODING]);
 
  /*
   * Encode the URI as needed...
@@ -4445,7 +4438,7 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->field_authorization && http->authstring &&
+  if (http->fields[HTTP_FIELD_AUTHORIZATION] && http->authstring &&
       (!strncmp(http->authstring, "Negotiate", 9) ||
        !strncmp(http->authstring, "AuthRef", 7)))
   {
@@ -4485,8 +4478,7 @@ http_set_length(http_t *http)		/* I - Connection */
       return (remaining);
     }
 
-    if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING],
-                          "chunked"))
+    if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_TRANSFER_ENCODING), "chunked"))
     {
       DEBUG_puts("1http_set_length: Setting data_encoding to "
                  "HTTP_ENCODING_CHUNKED.");
@@ -4520,7 +4512,7 @@ static void
 http_set_timeout(int    fd,		/* I - File descriptor */
                  double timeout)	/* I - Timeout in seconds */
 {
-#ifdef WIN32
+#ifdef _WIN32
   DWORD tv = (DWORD)(timeout * 1000);
 				      /* Timeout in milliseconds */
 
@@ -4535,7 +4527,7 @@ http_set_timeout(int    fd,		/* I - File descriptor */
 
   setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
   setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -4591,10 +4583,15 @@ http_tls_upgrade(http_t *http)		/* I - HTTP connection */
   * encryption on the link...
   */
 
-  http->tls_upgrade         = 1;
-  http->field_authorization = NULL;	/* Don't free the auth string */
+  http->tls_upgrade = 1;
+  memset(http->fields, 0, sizeof(http->fields));
+  http->expect = (http_status_t)0;
 
-  httpClearFields(http);
+  if (http->hostname[0] == '/')
+    httpSetField(http, HTTP_FIELD_HOST, "localhost");
+  else
+    httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
   httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
 
@@ -4611,14 +4608,15 @@ http_tls_upgrade(http_t *http)		/* I - HTTP connection */
   * Restore the HTTP request data...
   */
 
+  memcpy(http->_fields, myhttp._fields, sizeof(http->_fields));
   memcpy(http->fields, myhttp.fields, sizeof(http->fields));
-  http->data_encoding       = myhttp.data_encoding;
-  http->data_remaining      = myhttp.data_remaining;
-  http->_data_remaining     = myhttp._data_remaining;
-  http->expect              = myhttp.expect;
-  http->field_authorization = myhttp.field_authorization;
-  http->digest_tries        = myhttp.digest_tries;
-  http->tls_upgrade         = 0;
+
+  http->data_encoding   = myhttp.data_encoding;
+  http->data_remaining  = myhttp.data_remaining;
+  http->_data_remaining = myhttp._data_remaining;
+  http->expect          = myhttp.expect;
+  http->digest_tries    = myhttp.digest_tries;
+  http->tls_upgrade     = 0;
 
  /*
   * See if we actually went secure...
@@ -4697,12 +4695,12 @@ http_write(http_t     *http,		/* I - HTTP connection */
 
 	  nfds = select(http->fd + 1, NULL, &output_set, NULL, &timeout);
 	}
-#  ifdef WIN32
+#  ifdef _WIN32
 	while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
 			    WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
 	while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #endif /* HAVE_POLL */
 
         if (nfds < 0)
@@ -4712,11 +4710,11 @@ http_write(http_t     *http,		/* I - HTTP connection */
 	}
 	else if (nfds == 0 && (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data)))
 	{
-#ifdef WIN32
+#ifdef _WIN32
 	  http->error = WSAEWOULDBLOCK;
 #else
 	  http->error = EWOULDBLOCK;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 	  return (-1);
 	}
       }
@@ -4735,7 +4733,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
 
     if (bytes < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       if (WSAGetLastError() == WSAEINTR)
         continue;
       else if (WSAGetLastError() == WSAEWOULDBLOCK)
@@ -4769,7 +4767,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
         http->error = errno;
 	continue;
       }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
       DEBUG_printf(("3http_write: error writing data (%s).",
                     strerror(http->error)));

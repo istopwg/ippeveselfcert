@@ -1,7 +1,7 @@
 #
 # API library Makefile for CUPS.
 #
-# Copyright 2007-2016 by Apple Inc.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -37,7 +37,6 @@ OBJS	=	\
 		dest-options.o \
 		dir.o \
 		encode.o \
-		error.o \
 		file.o \
 		getputfile.o \
 		globals.o \
@@ -47,6 +46,8 @@ OBJS	=	\
 		http-addrlist.o \
 		http-support.o \
 		ipp.o \
+		ipp-file.o \
+		ipp-vars.o \
 		ipp-support.o \
 		langprintf.o \
 		language.o \
@@ -55,7 +56,9 @@ OBJS	=	\
 		notify.o \
 		options.o \
 		pwg-media.o \
-		raster.o \
+		raster-error.o \
+		raster-stream.o \
+		raster-stubs.o \
 		request.o \
 		snprintf.o \
 		string.o \

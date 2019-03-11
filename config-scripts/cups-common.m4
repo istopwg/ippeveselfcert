@@ -1,15 +1,12 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2015 by the ISTO Printer Working Group.
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2015-2019 by the ISTO Printer Working Group.
+dnl Copyright 2007-2019 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl These coded instructions, statements, and computer programs are the
-dnl property of Apple Inc. and are protected by Federal copyright
-dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl which should have been included with this file.  If this file is
-dnl missing or damaged, see the license at "http://www.cups.org/".
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
+dnl information.
 dnl
 
 dnl Set the name of the config header file...
@@ -38,6 +35,10 @@ AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(GZIP,gzip)
+AC_PATH_PROG(LD,ld)
+AC_PATH_PROG(LN,ln)
+AC_PATH_PROG(MKDIR,mkdir)
+AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(RMDIR,rmdir)
 AC_PATH_PROG(SED,sed)
@@ -90,18 +91,14 @@ AC_CHECK_FUNCS(statfs statvfs)
 
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup strlcat strlcpy)
-if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then
-	echo Forcing snprintf emulation for HP-UX.
-else
-	AC_CHECK_FUNCS(snprintf vsnprintf)
-fi
+AC_CHECK_FUNCS(snprintf vsnprintf)
 
 dnl Check for random number functions...
 AC_CHECK_FUNCS(random lrand48 arc4random)
 
 dnl Checks for signal functions.
-case "$uname" in
-	Linux | GNU)
+case "$host_os_name" in
+	linux* | gnu*)
 		# Do not use sigset on Linux or GNU HURD
 		;;
 	*)
@@ -145,8 +142,8 @@ AC_CHECK_HEADER(zlib.h,
 AC_SUBST(LIBZ)
 
 dnl Flags for "ar" command...
-case $uname in
-        Darwin* | *BSD*)
+case $host_os_name in
+        darwin* | *bsd*)
                 ARFLAGS="-rcv"
                 ;;
         *)
@@ -157,13 +154,12 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl Extra platform-specific libraries...
-case $uname in
-        Darwin*)
+case $host_os_name in
+        darwin*)
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
 
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(ApplicationServices/ApplicationServices.h,AC_DEFINE(HAVE_APPLICATIONSERVICES_H))
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
-		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
-		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
+		;;
 esac

@@ -1,13 +1,10 @@
 dnl
 dnl DNS Service Discovery (aka Bonjour) stuff for CUPS.
 dnl
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl
-dnl These coded instructions, statements, and computer programs are the
-dnl property of Apple Inc. and are protected by Federal copyright
-dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl which should have been included with this file.  If this file is
-dnl missing or damaged, see the license at "http://www.cups.org/".
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
+dnl information.
 dnl
 
 AC_ARG_ENABLE(avahi, [  --disable-avahi         disable DNS Service Discovery support using Avahi])
@@ -20,17 +17,15 @@ AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes   set directory for DNS Ser
 	CPPFLAGS="-I$withval $CPPFLAGS",)
 
 DNSSDLIBS=""
-DNSSD_BACKEND=""
 IPPFIND_BIN=""
 IPPFIND_MAN=""
 
-if test "x$PKGCONFIG" != x -a x$enable_avahi != xno -a x$uname != xDarwin; then
+if test "x$PKGCONFIG" != x -a x$enable_avahi != xno -a x$host_os_name != xdarwin; then
 	AC_MSG_CHECKING(for Avahi)
 	if $PKGCONFIG --exists avahi-client; then
 		AC_MSG_RESULT(yes)
 		CFLAGS="$CFLAGS `$PKGCONFIG --cflags avahi-client`"
 		DNSSDLIBS="`$PKGCONFIG --libs avahi-client`"
-		DNSSD_BACKEND="dnssd"
 		IPPFIND_BIN="ippfind"
 		IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 		AC_DEFINE(HAVE_AVAHI)
@@ -39,14 +34,13 @@ if test "x$PKGCONFIG" != x -a x$enable_avahi != xno -a x$uname != xDarwin; then
 	fi
 fi
 
-if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
+if test x$enable_dnssd != xno; then
 	AC_CHECK_HEADER(dns_sd.h, [
-		case "$uname" in
-			Darwin*)
+		case "$host_os_name" in
+			darwin*)
 				# Darwin and macOS...
 				AC_DEFINE(HAVE_DNSSD)
 				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
-				DNSSD_BACKEND="dnssd"
 				IPPFIND_BIN="ippfind"
 				IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 				;;
@@ -64,7 +58,6 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 					AC_MSG_RESULT(yes)
 					AC_DEFINE(HAVE_DNSSD)
 					DNSSDLIBS="-ldns_sd"
-					DNSSD_BACKEND="dnssd",
 					IPPFIND_BIN="ippfind"
 					IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 					AC_MSG_RESULT(no))
@@ -75,6 +68,5 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 fi
 
 AC_SUBST(DNSSDLIBS)
-AC_SUBST(DNSSD_BACKEND)
 AC_SUBST(IPPFIND_BIN)
 AC_SUBST(IPPFIND_MAN)

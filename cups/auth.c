@@ -1,19 +1,13 @@
 /*
  * Authentication functions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
- * Copyright © 1997-2007 by Easy Software Products.
+ * Copyright 2007-2019 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
- *
- * This file is subject to the Apple OS-Developed Software exception.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
 /*
@@ -21,21 +15,17 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 
 #if HAVE_AUTHORIZATION_H
 #  include <Security/Authorization.h>
-#  ifdef HAVE_SECBASEPRIV_H
-#    include <Security/SecBasePriv.h>
-#  else
-extern const char *cssmErrorString(int error);
-#  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
 
 #if defined(SO_PEERCRED) && defined(AF_LOCAL)
@@ -52,6 +42,9 @@ static const char	*cups_auth_param(const char *scheme, const char *name, char *v
 static const char	*cups_auth_scheme(const char *www_authenticate, char *scheme, size_t schemesize);
 
 #ifdef HAVE_GSSAPI
+#  define CUPS_GSS_OK	0		/* Successfully set credentials */
+#  define CUPS_GSS_NONE	-1		/* No credentials */
+#  define CUPS_GSS_FAIL	-2		/* Failed credentials/authentication */
 #  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
 #    ifdef HAVE_GSS_GSSAPI_SPI_H
 #      include <GSS/gssapi_spi.h>
@@ -119,9 +112,7 @@ cupsDoAuthentication(
 		*www_auth,		/* WWW-Authenticate header */
 		*schemedata;		/* Scheme-specific data */
   char		scheme[256],		/* Scheme name */
-		prompt[1024],		/* Prompt for user */
-		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
-		nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
+		prompt[1024];		/* Prompt for user */
   int		localauth;		/* Local authentication result */
   _cups_globals_t *cg;			/* Global data */
 
@@ -180,6 +171,8 @@ cupsDoAuthentication(
     * Check the scheme name...
     */
 
+    DEBUG_printf(("2cupsDoAuthentication: Trying scheme \"%s\"...", scheme));
+
 #ifdef HAVE_GSSAPI
     if (!_cups_strcasecmp(scheme, "Negotiate"))
     {
@@ -187,18 +180,36 @@ cupsDoAuthentication(
       * Kerberos authentication...
       */
 
-      if (_cupsSetNegotiateAuthString(http, method, resource))
+      int gss_status;			/* Auth status */
+
+      if ((gss_status = _cupsSetNegotiateAuthString(http, method, resource)) == CUPS_GSS_FAIL)
       {
+        DEBUG_puts("1cupsDoAuthentication: Negotiate failed.");
 	http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
 	return (-1);
       }
-
-      break;
+      else if (gss_status == CUPS_GSS_NONE)
+      {
+        DEBUG_puts("2cupsDoAuthentication: No credentials for Negotiate.");
+        continue;
+      }
+      else
+      {
+        DEBUG_puts("2cupsDoAuthentication: Using Negotiate.");
+        break;
+      }
     }
     else
 #endif /* HAVE_GSSAPI */
     if (_cups_strcasecmp(scheme, "Basic") && _cups_strcasecmp(scheme, "Digest"))
-      continue;				/* Not supported (yet) */
+    {
+     /*
+      * Other schemes not yet supported...
+      */
+
+      DEBUG_printf(("2cupsDoAuthentication: Scheme \"%s\" not yet supported.", scheme));
+      continue;
+    }
 
    /*
     * See if we should retry the current username:password...
@@ -228,6 +239,7 @@ cupsDoAuthentication(
 
       if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
       {
+        DEBUG_puts("1cupsDoAuthentication: User canceled password request.");
 	http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
 	return (-1);
       }
@@ -257,8 +269,10 @@ cupsDoAuthentication(
 
       char	encode[256];		/* Base64 buffer */
 
+      DEBUG_puts("2cupsDoAuthentication: Using Basic.");
       httpEncode64_2(encode, sizeof(encode), http->userpass, (int)strlen(http->userpass));
       httpSetAuthString(http, "Basic", encode);
+      break;
     }
     else if (!_cups_strcasecmp(scheme, "Digest"))
     {
@@ -266,136 +280,30 @@ cupsDoAuthentication(
       * Digest authentication...
       */
 
-      int		i;		/* Looping var */
-      char		algorithm[65],	/* Hashing algorithm */
-			opaque[HTTP_MAX_VALUE],
-					/* Opaque data from server */
-			cnonce[65],	/* cnonce value */
-			kd[65],		/* Final MD5/SHA-256 digest */
-			ha1[65],	/* Hash of username:realm:password */
-			ha2[65],	/* Hash of method:request-uri */
-			hdata[65],	/* Hash of auth data */
-			temp[1024],	/* Temporary string */
-			digest[1024];	/* Digest auth data */
-      unsigned char	hash[32];	/* Hash buffer */
-      const char	*hashalg;	/* Hashing algorithm */
-      size_t		hashsize;	/* Size of hash */
+      char nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
 
-      if (strcmp(nonce, http->nonce))
-      {
-        strlcpy(http->nonce, nonce, sizeof(http->nonce));
-        http->nonce_count = 1;
-      }
-      else
-        http->nonce_count ++;
-
-      cups_auth_param(schemedata, "opaque", opaque, sizeof(opaque));
+      cups_auth_param(schemedata, "algorithm", http->algorithm, sizeof(http->algorithm));
+      cups_auth_param(schemedata, "opaque", http->opaque, sizeof(http->opaque));
       cups_auth_param(schemedata, "nonce", nonce, sizeof(nonce));
-      cups_auth_param(schemedata, "realm", realm, sizeof(realm));
+      cups_auth_param(schemedata, "realm", http->realm, sizeof(http->realm));
 
-      for (i = 0; i < 64; i ++)
-        cnonce[i] = "0123456789ABCDEF"[CUPS_RAND() & 15];
-      cnonce[64] = '\0';
-
-      if (cups_auth_param(schemedata, "algorithm", algorithm, sizeof(algorithm)))
+      if (_httpSetDigestAuthString(http, nonce, method, resource))
       {
-       /*
-        * Follow RFC 2617/7616...
-        */
-
-        if (!_cups_strcasecmp(algorithm, "MD5"))
-        {
-         /*
-          * RFC 2617 Digest with MD5
-          */
-
-          hashalg = "md5";
-	}
-	else if (!_cups_strcasecmp(algorithm, "SHA-256"))
-	{
-	 /*
-	  * RFC 7616 Digest with SHA-256
-	  */
-
-          hashalg = "sha2-256";
-	}
-	else
-	{
-	 /*
-	  * Some other algorithm we don't support, skip this one...
-	  */
-
-	  continue;
-	}
-
-       /*
-        * Calculate digest value...
-        */
-
-        /* H(A1) = H(username:realm:password) */
-        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
-
-        /* H(A2) = H(method:uri) */
-	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
-
-        /* H(data) = H(nonce:nc:cnonce:qop:H(A2)) */
-	snprintf(temp, sizeof(temp), "%s:%08x:%s:auth:%s", nonce, http->nonce_count, cnonce, ha2);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, hdata, sizeof(hdata));
-
-        /* KD = H(H(A1):H(data)) */
-	snprintf(temp, sizeof(temp), "%s:%s", ha1, hdata);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, kd, sizeof(kd));
-
-        /* Pass the RFC 2617/7616 WWW-Authenticate header */
-        if (opaque[0])
-	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, opaque=\"%s\", cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, opaque, cnonce, http->nonce_count, resource, kd);
-	else
-	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, cnonce, http->nonce_count, resource, kd);
+	DEBUG_puts("2cupsDoAuthentication: Using Basic.");
+        break;
       }
-      else
-      {
-       /*
-        * Use old RFC 2069 Digest method...
-        */
-
-        /* H(A1) = H(username:realm:password) */
-        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
-        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
-
-        /* H(A2) = H(method:uri) */
-	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
-        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
-
-        /* KD = H(H(A1):nonce:H(A2)) */
-	snprintf(temp, sizeof(temp), "%s:%s:%s", ha1, nonce, ha2);
-	hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, kd, sizeof(kd));
-
-        /* Pass the RFC 2069 WWW-Authenticate header */
-	snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, resource, kd);
-      }
-
-      httpSetAuthString(http, "Digest", digest);
     }
   }
 
   if (http->authstring)
   {
-    DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\"", http->authstring));
+    DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\".", http->authstring));
 
     return (0);
   }
   else
   {
-    DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"", www_auth));
+    DEBUG_puts("1cupsDoAuthentication: No supported schemes.");
     http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
 
     return (-1);
@@ -408,7 +316,7 @@ cupsDoAuthentication(
  * '_cupsSetNegotiateAuthString()' - Set the Kerberos authentication string.
  */
 
-int					/* O - 0 on success, -1 on error */
+int					/* O - 0 on success, negative on error */
 _cupsSetNegotiateAuthString(
     http_t     *http,			/* I - Connection to server */
     const char *method,			/* I - Request method ("GET", "POST", "PUT") */
@@ -433,9 +341,15 @@ _cupsSetNegotiateAuthString(
   {
     DEBUG_puts("1_cupsSetNegotiateAuthString: Weak-linked GSSAPI/Kerberos "
                "framework is not present");
-    return (-1);
+    return (CUPS_GSS_NONE);
   }
 #  endif /* __APPLE__ */
+
+  if (!strcmp(http->hostname, "localhost") || http->hostname[0] == '/' || isdigit(http->hostname[0] & 255) || !strchr(http->hostname, '.'))
+  {
+    DEBUG_printf(("1_cupsSetNegotiateAuthString: Kerberos not available for host \"%s\".", http->hostname));
+    return (CUPS_GSS_NONE);
+  }
 
   if (http->gssname == GSS_C_NO_NAME)
   {
@@ -481,7 +395,7 @@ _cupsSetNegotiateAuthString(
 	     cupsUser(), http->gsshost);
 
     if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
-      return (-1);
+      return (CUPS_GSS_FAIL);
 
    /*
     * Try to acquire credentials...
@@ -535,18 +449,20 @@ _cupsSetNegotiateAuthString(
   }
 #  endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
-  if (GSS_ERROR(major_status))
+  if (major_status == GSS_S_NO_CRED)
   {
-    cups_gss_printf(major_status, minor_status,
-		    "_cupsSetNegotiateAuthString: Unable to initialize "
-		    "security context");
-    return (-1);
+    cups_gss_printf(major_status, minor_status, "_cupsSetNegotiateAuthString: No credentials");
+    return (CUPS_GSS_NONE);
+  }
+  else if (GSS_ERROR(major_status))
+  {
+    cups_gss_printf(major_status, minor_status, "_cupsSetNegotiateAuthString: Unable to initialize security context");
+    return (CUPS_GSS_FAIL);
   }
 
 #  ifdef DEBUG
   else if (major_status == GSS_S_CONTINUE_NEEDED)
-    cups_gss_printf(major_status, minor_status,
-		    "_cupsSetNegotiateAuthString: Continuation needed!");
+    cups_gss_printf(major_status, minor_status, "_cupsSetNegotiateAuthString: Continuation needed");
 #  endif /* DEBUG */
 
   if (output_token.length > 0 && output_token.length <= 65536)
@@ -557,7 +473,7 @@ _cupsSetNegotiateAuthString(
     */
 
     int authsize = 10 +			/* "Negotiate " */
-		   (int)output_token.length * 4 / 3 + 1 + 1;
+		   (((int)output_token.length * 4 / 3 + 3) & ~3) + 1;
 		   			/* Base64 + nul */
 
     httpSetAuthString(http, NULL, NULL);
@@ -580,10 +496,10 @@ _cupsSetNegotiateAuthString(
                   "large - %d bytes!", (int)output_token.length));
     gss_release_buffer(&minor_status, &output_token);
 
-    return (-1);
+    return (CUPS_GSS_FAIL);
   }
 
-  return (0);
+  return (CUPS_GSS_OK);
 }
 #endif /* HAVE_GSSAPI */
 
@@ -620,7 +536,7 @@ cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticat
     * See if this is "Scheme" followed by whitespace or the end of the string.
     */
 
-    if (!strncmp(www_authenticate, scheme, schemelen) && (isspace(www_authenticate[schemelen] & 255) || !www_authenticate[schemelen]))
+    if (!strncmp(www_authenticate, scheme, schemelen) && (isspace(www_authenticate[schemelen] & 255) || www_authenticate[schemelen] == ',' || !www_authenticate[schemelen]))
     {
      /*
       * Yes, this is the start of the scheme-specific information...
@@ -674,7 +590,7 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
                 size_t     valsize)		/* I - Size of value buffer */
 {
   char		*valptr = value,		/* Pointer into value buffer */
-		*valend = value + valsize - 1;	/* Pointer to end of buffer */
+      		*valend = value + valsize - 1;	/* Pointer to end of buffer */
   size_t	namelen = strlen(name);		/* Name length */
   int		param;				/* Is this a parameter? */
 
@@ -1011,9 +927,9 @@ static int				/* O - 0 if available */
 					/*    -1 error */
 cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 {
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
  /*
-  * Currently WIN32 and OS-2 do not support the CUPS server...
+  * Currently _WIN32 and OS-2 do not support the CUPS server...
   */
 
   return (1);
@@ -1066,8 +982,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
-      DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d (%s)",
-		    (int)status, cssmErrorString(status)));
+      DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d",
+		    (int)status));
       return (-1);
     }
 
@@ -1108,8 +1024,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     else if (status == errAuthorizationCanceled)
       return (-1);
 
-    DEBUG_printf(("9cups_local_auth: AuthorizationCopyRights() returned %d (%s)",
-		  (int)status, cssmErrorString(status)));
+    DEBUG_printf(("9cups_local_auth: AuthorizationCopyRights() returned %d", (int)status));
 
   /*
    * Fall through to try certificates...
@@ -1121,10 +1036,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   if (cups_auth_find(www_auth, "Negotiate"))
     return (1);
 #  endif /* HAVE_GSSAPI */
-#  ifdef HAVE_AUTHORIZATION_H
-  if (cups_auth_find(www_auth, "AuthRef"))
-    return (1);
-#  endif /* HAVE_AUTHORIZATION_H */
 
 #  if defined(SO_PEERCRED) && defined(AF_LOCAL)
  /*
@@ -1174,7 +1085,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * No certificate for this PID; see if we can get the root certificate...
     */
 
-    DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s", filename, strerror(errno)));
+    DEBUG_printf(("9cups_local_auth: Unable to open file \"%s\": %s", filename, strerror(errno)));
 
     if (!cups_auth_param(schemedata, "trc", trc, sizeof(trc)))
     {
@@ -1186,7 +1097,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     }
 
     snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
-    fp = fopen(filename, "r");
+    if ((fp = fopen(filename, "r")) == NULL)
+      DEBUG_printf(("9cups_local_auth: Unable to open file \"%s\": %s", filename, strerror(errno)));
   }
 
   if (fp)
@@ -1217,5 +1129,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 
   return (1);
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 }
