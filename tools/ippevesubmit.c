@@ -13,9 +13,14 @@
  *
  * Options:
  *
+ *    --help               Show help.
  *    -m models.txt        Specify list of models, one per line.
  *    -o filename.json     Specify the JSON output file, otherwise JSON is sent
  *                         to the standard output.
+ *    -p "product family"  Specify the product family.
+ *    -s                   Submit for a print server.
+ *    -u URL               Specify the product family web page.
+ *    -y                   Answer yes to the checklist questions.
  */
 
 
@@ -36,11 +41,19 @@
 #else
 #  include <unistd.h>
 #endif /* _WIN32 */
+#include <cups/cups.h>
 
 
 /*
  * Local types...
  */
+
+typedef enum media_format_e		/**** Media Format ****/
+{
+  MEDIA_FORMAT_SMALL,			/* Small media (<A3/Tabloid) */
+  MEDIA_FORMAT_MEDIUM,			/* Medium media (<A1/D) */
+  MEDIA_FORMAT_LARGE			/* Large media (A1/D and larger) */
+} media_format_t;
 
 typedef enum plist_type_e		/**** plist Data Type */
 {
@@ -79,6 +92,8 @@ static int	plist_array_count(plist_t *plist);
 static void	plist_delete(plist_t *plist);
 static plist_t	*plist_find(plist_t *parent, const char *path);
 static plist_t	*plist_read(const char *filename);
+static int	read_boolean(const char *prompt);
+static char	*read_string(const char *prompt, FILE *fp, char *buffer, size_t bufsize);
 static void	usage(void);
 static int	validate_dnssd_results(const char *filename, plist_t *results);
 static int	validate_document_results(const char *filename, plist_t *results);
@@ -97,14 +112,45 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option */
+		*family = NULL,		/* Product family name */
 		*json = NULL,		/* JSON output file */
 		*models = NULL,		/* File containing a list of models */
-		*printer = NULL;	/* Printer being tested */
+		*printer = NULL,	/* Printer being tested */
+		*webpage = NULL;	/* Product family web page */
+  int		override_tests = 0,	/* Test results were overridden */
+		print_server = 0,	/* Product is a print server */
+		yes_to_all = 0;		/* Answer "yes" to all checklist questions */
   char		filename[1024];		/* plist filename */
   int		ok = 1;			/* Are test results OK? */
   plist_t	*dnssd_results,		/* DNS-SD test results */
 		*ipp_results,		/* IPP test results */
-		*document_results;	/* Document test results */
+		*document_results,	/* Document test results */
+		*submission = NULL;	/* Submission data */
+  char		response[1024];		/* Response from user */
+  FILE		*models_fp;		/* Models file */
+  const char	*models_prompt;		/* Prompt for models */
+  plist_t	*supported,		/* Supported attributes */
+		*color_supported,	/* color-supported value */
+		*finishings_supported,	/* finishings-supported values */
+		*ipps_supported,	/* Is IPPS supported? */
+		*media_supported,	/* media-supported values */
+		*sides_supported,	/* sides-supported values */
+		*value;			/* Value from attributes */
+  int		finishings_fold = 0,	/* Folding? */
+		finishings_punch = 0,	/* Punching? */
+		finishings_staple = 0,	/* Stapling? */
+		finishings_trim = 0;	/* Trimming/cutting? */
+  time_t	submission_time;	/* Date/time of submission (seconds) */
+  struct tm	*submission_tm;		/* Date/time of submission (tm data) */
+  char		submission_date[32];	/* Date/time of submission (string) */
+  media_format_t media_format = MEDIA_FORMAT_SMALL;
+					/* Size class */
+  static const char * const media_formats[] =
+  {
+    "small",
+    "medium",
+    "large"
+  };
 
 
  /*
@@ -117,6 +163,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       usage();
       return (0);
+    }
+    else if (!strcmp(argv[i], "--override"))
+    {
+      override_tests = 1;
     }
     else if (!strncmp(argv[i], "--", 2))
     {
@@ -158,6 +208,38 @@ main(int  argc,				/* I - Number of command-line arguments */
               }
 
               json = argv[i];
+              break;
+
+          case 'p' : /* -p "product family" */
+              i ++;
+              if (i >= argc)
+              {
+                puts("ippevesubmit: Expected family name after '-p'.");
+                usage();
+                return (1);
+              }
+
+              family = argv[i];
+              break;
+
+          case 's' : /* -s (print server) */
+              print_server = 1;
+              break;
+
+          case 'u' : /* -u URL */
+              i ++;
+              if (i >= argc)
+              {
+                puts("ippevesubmit: Expected web page URL after '-u'.");
+                usage();
+                return (1);
+              }
+
+              webpage = argv[i];
+              break;
+
+          case 'y' : /* -y (yes to all) */
+              yes_to_all = 1;
               break;
 
           default :
@@ -204,13 +286,197 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (!validate_document_results(filename, document_results))
     ok = 0;
 
-  json_write_plist(stdout, dnssd_results);
+  if (!ok && !override_tests)
+    return (1);
+
+ /*
+  * Collect all information we need for the submission...
+  */
+
+  if (!yes_to_all && !read_boolean("Did you use the PWG-supplied self-certification tools"))
+    return (1);
+
+  if (!yes_to_all && !read_boolean("Did you use production-ready code"))
+    return (1);
+
+  if (!yes_to_all && !read_boolean("Did all output print correctly"))
+    return (1);
+
+  if (!family)
+  {
+    while (!read_string("Product Family Name", stdin, response, sizeof(response)))
+      puts("\b\n    Please enter a name for your product(s).\n");
+
+    family = strdup(response);
+  }
+
+  if (!webpage)
+  {
+    while (!read_string("Product Family Web Page", stdin, response, sizeof(response)))
+      puts("\b\n    Please enter a web page URL for your product(s).\n");
+
+    webpage = strdup(response);
+  }
+
+ /*
+  * Look for IPPS support in the DNS-SD results...
+  */
+
+  ipps_supported = plist_find(dnssd_results, "Tests/4/Successful");
+
+ /*
+  * Supported values from the IPP results...
+  */
+
+  supported            = plist_find(ipp_results, "Tests/8/ResponseAttributes/1");
+  color_supported      = plist_find(supported, "color-supported");
+  finishings_supported = plist_find(supported, "finishings-supported");
+  media_supported      = plist_find(supported, "media-supported");
+  sides_supported      = plist_find(supported, "sides-supported");
+
+  if (finishings_supported)
+  {
+   /*
+    * Look for specific kinds of finishers...
+    */
+
+    for (value = finishings_supported->first_child; value; value = value->next_sibling)
+    {
+      if (!strncmp(value->value, "fold", 4))
+        finishings_fold = 1;
+      else if (!strncmp(value->value, "punch", 5))
+        finishings_punch = 1;
+      else if (!strncmp(value->value, "staple", 6))
+        finishings_staple = 1;
+      else if (!strncmp(value->value, "trim", 4))
+        finishings_trim = 1;
+    }
+  }
+
+  if (media_supported)
+  {
+   /*
+    * Look at the supported media sizes - large format is more than 22" wide,
+    * and medium format is more than 11" and less than 22" wide...
+    */
+
+    for (value = finishings_supported->first_child; value; value = value->next_sibling)
+    {
+      pwg_media_t *pwg = pwgMediaForPWG(value->value);
+					/* Decoded PWG size name */
+
+      if (!pwg)
+        continue;
+
+      if (pwg->width > 43180)
+        media_format = MEDIA_FORMAT_LARGE;
+      else if (pwg->width > 22860 && media_format < MEDIA_FORMAT_MEDIUM)
+        media_format = MEDIA_FORMAT_MEDIUM;
+    }
+  }
+
+ /*
+  * Build the submission profile...
+  */
+
+  submission = plist_add(NULL, PLIST_TYPE_ARRAY, NULL);
+
+  submission_time = time(NULL);
+  submission_tm   = gmtime(&submission_time);
+
+  snprintf(submission_date, sizeof(submission_date), "%04d-%02d-%02dT%02d:%02d:%02dZ", submission_tm->tm_year + 1900, submission_tm->tm_mon + 1, submission_tm->tm_mday, submission_tm->tm_hour, submission_tm->tm_min, submission_tm->tm_sec);
+
+  if (models)
+  {
+    models_fp     = fopen(models, "r");
+    models_prompt = NULL;
+  }
+  else
+  {
+    models_fp     = stdin;
+    models_prompt = "First Model Name";
+  }
+
+  while (read_string(models_prompt, models_fp, response, sizeof(response)))
+  {
+    if (models_prompt)
+      models_prompt = "Next Model Name (blank when done)";
+
+    plist_t *dict = plist_add(submission, PLIST_TYPE_DICT, NULL);
+
+    plist_add(dict, PLIST_TYPE_KEY, "product_family");
+    plist_add(dict, PLIST_TYPE_STRING, family);
+
+    plist_add(dict, PLIST_TYPE_KEY, "model");
+    plist_add(dict, PLIST_TYPE_STRING, response);
+
+    plist_add(dict, PLIST_TYPE_KEY, "url");
+    plist_add(dict, PLIST_TYPE_STRING, webpage);
+
+    plist_add(dict, PLIST_TYPE_KEY, "color_supported");
+    plist_add(dict, PLIST_TYPE_STRING, (color_supported && color_supported->type == PLIST_TYPE_TRUE) ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "duplex_supported");
+    plist_add(dict, PLIST_TYPE_STRING, plist_array_count(sides_supported) > 1 ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "finishings_supported");
+    plist_add(dict, PLIST_TYPE_STRING, plist_array_count(finishings_supported) > 1 ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "finishings_fold");
+    plist_add(dict, PLIST_TYPE_STRING, finishings_fold ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "finishings_punch");
+    plist_add(dict, PLIST_TYPE_STRING, finishings_punch ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "finishings_staple");
+    plist_add(dict, PLIST_TYPE_STRING, finishings_staple ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "finishings_trim");
+    plist_add(dict, PLIST_TYPE_STRING, finishings_trim ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "ipps_supported");
+    plist_add(dict, PLIST_TYPE_STRING, ipps_supported ? "1" : "0");
+
+    plist_add(dict, PLIST_TYPE_KEY, "media_format");
+    plist_add(dict, PLIST_TYPE_STRING, media_formats[media_format]);
+
+    plist_add(dict, PLIST_TYPE_KEY, "submission_date");
+    plist_add(dict, PLIST_TYPE_STRING, submission_date);
+  }
 
  /*
   * Write JSON file for submission...
   */
 
-  return (!ok);
+  if (json)
+  {
+    FILE *fp = fopen(json, "w");	/* Output file */
+
+    if (!fp)
+    {
+      printf("ippevesubmit: Unable to create '%s': %s\n", json, strerror(errno));
+      return (1);
+    }
+
+    if (override_tests)
+      fputs("/* Note: submitted with --override */\n", fp);
+
+    json_write_plist(fp, submission);
+    fclose(fp);
+
+    printf("\nWrote submission to '%s'.\n", json);
+  }
+  else
+  {
+    if (override_tests)
+      puts("/* Note: submitted with --override */");
+
+    json_write_plist(stdout, submission);
+  }
+
+  puts("\nNow continue with your submission at:\n\n    https://www.pwg.org/ippeveselfcert\n");
+
+  return (0);
 }
 
 
@@ -796,6 +1062,70 @@ plist_read(const char *filename)	/* I - File to read */
 }
 
 
+/*
+ * 'read_boolean()' - Ask a yes/no question.
+ */
+
+static int				/* O - 1 if yes, 0 if no */
+read_boolean(const char *prompt)	/* I - Question to ask */
+{
+  char	buffer[256];			/* Response buffer */
+
+
+  printf("%s (y/N)? ", prompt);
+  fflush(stdout);
+
+  if (fgets(buffer, sizeof(buffer), stdin) && toupper(buffer[0] & 255) == 'Y')
+    return (1);
+  else
+    return (0);
+}
+
+
+/*
+ * 'read_string()' - Read a string response from the console or a file.
+ */
+
+static char *				/* O - String or `NULL` if none */
+read_string(const char *prompt,		/* I - Prompt (if interactive) */
+            FILE       *fp,		/* I - File to read from */
+            char       *buffer,		/* I - Response buffer */
+            size_t     bufsize)		/* I - Size of response buffer */
+{
+  char	*bufptr;			/* Pointer into buffer */
+
+
+  if (prompt)
+  {
+   /*
+    * Show prompt...
+    */
+
+    printf("%s? ", prompt);
+    fflush(stdout);
+  }
+
+  if (fgets(buffer, bufsize, fp))
+  {
+   /*
+    * Got a line from the user, strip trailing whitespace...
+    */
+
+    for (bufptr = buffer + strlen(buffer) - 1; bufptr >= buffer; bufptr --)
+      if (isspace(*bufptr & 255))
+        *bufptr = '\0';
+
+   /*
+    * If there is anything left, return it...
+    */
+
+    if (buffer[0])
+      return (buffer);
+  }
+
+  return (NULL);
+}
+
 
 /*
  * 'usage()' - Show program usage.
@@ -807,10 +1137,14 @@ usage(void)
   puts("Usage: ippevesubmit [options] \"Printer Name\"");
   puts("");
   puts("Options:");
-  puts("  --help             Show help.");
-  puts("  -m models.txt      Specify a list of models, one per line.");
-  puts("  -o filename.json   Specify the JSON output file, otherwise JSON is sent");
-  puts("                     to the standard output.");
+  puts("  --help               Show help.");
+  puts("  -m models.txt        Specify a list of models, one per line.");
+  puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
+  puts("                       to the standard output.");
+  puts("  -p \"product family\"  Specify the product family.");
+  puts("  -s                   Submit for a print server.");
+  puts("  -u URL               Specify the product family web page.");
+  puts("  -y                   Answer yes to the checklist questions.");
 }
 
 
