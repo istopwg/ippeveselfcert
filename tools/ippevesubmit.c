@@ -14,6 +14,8 @@
  * Options:
  *
  *    -m models.txt        Specify list of models, one per line.
+ *    -o filename.json     Specify the JSON output file, otherwise JSON is sent
+ *                         to the standard output.
  */
 
 
@@ -34,7 +36,6 @@
 #else
 #  include <unistd.h>
 #endif /* _WIN32 */
-#include <cups/cups.h>
 
 
 /*
@@ -71,6 +72,8 @@ typedef struct plist_s			/**** plist Data Node ****/
  * Local functions...
  */
 
+static void	json_puts(FILE *fp, const char *s);
+static void	json_write_plist(FILE *fp, plist_t *plist);
 static plist_t	*plist_add(plist_t *parent, plist_type_t type, const char *value);
 static int	plist_array_count(plist_t *plist);
 static void	plist_delete(plist_t *plist);
@@ -94,6 +97,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option */
+		*json = NULL,		/* JSON output file */
 		*models = NULL,		/* File containing a list of models */
 		*printer = NULL;	/* Printer being tested */
   char		filename[1024];		/* plist filename */
@@ -144,6 +148,18 @@ main(int  argc,				/* I - Number of command-line arguments */
               models = argv[i];
               break;
 
+          case 'o' : /* -o filename.json */
+              i ++;
+              if (i >= argc)
+              {
+                puts("ippevesubmit: Expected filename after '-o'.");
+                usage();
+                return (1);
+              }
+
+              json = argv[i];
+              break;
+
           default :
               printf("ippevesubmit: Unknown option '-%c'.\n", *opt);
               usage();
@@ -188,11 +204,129 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (!validate_document_results(filename, document_results))
     ok = 0;
 
+  json_write_plist(stdout, dnssd_results);
+
  /*
   * Write JSON file for submission...
   */
 
   return (!ok);
+}
+
+
+/*
+ * 'json_puts()' - Write a string with JSON encoding to a file.
+ */
+
+static void
+json_puts(FILE       *fp,		/* I - File to write to */
+          const char *s)		/* I - String to write */
+{
+  putc('\"', fp);
+
+  while (*s)
+  {
+    if (*s == '\b')
+      fputs("\\b", fp);
+    else if (*s == '\f')
+      fputs("\\f", fp);
+    else if (*s == '\n')
+      fputs("\\n", fp);
+    else if (*s == '\r')
+      fputs("\\r", fp);
+    else if (*s == '\t')
+      fputs("\\t", fp);
+    else if (*s == '\\')
+      fputs("\\\\", fp);
+    else if (*s == '\"')
+      fputs("\\\"", fp);
+    else if (*s == '\'')
+      fputs("\\'", fp);
+    else if ((*s & 255) >= ' ')
+      putc(*s, fp);
+
+    s ++;
+  }
+
+  putc('\"', fp);
+}
+
+
+/*
+ * 'json_write_plist()' - Write a plist as a JSON file.
+ */
+
+static void
+json_write_plist(FILE    *fp,		/* I - File to write to */
+                 plist_t *plist)	/* I - plist to write */
+{
+  plist_t	*current,		/* Current node */
+		*next;			/* Next node */
+
+
+  for (current = plist->first_child; current; current = next)
+  {
+    if (current->prev_sibling && current->parent->type == PLIST_TYPE_ARRAY)
+      fputs(",\n", fp);
+
+    switch (current->type)
+    {
+      case PLIST_TYPE_PLIST :
+          break;
+      case PLIST_TYPE_ARRAY :
+          putc('[', fp);
+          break;
+      case PLIST_TYPE_DICT :
+          putc('{', fp);
+          break;
+      case PLIST_TYPE_KEY :
+          if (current->prev_sibling)
+            putc(',', fp);
+
+          json_puts(fp, current->value);
+          putc(':', fp);
+          break;
+      case PLIST_TYPE_DATA :
+      case PLIST_TYPE_DATE :
+      case PLIST_TYPE_STRING :
+          json_puts(fp, current->value);
+          break;
+      case PLIST_TYPE_FALSE :
+          fputs("false", fp);
+          break;
+      case PLIST_TYPE_TRUE :
+          fputs("true", fp);
+          break;
+      case PLIST_TYPE_INTEGER :
+          fputs(current->value, fp);
+          break;
+    }
+
+    next = current->first_child;
+    if (!next)
+      next = current->next_sibling;
+    if (!next)
+    {
+      next = current->parent;
+      while (next)
+      {
+        if (next->type == PLIST_TYPE_ARRAY)
+          putc(']', fp);
+        else if (next->type == PLIST_TYPE_DICT)
+          putc('}', fp);
+
+        if (next->next_sibling)
+        {
+          next = next->next_sibling;
+          break;
+        }
+        else
+          next = next->parent;
+      }
+    }
+  }
+
+  putc('\n', fp);
 }
 
 
@@ -453,10 +587,12 @@ plist_read(const char *filename)	/* I - File to read */
       */
 
       if (plist)
+      {
+        printf("%s:%d: Unexpected (second) <plist> seen.\n", filename, linenum);
         break;
+      }
 
-      plist = parent = (plist_t *)calloc(1, sizeof(plist_t));
-      plist->type = PLIST_TYPE_PLIST;
+      plist = parent = plist_add(NULL, PLIST_TYPE_PLIST, NULL);
     }
     else if (!plist)
     {
@@ -671,8 +807,10 @@ usage(void)
   puts("Usage: ippevesubmit [options] \"Printer Name\"");
   puts("");
   puts("Options:");
-  puts("  --help           Show help.");
-  puts("  -m models.txt    Specify a list of models, one per line.");
+  puts("  --help             Show help.");
+  puts("  -m models.txt      Specify a list of models, one per line.");
+  puts("  -o filename.json   Specify the JSON output file, otherwise JSON is sent");
+  puts("                     to the standard output.");
 }
 
 
