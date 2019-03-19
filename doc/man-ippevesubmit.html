@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ippevesubmit(1)</title>
+</head>
+<body>
+<h1 class="title">ippevesubmit(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ippevesubmit - prepare a submission for self-certification results.
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ippevesubmit</b>
+[
+<b>--help</b>
+]
+<br>
+<b>ippevesubmit</b>
+[
+<b>-m</b>
+<i>models.txt</i>
+] [
+<b>-o</b>
+<i>filename.json</i>
+] [
+<b>-p</b>
+<i>"product family"</i>
+] [
+<b>-s</b>
+] [
+<b>-u</b>
+<i>URL</i>
+] [
+<b>-y</b>
+] "Printer Name"
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ippevesubmit</b>
+validates the results from the IPP Everywhere<sup>TM</sup> Printer Self-Certification Tools and generates a JSON file suitable for submission to the IEEE-ISTO Printer Working Group.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized by
+<b>ippevesubmit:</b>
+<dl class="man">
+<dt><b>--help</b>
+<dd style="margin-left: 5.0em">Shows program help.
+<dt><b>-m </b><i>models.txt</i>
+<dd style="margin-left: 5.0em">Specifies a file containing a list of printer models, one per line, that are being submitted for certification.
+<dt><b>-o </b><i>filename.json</i>
+<dd style="margin-left: 5.0em">Specifies a JSON output file.
+If not specified, the JSON file is sent to the standard output.
+<dt><b>-p "</b><i>product family</i><b>"</b>
+<dd style="margin-left: 5.0em">Specifies the product family for the models being submitted.
+If not specified,
+<b>ippevesubmit</b>
+will ask for the family name.
+<dt><b>-s</b>
+<dd style="margin-left: 5.0em">Specifies that the submission is for a print server product and not a standalone printer.
+<dt><b>-u </b><i>URL</i>
+<dd style="margin-left: 5.0em">Specifies a product web page for the models being submitted.
+If not specified,
+<b>ippevesubmit</b>
+will ask for the web page URL.
+<b>-y</b>
+Specifies that the submitter used the tools from the PWG web site, has production-ready firmware on the printer or production-ready software on the print server, and that all output printed correctly.
+If not specified,
+<b>ippevesubmit</b>
+will ask the user to confirm each of these things.
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp">http://www.pwg.org/ipp</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2019 by the IEEE-ISTO Printer Working Group.
+Copyright &copy; 2019 by Apple Inc.
+
+</body>
+</html>
