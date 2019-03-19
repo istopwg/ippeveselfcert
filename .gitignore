@@ -4,8 +4,9 @@ config.h
 config.log
 config.status
 cups/libcups.a
-sw-ippeveselfcert10-*
+sw-ippeveselfcert11-*
 tests/pwg-raster-samples-*
+tools/ippevesubmit
 tools/ippfind
 tools/ippserver
 tools/ipptool
