@@ -4,7 +4,7 @@
  * Copyright © 2019 by the ISTO Printer Working Group.
  * Copyright © 2019 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * Licensed under Apache License v2.0.	See the file "LICENSE" for more
  * information.
  *
  * Usage:
@@ -13,14 +13,14 @@
  *
  * Options:
  *
- *    --help               Show help.
- *    -m models.txt        Specify list of models, one per line.
- *    -o filename.json     Specify the JSON output file, otherwise JSON is sent
- *                         to the standard output.
+ *    --help		   Show help.
+ *    -m models.txt	   Specify list of models, one per line.
+ *    -o filename.json	   Specify the JSON output file, otherwise JSON is sent
+ *			   to the standard output.
  *    -p "product family"  Specify the product family.
- *    -s                   Submit for a print server.
- *    -u URL               Specify the product family web page.
- *    -y                   Answer yes to the checklist questions.
+ *    -s		   Submit for a print server.
+ *    -u URL		   Specify the product family web page.
+ *    -y		   Answer yes to the checklist questions.
  */
 
 
@@ -37,7 +37,7 @@
 #  include <io.h>
 #  include <direct.h>
 #  define access	_access
-#  define R_OK          04
+#  define R_OK		04
 #else
 #  include <unistd.h>
 #endif /* _WIN32 */
@@ -180,75 +180,75 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
-        switch (*opt)
-        {
-          case 'm' : /* -m models.txt */
-              i ++;
-              if (i >= argc)
-              {
-                puts("ippevesubmit: Expected filename after '-m'.");
-                usage();
-                return (1);
-              }
+	switch (*opt)
+	{
+	  case 'm' : /* -m models.txt */
+	      i ++;
+	      if (i >= argc)
+	      {
+		puts("ippevesubmit: Expected filename after '-m'.");
+		usage();
+		return (1);
+	      }
 
-              if (access(argv[i], R_OK))
-              {
-                printf("ippevesubmit: Unable to access models file \"%s\": %s\n", argv[i], strerror(errno));
-                return (1);
-              }
+	      if (access(argv[i], R_OK))
+	      {
+		printf("ippevesubmit: Unable to access models file \"%s\": %s\n", argv[i], strerror(errno));
+		return (1);
+	      }
 
-              models = argv[i];
-              break;
+	      models = argv[i];
+	      break;
 
-          case 'o' : /* -o filename.json */
-              i ++;
-              if (i >= argc)
-              {
-                puts("ippevesubmit: Expected filename after '-o'.");
-                usage();
-                return (1);
-              }
+	  case 'o' : /* -o filename.json */
+	      i ++;
+	      if (i >= argc)
+	      {
+		puts("ippevesubmit: Expected filename after '-o'.");
+		usage();
+		return (1);
+	      }
 
-              json = argv[i];
-              break;
+	      json = argv[i];
+	      break;
 
-          case 'p' : /* -p "product family" */
-              i ++;
-              if (i >= argc)
-              {
-                puts("ippevesubmit: Expected family name after '-p'.");
-                usage();
-                return (1);
-              }
+	  case 'p' : /* -p "product family" */
+	      i ++;
+	      if (i >= argc)
+	      {
+		puts("ippevesubmit: Expected family name after '-p'.");
+		usage();
+		return (1);
+	      }
 
-              family = argv[i];
-              break;
+	      family = argv[i];
+	      break;
 
-          case 's' : /* -s (print server) */
-              print_server = 1;
-              break;
+	  case 's' : /* -s (print server) */
+	      print_server = 1;
+	      break;
 
-          case 'u' : /* -u URL */
-              i ++;
-              if (i >= argc)
-              {
-                puts("ippevesubmit: Expected web page URL after '-u'.");
-                usage();
-                return (1);
-              }
+	  case 'u' : /* -u URL */
+	      i ++;
+	      if (i >= argc)
+	      {
+		puts("ippevesubmit: Expected web page URL after '-u'.");
+		usage();
+		return (1);
+	      }
 
-              webpage = argv[i];
-              break;
+	      webpage = argv[i];
+	      break;
 
-          case 'y' : /* -y (yes to all) */
-              yes_to_all = 1;
-              break;
+	  case 'y' : /* -y (yes to all) */
+	      yes_to_all = 1;
+	      break;
 
-          default :
-              printf("ippevesubmit: Unknown option '-%c'.\n", *opt);
-              usage();
-              return (1);
-        }
+	  default :
+	      printf("ippevesubmit: Unknown option '-%c'.\n", *opt);
+	      usage();
+	      return (1);
+	}
       }
     }
     else if (!printer)
@@ -341,7 +341,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Supported values from the IPP results...
   */
 
-  supported            = plist_find(ipp_results, "Tests/8/ResponseAttributes/1");
+  supported	       = plist_find(ipp_results, "Tests/8/ResponseAttributes/1");
   color_supported      = plist_find(supported, "color-supported");
   finishings_supported = plist_find(supported, "finishings-supported");
   media_supported      = plist_find(supported, "media-supported");
@@ -356,13 +356,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     for (value = finishings_supported->first_child; value; value = value->next_sibling)
     {
       if (!strncmp(value->value, "fold", 4))
-        finishings_fold = 1;
+	finishings_fold = 1;
       else if (!strncmp(value->value, "punch", 5))
-        finishings_punch = 1;
+	finishings_punch = 1;
       else if (!strncmp(value->value, "staple", 6))
-        finishings_staple = 1;
+	finishings_staple = 1;
       else if (!strncmp(value->value, "trim", 4))
-        finishings_trim = 1;
+	finishings_trim = 1;
     }
   }
 
@@ -379,12 +379,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 					/* Decoded PWG size name */
 
       if (!pwg)
-        continue;
+	continue;
 
       if (pwg->width > 43180)
-        media_format = MEDIA_FORMAT_LARGE;
+	media_format = MEDIA_FORMAT_LARGE;
       else if (pwg->width > 22860 && media_format < MEDIA_FORMAT_MEDIUM)
-        media_format = MEDIA_FORMAT_MEDIUM;
+	media_format = MEDIA_FORMAT_MEDIUM;
     }
   }
 
@@ -395,18 +395,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   submission = plist_add(NULL, PLIST_TYPE_ARRAY, NULL);
 
   submission_time = time(NULL);
-  submission_tm   = gmtime(&submission_time);
+  submission_tm	  = gmtime(&submission_time);
 
   snprintf(submission_date, sizeof(submission_date), "%04d-%02d-%02dT%02d:%02d:%02dZ", submission_tm->tm_year + 1900, submission_tm->tm_mon + 1, submission_tm->tm_mday, submission_tm->tm_hour, submission_tm->tm_min, submission_tm->tm_sec);
 
   if (models)
   {
-    models_fp     = fopen(models, "r");
+    models_fp	  = fopen(models, "r");
     models_prompt = NULL;
   }
   else
   {
-    models_fp     = stdin;
+    models_fp	  = stdin;
     models_prompt = "First Model Name";
   }
 
@@ -501,8 +501,8 @@ main(int  argc,				/* I - Number of command-line arguments */
  */
 
 static void
-json_puts(FILE       *fp,		/* I - File to write to */
-          const char *s)		/* I - String to write */
+json_puts(FILE	     *fp,		/* I - File to write to */
+	  const char *s)		/* I - String to write */
 {
   putc('\"', fp);
 
@@ -539,8 +539,8 @@ json_puts(FILE       *fp,		/* I - File to write to */
  */
 
 static void
-json_write_plist(FILE    *fp,		/* I - File to write to */
-                 plist_t *plist)	/* I - plist to write */
+json_write_plist(FILE	 *fp,		/* I - File to write to */
+		 plist_t *plist)	/* I - plist to write */
 {
   plist_t	*current,		/* Current node */
 		*next;			/* Next node */
@@ -554,34 +554,34 @@ json_write_plist(FILE    *fp,		/* I - File to write to */
     switch (current->type)
     {
       case PLIST_TYPE_PLIST :
-          break;
+	  break;
       case PLIST_TYPE_ARRAY :
-          putc('[', fp);
-          break;
+	  putc('[', fp);
+	  break;
       case PLIST_TYPE_DICT :
-          putc('{', fp);
-          break;
+	  putc('{', fp);
+	  break;
       case PLIST_TYPE_KEY :
-          if (current->prev_sibling)
-            putc(',', fp);
+	  if (current->prev_sibling)
+	    putc(',', fp);
 
-          json_puts(fp, current->value);
-          putc(':', fp);
-          break;
+	  json_puts(fp, current->value);
+	  putc(':', fp);
+	  break;
       case PLIST_TYPE_DATA :
       case PLIST_TYPE_DATE :
       case PLIST_TYPE_STRING :
-          json_puts(fp, current->value);
-          break;
+	  json_puts(fp, current->value);
+	  break;
       case PLIST_TYPE_FALSE :
-          fputs("false", fp);
-          break;
+	  fputs("false", fp);
+	  break;
       case PLIST_TYPE_TRUE :
-          fputs("true", fp);
-          break;
+	  fputs("true", fp);
+	  break;
       case PLIST_TYPE_INTEGER :
-          fputs(current->value, fp);
-          break;
+	  fputs(current->value, fp);
+	  break;
     }
 
     next = current->first_child;
@@ -592,18 +592,18 @@ json_write_plist(FILE    *fp,		/* I - File to write to */
       next = current->parent;
       while (next)
       {
-        if (next->type == PLIST_TYPE_ARRAY)
-          putc(']', fp);
-        else if (next->type == PLIST_TYPE_DICT)
-          putc('}', fp);
+	if (next->type == PLIST_TYPE_ARRAY)
+	  putc(']', fp);
+	else if (next->type == PLIST_TYPE_DICT)
+	  putc('}', fp);
 
-        if (next->next_sibling)
-        {
-          next = next->next_sibling;
-          break;
-        }
-        else
-          next = next->parent;
+	if (next->next_sibling)
+	{
+	  next = next->next_sibling;
+	  break;
+	}
+	else
+	  next = next->parent;
       }
     }
   }
@@ -618,10 +618,10 @@ json_write_plist(FILE    *fp,		/* I - File to write to */
 
 static plist_t *			/* O - New node or `NULL` on error */
 plist_add(plist_t      *parent,		/* I - Parent node */
-          plist_type_t type,		/* I - Node type */
-          const char   *value)		/* I - Node value or `NULL` */
+	  plist_type_t type,		/* I - Node type */
+	  const char   *value)		/* I - Node value or `NULL` */
 {
-  plist_t         *temp;                  /* New node */
+  plist_t	  *temp;		  /* New node */
 
 
   if ((temp = calloc(1, sizeof(plist_t))) != NULL)
@@ -636,13 +636,13 @@ plist_add(plist_t      *parent,		/* I - Parent node */
 
       if (parent->last_child)
       {
-        parent->last_child->next_sibling = temp;
-        temp->prev_sibling               = parent->last_child;
-        parent->last_child               = temp;
+	parent->last_child->next_sibling = temp;
+	temp->prev_sibling		 = parent->last_child;
+	parent->last_child		 = temp;
       }
       else
       {
-        parent->first_child = parent->last_child = temp;
+	parent->first_child = parent->last_child = temp;
       }
     }
 
@@ -718,7 +718,7 @@ plist_delete(plist_t *plist)		/* I - Root node of plist file */
       */
 
       if ((next = current->parent) == plist)
-        next = NULL;
+	next = NULL;
     }
 
    /*
@@ -742,7 +742,7 @@ plist_delete(plist_t *plist)		/* I - Root node of plist file */
 
 static plist_t *			/* O - Matching node or `NULL` if none */
 plist_find(plist_t    *parent,		/* I - Parent node */
-           const char *path)		/* I - Slash-separated path */
+	   const char *path)		/* I - Slash-separated path */
 {
   plist_t	*current;		/* Current node */
   char		temp[8192],		/* Temporary string */
@@ -780,22 +780,22 @@ plist_find(plist_t    *parent,		/* I - Parent node */
       if (current->type == PLIST_TYPE_ARRAY)
       {
        /*
-        * Get the Nth child node...
-        */
+	* Get the Nth child node...
+	*/
 
-        current = current->first_child;
+	current = current->first_child;
 
-        while (n > 0 && current)
-        {
-          current = current->next_sibling;
-          n --;
-        }
+	while (n > 0 && current)
+	{
+	  current = current->next_sibling;
+	  n --;
+	}
 
-        if (!current)
-          return (NULL);
+	if (!current)
+	  return (NULL);
       }
       else
-        return (NULL);
+	return (NULL);
     }
     else
     {
@@ -804,19 +804,19 @@ plist_find(plist_t    *parent,		/* I - Parent node */
       */
 
       if (current->type == PLIST_TYPE_PLIST && current->first_child && current->first_child->type == PLIST_TYPE_DICT)
-        current = current->first_child;
+	current = current->first_child;
 
       if (current->type != PLIST_TYPE_DICT)
-        return (NULL);
+	return (NULL);
 
       for (current = current->first_child; current; current = current->next_sibling)
       {
-        if (current->type == PLIST_TYPE_KEY && !strcmp(current->value, name))
-          break;
+	if (current->type == PLIST_TYPE_KEY && !strcmp(current->value, name))
+	  break;
       }
 
       if (!current || !current->next_sibling)
-        return (NULL);
+	return (NULL);
 
      /*
       * Then point to the value node that follows it...
@@ -870,8 +870,8 @@ plist_read(const char *filename)	/* I - File to read */
 
       if (plist)
       {
-        printf("%s:%d: Unexpected (second) <plist> seen.\n", filename, linenum);
-        break;
+	printf("%s:%d: Unexpected (second) <plist> seen.\n", filename, linenum);
+	break;
       }
 
       plist = parent = plist_add(NULL, PLIST_TYPE_PLIST, NULL);
@@ -892,9 +892,9 @@ plist_read(const char *filename)	/* I - File to read */
 
       if (parent != plist)
       {
-        buffer[0] = 'x';		/* Flag this as an error */
+	buffer[0] = 'x';		/* Flag this as an error */
 
-        printf("%s:%d: Unexpected '</plist>'\n", filename, linenum);
+	printf("%s:%d: Unexpected '</plist>'\n", filename, linenum);
       }
 
       break;
@@ -918,7 +918,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (parent->type != PLIST_TYPE_ARRAY)
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
 
       parent = parent->parent;
@@ -942,7 +942,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (parent->type != PLIST_TYPE_DICT)
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
 
       parent = parent->parent;
@@ -952,13 +952,13 @@ plist_read(const char *filename)	/* I - File to read */
       if (needval)
       {
 	printf("%s:%d: Expected a value after a '<key>' element.\n", filename, linenum);
-        break;
+	break;
       }
 
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum))
       {
 	printf("%s:%d: Missing <key> value.\n", filename, linenum);
-        break;
+	break;
       }
 
       plist_add(parent, PLIST_TYPE_KEY, buffer);
@@ -967,7 +967,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum) || strcmp(buffer, "</key>"))
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
     }
     else if (!strcmp(buffer, "<data>"))
@@ -975,7 +975,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum))
       {
 	printf("%s:%d: Missing <data> value.\n", filename, linenum);
-        break;
+	break;
       }
 
       plist_add(parent, PLIST_TYPE_DATA, buffer);
@@ -984,7 +984,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum) || strcmp(buffer, "</data>"))
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
     }
     else if (!strcmp(buffer, "<date>"))
@@ -992,7 +992,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum))
       {
 	printf("%s:%d: Missing <date> value.\n", filename, linenum);
-        break;
+	break;
       }
 
       plist_add(parent, PLIST_TYPE_DATE, buffer);
@@ -1001,7 +1001,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum) || strcmp(buffer, "</date>"))
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
     }
     else if (!strcmp(buffer, "<false />"))
@@ -1014,7 +1014,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum))
       {
 	printf("%s:%d: Missing <integer> value.\n", filename, linenum);
-        break;
+	break;
       }
 
       plist_add(parent, PLIST_TYPE_INTEGER, buffer);
@@ -1023,7 +1023,7 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum) || strcmp(buffer, "</integer>"))
       {
 	printf("%s:%d: Unexpected '%s'\n", filename, linenum, buffer);
-        break;
+	break;
       }
     }
     else if (!strcmp(buffer, "<string>"))
@@ -1031,16 +1031,16 @@ plist_read(const char *filename)	/* I - File to read */
       if (!xml_gets(fp, buffer, sizeof(buffer), &linenum))
       {
 	printf("%s:%d: Missing <string> value.\n", filename, linenum);
-        break;
+	break;
       }
 
       if (!strcmp(buffer, "</string>"))
       {
-        plist_add(parent, PLIST_TYPE_STRING, "");
+	plist_add(parent, PLIST_TYPE_STRING, "");
       }
       else
       {
-        plist_add(parent, PLIST_TYPE_STRING, buffer);
+	plist_add(parent, PLIST_TYPE_STRING, buffer);
 
 	if (!xml_gets(fp, buffer, sizeof(buffer), &linenum) || strcmp(buffer, "</string>"))
 	{
@@ -1104,9 +1104,9 @@ read_boolean(const char *prompt)	/* I - Question to ask */
 
 static char *				/* O - String or `NULL` if none */
 read_string(const char *prompt,		/* I - Prompt (if interactive) */
-            FILE       *fp,		/* I - File to read from */
-            char       *buffer,		/* I - Response buffer */
-            size_t     bufsize)		/* I - Size of response buffer */
+	    FILE       *fp,		/* I - File to read from */
+	    char       *buffer,		/* I - Response buffer */
+	    size_t     bufsize)		/* I - Size of response buffer */
 {
   char	*bufptr;			/* Pointer into buffer */
 
@@ -1129,7 +1129,7 @@ read_string(const char *prompt,		/* I - Prompt (if interactive) */
 
     for (bufptr = buffer + strlen(buffer) - 1; bufptr >= buffer; bufptr --)
       if (isspace(*bufptr & 255))
-        *bufptr = '\0';
+	*bufptr = '\0';
 
    /*
     * If there is anything left, return it...
@@ -1153,14 +1153,14 @@ usage(void)
   puts("Usage: ippevesubmit [options] \"Printer Name\"");
   puts("");
   puts("Options:");
-  puts("  --help               Show help.");
-  puts("  -m models.txt        Specify a list of models, one per line.");
+  puts("  --help	       Show help.");
+  puts("  -m models.txt	       Specify a list of models, one per line.");
   puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
-  puts("                       to the standard output.");
-  puts("  -p \"product family\"  Specify the product family.");
-  puts("  -s                   Submit for a print server.");
-  puts("  -u URL               Specify the product family web page.");
-  puts("  -y                   Answer yes to the checklist questions.");
+  puts("		       to the standard output.");
+  puts("  -p \"product family\"	 Specify the product family.");
+  puts("  -s		       Submit for a print server.");
+  puts("  -u URL	       Specify the product family web page.");
+  puts("  -y		       Answer yes to the checklist questions.");
 }
 
 
@@ -1172,44 +1172,284 @@ static int				/* O - 1 on success, 0 on failure */
 validate_dnssd_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - DNS-SD results */
-    int        print_server)		/* I - Certifying a print server? */
+    int	       print_server)		/* I - Certifying a print server? */
 {
-  (void)filename;
-  (void)results;
-  (void)print_server;
+  int		result = 1;		/* Success/fail result */
+  plist_t	*fileid,		/* FileId value */
+		*successful,		/* Successful value */
+		*tests,			/* Tests array */
+		*test;			/* Current test */
+  int		number,			/* Test number */
+		tests_count = 0;	/* Number of tests */
 
-  return (1);
+
+  if ((fileid = plist_find(results, "Tests/0/FileId")) == NULL)
+  {
+    printf("%s: Missing FileId.\n", filename);
+    return (0);
+  }
+  else if (fileid->type != PLIST_TYPE_STRING)
+  {
+    printf("%s: FileId is not a string value.\n", filename);
+    return (0);
+  }
+  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd"))
+  {
+    printf("%s: Unsupported FileId '%s'.\n", filename, fileid->value);
+    result = 0;
+  }
+
+  if ((successful = plist_find(results, "Successful")) == NULL)
+  {
+    printf("%s: Missing Successful.\n", filename);
+    result = 0;
+  }
+  else if (successful->type != PLIST_TYPE_FALSE && successful->type != PLIST_TYPE_TRUE)
+  {
+    printf("%s: Successful is not a boolean value.\n", filename);
+    result = 0;
+  }
+
+  if ((tests = plist_find(results, "Tests")) == NULL)
+  {
+    printf("%s: Missing Tests.\n", filename);
+    result = 0;
+  }
+  else if (tests->type != PLIST_TYPE_ARRAY)
+  {
+    printf("%s: Tests is not an array value.\n", filename);
+    result = 0;
+    tests  = NULL;
+  }
+
+  tests_count = plist_array_count(tests);
+
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && tests_count != 10)
+  {
+    printf("%s: Wrong number of tests (got %d, expected 10).\n", filename, tests_count);
+    result = 0;
+  }
+  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd") && tests_count != 10)
+  {
+    printf("%s: Wrong number of tests (got %d, expected 10).\n", filename, tests_count);
+    result = 0;
+  }
+
+  if (tests)
+  {
+    for (test = tests->first_child, number = 1; test; test = test->next_sibling, number ++)
+    {
+      plist_t	*tname = plist_find(test, "Name"),
+					/* Test name */
+		*tsuccessful = plist_find(test, "Successful"),
+					/* Was the test successful? */
+		*terrors = plist_find(test, "Errors"),
+					/* What errors occurred? */
+		*terror;		/* Current error message */
+
+      if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
+      {
+	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	result = 0;
+	continue;
+      }
+
+      if (tsuccessful->type == PLIST_TYPE_FALSE)
+      {
+       /*
+	* Test failed, check for auto-exceptions and show error otherwise...
+	*/
+
+	int show_errors = 1;		/* Show error messages? */
+
+	if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && (number == 4 || number == 10) && terrors)
+	{
+	 /*
+	  * Inspect errors for the current auto-exceptions for all printers:
+	  *
+	  * - Allow rp values other than ipp/print and ipp/print/...
+	  */
+
+	  show_errors = 0;
+
+	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
+	  {
+	    if (terror->type != PLIST_TYPE_STRING)
+	      continue;
+	    else if (strncmp(terror->value, "rp has bad value", 16))
+	    {
+	     /*
+	      * Show any errors that don't fall under the exception here...
+	      */
+
+	      if (!show_errors)
+	      {
+		show_errors = 1;
+		printf("%s: FAILED %s\n", filename, tname->value);
+	      }
+
+	      printf("%s: %s\n", filename, terror->value);
+	    }
+	  }
+
+	  if (show_errors)
+	  {
+	   /*
+	    * Since we already showed the errors we care about, clear the show
+	    * flag and say that we fail...
+	    */
+
+	    show_errors = 0;
+	    result	= 0;
+	  }
+	}
+
+	if (show_errors)
+	{
+	  result = 0;
+
+	  printf("%s: FAILED %s\n", filename, tname->value);
+
+	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
+	  {
+	    if (terror->type != PLIST_TYPE_STRING)
+	      continue;
+
+	    printf("%s: %s\n", filename, terror->value);
+	  }
+	}
+      }
+    }
+  }
+
+  return (result);
 }
 
 
 /*
- * 'validate_document_results()' - Validate the results from the document
- * tests.
+ * 'validate_document_results()' - Validate the results from the document tests.
  */
 
 static int				/* O - 1 on success, 0 on failure */
 validate_document_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - Document results */
-    int        print_server)		/* I - Certifying a print server? */
+    int	       print_server)		/* I - Certifying a print server? */
 {
-  (void)filename;
-  (void)results;
-  (void)print_server;
+  int		result = 1;		/* Success/fail result */
+  plist_t	*fileid,		/* FileId value */
+		*successful,		/* Successful value */
+		*tests,			/* Tests array */
+		*test;			/* Current test */
+  int		number,			/* Test number */
+		tests_count = 0;	/* Number of tests */
 
-  return (1);
+
+  if ((fileid = plist_find(results, "Tests/0/FileId")) == NULL)
+  {
+    printf("%s: Missing FileId.\n", filename);
+    return (0);
+  }
+  else if (fileid->type != PLIST_TYPE_STRING)
+  {
+    printf("%s: FileId is not a string value.\n", filename);
+    return (0);
+  }
+  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.document"))
+  {
+    printf("%s: Unsupported FileId '%s'.\n", filename, fileid->value);
+    result = 0;
+  }
+
+  if ((successful = plist_find(results, "Successful")) == NULL)
+  {
+    printf("%s: Missing Successful.\n", filename);
+    result = 0;
+  }
+  else if (successful->type != PLIST_TYPE_FALSE && successful->type != PLIST_TYPE_TRUE)
+  {
+    printf("%s: Successful is not a boolean value.\n", filename);
+    result = 0;
+  }
+
+  if ((tests = plist_find(results, "Tests")) == NULL)
+  {
+    printf("%s: Missing Tests.\n", filename);
+    result = 0;
+  }
+  else if (tests->type != PLIST_TYPE_ARRAY)
+  {
+    printf("%s: Tests is not an array value.\n", filename);
+    result = 0;
+    tests  = NULL;
+  }
+
+  tests_count = plist_array_count(tests);
+
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && tests_count != 34)
+  {
+    printf("%s: Wrong number of tests (got %d, expected 34).\n", filename, tests_count);
+    result = 0;
+  }
+  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 34)
+  {
+    printf("%s: Wrong number of tests (got %d, expected 34).\n", filename, tests_count);
+    result = 0;
+  }
+
+  if (tests)
+  {
+    for (test = tests->first_child, number = 1; test; test = test->next_sibling, number ++)
+    {
+      plist_t	*tname = plist_find(test, "Name"),
+					/* Test name */
+		*tsuccessful = plist_find(test, "Successful"),
+					/* Was the test successful? */
+		*terrors = plist_find(test, "Errors"),
+					/* What errors occurred? */
+		*terror;		/* Current error message */
+
+      if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
+      {
+	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	result = 0;
+	continue;
+      }
+
+      if (tsuccessful->type == PLIST_TYPE_FALSE)
+      {
+       /*
+	* Test failed, show errors...
+	*/
+
+	result = 0;
+
+	printf("%s: FAILED %s\n", filename, tname->value);
+
+	for (terror = terrors->first_child; terror; terror = terror->next_sibling)
+	{
+	  if (terror->type != PLIST_TYPE_STRING)
+	    continue;
+
+	  printf("%s: %s\n", filename, terror->value);
+	}
+      }
+    }
+  }
+
+  return (result);
 }
 
 
 /*
- * 'validate__results()' - Validate the results from the  tests.
+ * 'validate_ipp_results()' - Validate the results from the IPP tests.
  */
 
 static int				/* O - 1 on success, 0 on failure */
 validate_ipp_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - IPP results */
-    int        print_server)		/* I - Certifying a print server? */
+    int	       print_server)		/* I - Certifying a print server? */
 {
   int		result = 1;		/* Success/fail result */
   plist_t	*fileid,		/* FileId value */
@@ -1261,12 +1501,12 @@ validate_ipp_results(
 
   tests_count = plist_array_count(tests);
 
-  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10") && tests_count != 27)
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && tests_count != 27)
   {
     printf("%s: Wrong number of tests (got %d, expected 27).\n", filename, tests_count);
     result = 0;
   }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11") && tests_count != 28)
+  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 28)
   {
     printf("%s: Wrong number of tests (got %d, expected 28).\n", filename, tests_count);
     result = 0;
@@ -1286,69 +1526,69 @@ validate_ipp_results(
 
       if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
       {
-        printf("%s: Missing/bad values for test #%d.\n", filename, number);
-        result = 0;
-        continue;
+	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	result = 0;
+	continue;
       }
 
       if (tsuccessful->type == PLIST_TYPE_FALSE)
       {
        /*
-        * Test failed, check for auto-exceptions and show error otherwise...
-        */
+	* Test failed, check for auto-exceptions and show error otherwise...
+	*/
 
-        int show_errors = 1;		/* Show error messages? */
+	int show_errors = 1;		/* Show error messages? */
 
-        if (print_server && (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") || !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp")) && number == 9 && terrors)
-        {
-         /*
-          * Inspect errors for the current auto-exceptions for Print Servers:
-          *
-          * - media-col-ready, media-ready, identify-actions-xxx,
-          *   printer-device-id, and the printer-supply attribute are not
-          *   required.
-          * - The Identify-Printer operation is not required.
-          */
+	if (print_server && (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") || !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp")) && number == 9 && terrors)
+	{
+	 /*
+	  * Inspect errors for the current auto-exceptions for Print Servers:
+	  *
+	  * - media-col-ready, media-ready, identify-actions-xxx,
+	  *   printer-device-id, and the printer-supply attribute are not
+	  *   required.
+	  * - The Identify-Printer operation is not required.
+	  */
 
-          show_errors = 0;
+	  show_errors = 0;
 
-          for (terror = terrors->first_child; terror; terror = terror->next_sibling)
-          {
-            if (terror->type != PLIST_TYPE_STRING)
-              continue;
-            else if (strncmp(terror->value, "EXPECTED: media-col-ready", 25) &&
-                     strncmp(terror->value, "EXPECTED: media-ready", 21) &&
-                     strncmp(terror->value, "EXPECTED: identify-actions-", 27) &&
-                     strncmp(terror->value, "EXPECTED: printer-device-id", 27) &&
-                     strncmp(terror->value, "EXPECTED: printer-supply", 24) &&
-                     strncmp(terror->value, "EXPECTED: operations-supported WITH-VALUE \"0x003c\"", 50) &&
-                     strncmp(terror->value, "GOT: printer-supply=", 20))
-            {
-             /*
-              * Show any errors that don't fall under the exception here...
-              */
+	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
+	  {
+	    if (terror->type != PLIST_TYPE_STRING)
+	      continue;
+	    else if (strncmp(terror->value, "EXPECTED: media-col-ready", 25) &&
+		     strncmp(terror->value, "EXPECTED: media-ready", 21) &&
+		     strncmp(terror->value, "EXPECTED: identify-actions-", 27) &&
+		     strncmp(terror->value, "EXPECTED: printer-device-id", 27) &&
+		     strncmp(terror->value, "EXPECTED: printer-supply", 24) &&
+		     strncmp(terror->value, "EXPECTED: operations-supported WITH-VALUE \"0x003c\"", 50) &&
+		     strncmp(terror->value, "GOT: printer-supply=", 20))
+	    {
+	     /*
+	      * Show any errors that don't fall under the exception here...
+	      */
 
-              if (!show_errors)
-              {
-                show_errors = 1;
+	      if (!show_errors)
+	      {
+		show_errors = 1;
 		printf("%s: FAILED %s\n", filename, tname->value);
 	      }
 
-	      printf("%s:     %s\n", filename, terror->value);
+	      printf("%s: %s\n", filename, terror->value);
 	    }
-          }
+	  }
 
-          if (show_errors)
-          {
-           /*
-            * Since we already showed the errors we care about, clear the show
-            * flag and say that we fail...
-            */
+	  if (show_errors)
+	  {
+	   /*
+	    * Since we already showed the errors we care about, clear the show
+	    * flag and say that we fail...
+	    */
 
-            show_errors = 0;
-            result      = 0;
-          }
-        }
+	    show_errors = 0;
+	    result	= 0;
+	  }
+	}
 	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
 	{
 	 /*
@@ -1369,7 +1609,7 @@ validate_ipp_results(
 	    if (terror->type != PLIST_TYPE_STRING)
 	      continue;
 
-	    printf("%s:     %s\n", filename, terror->value);
+	    printf("%s: %s\n", filename, terror->value);
 	  }
 	}
       }
@@ -1388,14 +1628,14 @@ validate_ipp_results(
  */
 
 static char *				/* O  - XML fragment or `NULL` on EOF/error */
-xml_gets(FILE   *fp,			/* I  - File to read from */
-         char   *buffer,		/* I  - Buffer */
-         size_t bufsize,		/* I  - Size of buffer */
-         int    *linenum)		/* IO - Current line number */
+xml_gets(FILE	*fp,			/* I  - File to read from */
+	 char	*buffer,		/* I  - Buffer */
+	 size_t bufsize,		/* I  - Size of buffer */
+	 int	*linenum)		/* IO - Current line number */
 {
-  char  ch,                             /* Current character */
-        *bufptr,                       /* Pointer into buffer */
-        *bufend;                       /* Pointer to end of buffer */
+  char	ch,				/* Current character */
+	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* Pointer to end of buffer */
 
 
  /*
@@ -1434,40 +1674,40 @@ xml_gets(FILE   *fp,			/* I  - File to read from */
     while ((ch = getc(fp)) != EOF)
     {
       if (bufptr < bufend)
-        *bufptr++ = ch;
+	*bufptr++ = ch;
 
       if (ch == '\n')
       {
-        (*linenum)++;
+	(*linenum)++;
       }
       else if (ch == '>')
       {
-        break;
+	break;
       }
       else if (ch == '\"' || ch == '\'')
       {
        /*
-        * Read quoted string...
-        */
+	* Read quoted string...
+	*/
 
-        char quote = ch;		/* Quote character */
+	char quote = ch;		/* Quote character */
 
-        while ((ch = getc(fp)) != EOF)
-        {
-          if (bufptr < bufend)
-            *bufptr++ = ch;
+	while ((ch = getc(fp)) != EOF)
+	{
+	  if (bufptr < bufend)
+	    *bufptr++ = ch;
 
-          if (ch == '\n')
-            (*linenum)++;
-          else if (ch == quote)
-            break;
-        }
+	  if (ch == '\n')
+	    (*linenum)++;
+	  else if (ch == quote)
+	    break;
+	}
 
-        if (ch != quote)
-        {
-          *buffer = '\0';
-          return (NULL);
-        }
+	if (ch != quote)
+	{
+	  *buffer = '\0';
+	  return (NULL);
+	}
       }
     }
 
@@ -1489,16 +1729,16 @@ xml_gets(FILE   *fp,			/* I  - File to read from */
     {
       if (ch == '\n')
       {
-        (*linenum)++;
+	(*linenum)++;
       }
       else if (ch == '<')
       {
-        ungetc(ch, fp);
-        break;
+	ungetc(ch, fp);
+	break;
       }
 
       if (bufptr < bufend)
-        *bufptr++ = ch;
+	*bufptr++ = ch;
     }
 
    /*
@@ -1508,7 +1748,7 @@ xml_gets(FILE   *fp,			/* I  - File to read from */
     while (bufptr > buffer)
     {
       if (!isspace(bufptr[-1] & 255))
-        break;
+	break;
 
       bufptr --;
     }
