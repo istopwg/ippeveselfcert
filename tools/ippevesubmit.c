@@ -95,9 +95,9 @@ static plist_t	*plist_read(const char *filename);
 static int	read_boolean(const char *prompt);
 static char	*read_string(const char *prompt, FILE *fp, char *buffer, size_t bufsize);
 static void	usage(void);
-static int	validate_dnssd_results(const char *filename, plist_t *results);
-static int	validate_document_results(const char *filename, plist_t *results);
-static int	validate_ipp_results(const char *filename, plist_t *results);
+static int	validate_dnssd_results(const char *filename, plist_t *results, int print_server);
+static int	validate_document_results(const char *filename, plist_t *results, int print_server);
+static int	validate_ipp_results(const char *filename, plist_t *results, int print_server);
 static char	*xml_gets(FILE *fp, char *buffer, size_t bufsize, int *linenum);
 static void	xml_unescape(char *buffer);
 
@@ -129,7 +129,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		response[1024];		/* Response from user */
   FILE		*models_fp;		/* Models file */
   const char	*models_prompt;		/* Prompt for models */
-  plist_t	*supported,		/* Supported attributes */
+  plist_t	*fileid,		/* FileId from the first test */
+		*supported,		/* Supported attributes */
 		*color_supported,	/* color-supported value */
 		*finishings_supported,	/* finishings-supported values */
 		*ipps_supported,	/* Is IPPS supported? */
@@ -142,14 +143,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 		finishings_trim = 0;	/* Trimming/cutting? */
   time_t	submission_time;	/* Date/time of submission (seconds) */
   struct tm	*submission_tm;		/* Date/time of submission (tm data) */
-  char		submission_date[32];	/* Date/time of submission (string) */
+  char		submission_date[32],	/* Date/time of submission (string) */
+		submission_version[4];	/* Version of the cert tools */
   media_format_t media_format = MEDIA_FORMAT_SMALL;
 					/* Size class */
   static const char * const media_formats[] =
   {
-    "small",
-    "medium",
-    "large"
+    "Small",
+    "Medium",
+    "Large"
   };
 
 
@@ -273,17 +275,17 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   snprintf(filename, sizeof(filename), "%s DNS-SD Results.plist", printer);
   dnssd_results = plist_read(filename);
-  if (!validate_dnssd_results(filename, dnssd_results))
+  if (!validate_dnssd_results(filename, dnssd_results, print_server))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s IPP Results.plist", printer);
   ipp_results = plist_read(filename);
-  if (!validate_ipp_results(filename, ipp_results))
+  if (!validate_ipp_results(filename, ipp_results, print_server))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s Document Results.plist", printer);
   document_results = plist_read(filename);
-  if (!validate_document_results(filename, document_results))
+  if (!validate_document_results(filename, document_results, print_server))
     ok = 0;
 
   if (!ok && !override_tests)
@@ -317,6 +319,17 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     webpage = strdup(response);
   }
+
+ /*
+  * Look for the cert version in the IPP results...
+  */
+
+  if ((fileid = plist_find(ipp_results, "Tests/0/FileId")) != NULL && !strncmp(fileid->value, "org.pwg.ippeveselfcert", 22) && isdigit(fileid->value[22] & 255) && isdigit(fileid->value[23] & 255))
+    opt = fileid->value + 22;
+  else
+    opt = "??";
+
+  snprintf(submission_version, sizeof(submission_version), "%c.%c", opt[0], opt[1]);
 
  /*
   * Look for IPPS support in the DNS-SD results...
@@ -404,7 +417,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     plist_t *dict = plist_add(submission, PLIST_TYPE_DICT, NULL);
 
-    plist_add(dict, PLIST_TYPE_KEY, "product_family");
+    plist_add(dict, PLIST_TYPE_KEY, "family");
     plist_add(dict, PLIST_TYPE_STRING, family);
 
     plist_add(dict, PLIST_TYPE_KEY, "model");
@@ -413,34 +426,37 @@ main(int  argc,				/* I - Number of command-line arguments */
     plist_add(dict, PLIST_TYPE_KEY, "url");
     plist_add(dict, PLIST_TYPE_STRING, webpage);
 
-    plist_add(dict, PLIST_TYPE_KEY, "color_supported");
+    plist_add(dict, PLIST_TYPE_KEY, "color");
     plist_add(dict, PLIST_TYPE_STRING, (color_supported && color_supported->type == PLIST_TYPE_TRUE) ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "duplex_supported");
+    plist_add(dict, PLIST_TYPE_KEY, "duplex");
     plist_add(dict, PLIST_TYPE_STRING, plist_array_count(sides_supported) > 1 ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "finishings_supported");
+    plist_add(dict, PLIST_TYPE_KEY, "finishings");
     plist_add(dict, PLIST_TYPE_STRING, plist_array_count(finishings_supported) > 1 ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "finishings_fold");
+    plist_add(dict, PLIST_TYPE_KEY, "fin_fold");
     plist_add(dict, PLIST_TYPE_STRING, finishings_fold ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "finishings_punch");
+    plist_add(dict, PLIST_TYPE_KEY, "fin_punch");
     plist_add(dict, PLIST_TYPE_STRING, finishings_punch ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "finishings_staple");
+    plist_add(dict, PLIST_TYPE_KEY, "fin_staple");
     plist_add(dict, PLIST_TYPE_STRING, finishings_staple ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "finishings_trim");
+    plist_add(dict, PLIST_TYPE_KEY, "fin_trim");
     plist_add(dict, PLIST_TYPE_STRING, finishings_trim ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "ipps_supported");
+    plist_add(dict, PLIST_TYPE_KEY, "ipps");
     plist_add(dict, PLIST_TYPE_STRING, ipps_supported ? "1" : "0");
 
-    plist_add(dict, PLIST_TYPE_KEY, "media_format");
+    plist_add(dict, PLIST_TYPE_KEY, "media");
     plist_add(dict, PLIST_TYPE_STRING, media_formats[media_format]);
 
-    plist_add(dict, PLIST_TYPE_KEY, "submission_date");
+    plist_add(dict, PLIST_TYPE_KEY, "version");
+    plist_add(dict, PLIST_TYPE_STRING, submission_version);
+
+    plist_add(dict, PLIST_TYPE_KEY, "date");
     plist_add(dict, PLIST_TYPE_STRING, submission_date);
   }
 
@@ -1155,10 +1171,12 @@ usage(void)
 static int				/* O - 1 on success, 0 on failure */
 validate_dnssd_results(
     const char *filename,		/* I - plist filename */
-    plist_t    *results)		/* I - DNS-SD results */
+    plist_t    *results,		/* I - DNS-SD results */
+    int        print_server)		/* I - Certifying a print server? */
 {
   (void)filename;
   (void)results;
+  (void)print_server;
 
   return (1);
 }
@@ -1172,10 +1190,12 @@ validate_dnssd_results(
 static int				/* O - 1 on success, 0 on failure */
 validate_document_results(
     const char *filename,		/* I - plist filename */
-    plist_t    *results)		/* I - Document results */
+    plist_t    *results,		/* I - Document results */
+    int        print_server)		/* I - Certifying a print server? */
 {
   (void)filename;
   (void)results;
+  (void)print_server;
 
   return (1);
 }
@@ -1188,7 +1208,8 @@ validate_document_results(
 static int				/* O - 1 on success, 0 on failure */
 validate_ipp_results(
     const char *filename,		/* I - plist filename */
-    plist_t    *results)		/* I - IPP results */
+    plist_t    *results,		/* I - IPP results */
+    int        print_server)		/* I - Certifying a print server? */
 {
   int		result = 1;		/* Success/fail result */
   plist_t	*fileid,		/* FileId value */
@@ -1278,10 +1299,15 @@ validate_ipp_results(
 
         int show_errors = 1;		/* Show error messages? */
 
-        if ((!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") || !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp")) && number == 9 && terrors)
+        if (print_server && (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") || !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp")) && number == 9 && terrors)
         {
          /*
-          * Inspect errors...
+          * Inspect errors for the current auto-exceptions for Print Servers:
+          *
+          * - media-col-ready, media-ready, identify-actions-xxx,
+          *   printer-device-id, and the printer-supply attribute are not
+          *   required.
+          * - The Identify-Printer operation is not required.
           */
 
           show_errors = 0;
@@ -1323,8 +1349,14 @@ validate_ipp_results(
             result      = 0;
           }
         }
-	else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
+	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
+	{
+	 /*
+	  * Print Servers also do not need to support 'media-needed'.
+	  */
+
 	  show_errors = 0;
+	}
 
 	if (show_errors)
 	{
