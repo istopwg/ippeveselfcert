@@ -1,7 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -155,6 +155,7 @@ static int	PasswordTries = 0;	/* Number of tries with password */
 static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static int      compare_uris(const char *a, const char *b);
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
+static void	copy_hex_string(char *buffer, unsigned char *data, int datalen, size_t bufsize);
 static int	do_tests(cups_file_t *outfile, _cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
@@ -826,6 +827,69 @@ compare_vars(_cups_var_t *a,		/* I - First variable */
              _cups_var_t *b)		/* I - Second variable */
 {
   return (_cups_strcasecmp(a->name, b->name));
+}
+
+
+/*
+ * 'copy_hex_string()' - Copy an octetString to a C string and encode as hex if
+ *                       needed.
+ */
+
+static void
+copy_hex_string(char          *buffer,	/* I - String buffer */
+		unsigned char *data,	/* I - octetString data */
+		int           datalen,	/* I - octetString length */
+		size_t        bufsize)	/* I - Size of string buffer */
+{
+  char		*bufptr,		/* Pointer into string buffer */
+		*bufend = buffer + bufsize - 2;
+					/* End of string buffer */
+  unsigned char	*dataptr,		/* Pointer into octetString data */
+		*dataend = data + datalen;
+					/* End of octetString data */
+  static const char *hexdigits = "0123456789ABCDEF";
+					/* Hex digits */
+
+
+ /*
+  * First see if there are any non-ASCII bytes in the octetString...
+  */
+
+  for (dataptr = data; dataptr < dataend; dataptr ++)
+    if (*dataptr < 0x20 || *dataptr >= 0x7f)
+      break;
+
+  if (dataptr < dataend)
+  {
+   /*
+    * Yes, encode as hex...
+    */
+
+    *buffer = '<';
+
+    for (bufptr = buffer + 1, dataptr = data; bufptr < bufend && dataptr < dataend; dataptr ++)
+    {
+      *bufptr++ = hexdigits[*dataptr >> 4];
+      *bufptr++ = hexdigits[*dataptr & 15];
+    }
+
+    if (bufptr < bufend)
+      *bufptr++ = '>';
+
+    *bufptr = '\0';
+  }
+  else
+  {
+   /*
+    * No, copy as a string...
+    */
+
+    if ((size_t)datalen > bufsize)
+      datalen = (int)bufsize - 1;
+
+    memcpy(buffer, data, (size_t)datalen);
+    buffer[datalen] = '\0';
+  }
 }
 
 
@@ -6202,6 +6266,169 @@ with_value(cups_file_t     *outfile,	/* I - Output file */
 			attr->values[i].string.text);
         }
 	break;
+
+    case IPP_TAG_STRING :
+        if (flags & _CUPS_WITH_REGEX)
+	{
+	 /*
+	  * Value is an extended, case-sensitive POSIX regular expression...
+	  */
+
+	  regex_t	re;		/* Regular expression */
+
+          if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
+	  {
+            regerror(i, &re, temp, sizeof(temp));
+
+	    print_fatal_error(outfile, "Unable to compile WITH-VALUE regular expression \"%s\" - %s", value, temp);
+	    return (0);
+	  }
+
+         /*
+	  * See if ALL of the values match the given regular expression.
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    void	*data;		/* Pointer to octetString data */
+            int		datalen;	/* Length of octetString */
+
+            if ((data = ippGetOctetString(attr, i, &datalen)) == NULL || datalen >= (int)sizeof(temp))
+            {
+              match = 0;
+              break;
+            }
+            memcpy(temp, data, (size_t)datalen);
+            temp[datalen] = '\0';
+
+	    if (!regexec(&re, temp, 0, NULL, 0))
+	    {
+	      if (!matchbuf[0])
+		strlcpy(matchbuf, temp, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
+
+	  regfree(&re);
+
+	  if (!match && errors)
+	  {
+	    for (i = 0; i < attr->num_values; i ++)
+	    {
+	      int	adatalen;
+	      void	*adata = ippGetOctetString(attr, i, &adatalen);
+
+	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
+	      add_stringf(errors, "GOT: %s=\"%s\"", attr->name, temp);
+	    }
+	  }
+	}
+	else
+        {
+         /*
+          * Value is a literal or hex-encoded string...
+          */
+
+          unsigned char	withdata[1023],	/* WITH-VALUE data */
+			*adata;		/* Pointer to octetString data */
+	  int		withlen,	/* Length of WITH-VALUE data */
+			adatalen;	/* Length of octetString */
+
+          if (*value == '<')
+          {
+           /*
+            * Grab hex-encoded value...
+            */
+
+            if ((withlen = (int)strlen(value)) & 1 || withlen > (int)(2 * (sizeof(withdata) + 1)))
+            {
+	      print_fatal_error(outfile, "Bad WITH-VALUE hex value.");
+              return (0);
+	    }
+
+	    withlen = withlen / 2 - 1;
+
+            for (valptr = value + 1, adata = withdata; *valptr; valptr += 2)
+            {
+              int ch;			/* Current character/byte */
+
+	      if (isdigit(valptr[0]))
+	        ch = (valptr[0] - '0') << 4;
+	      else if (isalpha(valptr[0]))
+	        ch = (tolower(valptr[0]) - 'a' + 10) << 4;
+	      else
+	        break;
+
+	      if (isdigit(valptr[1]))
+	        ch |= valptr[1] - '0';
+	      else if (isalpha(valptr[1]))
+	        ch |= tolower(valptr[1]) - 'a' + 10;
+	      else
+	        break;
+
+	      *adata++ = (unsigned char)ch;
+	    }
+
+	    if (*valptr)
+	    {
+	      print_fatal_error(outfile, "Bad WITH-VALUE hex value.");
+              return (0);
+	    }
+          }
+          else
+          {
+           /*
+            * Copy literal string value...
+            */
+
+            withlen = (int)strlen(value);
+
+            memcpy(withdata, value, (size_t)withlen);
+	  }
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    adata = ippGetOctetString(attr, i, &adatalen);
+
+	    if (withlen == adatalen && !memcmp(withdata, adata, (size_t)withlen))
+	    {
+	      if (!matchbuf[0])
+                copy_hex_string(matchbuf, adata, adatalen, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
+
+	  if (!match && errors)
+	  {
+	    for (i = 0; i < attr->num_values; i ++)
+	    {
+	      adata = ippGetOctetString(attr, i, &adatalen);
+	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
+	      add_stringf(errors, "GOT: %s=\"%s\"", attr->name, temp);
+	    }
+	  }
+        }
+        break;
 
     default :
         break;
