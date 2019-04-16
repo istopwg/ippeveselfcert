@@ -1,15 +1,12 @@
 #
-# IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
+# IPP Everywhere Printer Self-Certification Manual 1.1: Section 6: IPP Tests.
 #
-# Copyright 2014-2016 by The Printer Working Group.
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2014-2019 by The Printer Working Group.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
-# These coded instructions, statements, and computer programs are the
-# property of Apple Inc. and are protected by Federal copyright
-# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-# which should have been included with this file.  If this file is
-# file is missing or damaged, see the license at "http://www.cups.org/".
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 # Usage:
 #
@@ -42,18 +39,18 @@ DEFINE UUID_URI "/^urn:uuid:[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[
 
 # Regular expression for PWG media size names (eek!)
 #
-# Generated with help from: http://www.msweet.org/abnf.php
+# Generated with help from: http://abnf.msweet.org/
 DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)){2,}|(custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)$$/"
 
 # Regular expression for printer-alert attribute
 #
-# Generated with help from: http://www.msweet.org/abnf.php
-DEFINE ALERT_REGEX "/^code\=[A-Za-z]+(;(index\=[0-9]+|severity\=[A-Za-z]+|training\=[A-Za-z]+|group\=[A-Za-z]+|groupindex\=[0-9]+|location\=[0-9]+|time\=[0-9]+)){0,1}$$/"
+# Generated with help from: http://abnf.msweet.org/
+DEFINE ALERT_REGEX "/^code\=[A-Za-z]+;(index\=[0-9]+;|severity\=[A-Za-z]+;|training\=[A-Za-z]+;|group\=[A-Za-z]+;|groupindex\=[0-9]+;|location\=[0-9]+;|time\=[0-9]+;){0,}$$/"
 
 # Regular expression for printer-supply attribute
 #
-# Generated with help from: http://www.msweet.org/abnf.php
-DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([0-9]|\-){0,1})|);*((index\=[0-9]+|markerindex\=[0-9]+|class\=[A-Za-z]+|unit\=[A-Za-z]+|colorantindex\=[0-9]+|colorantrole\=[A-Za-z]+|colorantname\=[A-Za-z]+|coloranttonality\=[0-9]+);){0,1}$$/"
+# Generated with help from: http://abnf.msweet.org/
+DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1}[0-9]+;|index\=[0-9]+;|markerindex\=[0-9]+;|class\=[A-Za-z]+;|unit\=[A-Za-z]+;|colorantindex\=[0-9]+;|colorantrole\=[A-Za-z]+;|colorantname\=[A-Za-z]+;|coloranttonality\=[0-9]+;){0,}$$/"
 
 # Test that a request-id value of 0 is not accepted.
 #
@@ -412,7 +409,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
 
 	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
-	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/"
+
+	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^two-sided-(long|short)-edge$$/" DEFINE-MATCH HAVE_DUPLEX
+	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/" IF-DEFINED HAVE_DUPLEX
+
 	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
