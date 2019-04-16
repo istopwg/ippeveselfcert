@@ -409,8 +409,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
 
 	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+
 	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^two-sided-(long|short)-edge$$/" DEFINE-MATCH HAVE_DUPLEX
 	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/" IF-DEFINED HAVE_DUPLEX
+
 	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
