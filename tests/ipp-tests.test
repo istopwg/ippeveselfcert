@@ -337,9 +337,28 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT copies-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
 
-	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3 DEFINE-MATCH HAVE_FINISHINGS
+	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_FINISHINGS
+
+	EXPECT finishing-template-supported OF-TYPE keyword IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishing-template-supported WITH-VALUE "none" IF-DEFINED HAVE_FINISHINGS
+
+	EXPECT finishings-col-database OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-col-database/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
+
+	EXPECT finishings-col-default OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-col-default/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
+
+	EXPECT finishings-col-ready OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-col-ready/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
+
+	EXPECT finishings-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "finishing-template" IF-DEFINED HAVE_FINISHINGS
+
 	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE-FROM "finishings-supported" IF-DEFINED HAVE_FINISHINGS
+
 	EXPECT ?finishings-ready OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE-FROM "finishings-supported"
+
+	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-supported WITH-VALUE 3 IF-DEFINED HAVE_FINISHINGS
 
 	EXPECT job-account-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true COUNT 1 DEFINE-MATCH HAVE_JOB_ACCOUNT_ID
 	EXPECT job-account-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_JOB_ACCOUNT_ID
