@@ -2,15 +2,12 @@
 #
 # Make an IPP Everywhere Printer self-certification package.
 #
-# Copyright 2014-2017 by the ISTO Printer Working Group.
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2014-2019 by the ISTO Printer Working Group.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-# These coded instructions, statements, and computer programs are the
-# property of Apple Inc. and are protected by Federal copyright
-# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-# which should have been included with this file.  If this file is
-# file is missing or damaged, see the license at "http://www.cups.org/".
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 # Make sure we are running in the right directory...
@@ -63,16 +60,16 @@ mkdir $pkgdir || exit 1
 
 echo Copying package files
 cp LICENSE.md $pkgdir
-cp doc/man-ipp*.html $pkgdir
+cp doc/*.html $pkgdir
 cp tests/README.md $pkgdir
 cp tests/*.jpg $pkgdir
 cp tests/*.pdf $pkgdir
 cp tests/*.sh $pkgdir
 cp tests/*.test $pkgdir
+cp tools/ippeveprinter $pkgdir
+cp tools/ippevesubmit $pkgdir
 cp tools/ippfind $pkgdir/ippfind
-cp tools/ippserver $pkgdir
 cp tools/ipptool $pkgdir/ipptool
-cp tools/printer.png $pkgdir
 
 chmod +x $pkgdir/*.sh
 
@@ -82,8 +79,9 @@ if test x$platform = xmacos; then
 		CODESIGN_IDENTITY="IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION"
 	fi
 
+	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippeveprinter
+	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippevesubmit
 	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippfind
-	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippserver
 	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ipptool
 
 	# Make ZIP archive...

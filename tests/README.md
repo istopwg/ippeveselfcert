@@ -1,4 +1,4 @@
-README.md - 2019-03-12
+README.md - 2019-04-25
 ======================
 
 Introduction
@@ -12,6 +12,10 @@ one or more PWG Raster Format file archives from:
     http://ftp.pwg.org/pub/pwg/ipp/examples/
 
 These archives are used for the Document Data tests.
+
+> Note: Tests are intended to be run on an isolated network, or at least when no
+> other users are printing using the target printer.  Otherwise the test scripts
+> will fail randomly.
 
 
 Contents
@@ -30,8 +34,9 @@ Scripts for running the self-certification tests:
 
 Tools:
 
+- "ippeveprinter": Sample IPP Everywhere printer, useful for testing
+- "ippevesubmit": IPP Everywhere Printer Self-Certification submission tool
 - "ippfind": Tool for finding printers with DNS-SD (Bonjour)
-- "ippserver": Sample IPP server, useful for testing
 - "ipptool": IPP test tool
 
 Documentation:

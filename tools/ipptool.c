@@ -176,7 +176,7 @@ static const char *get_string(ipp_attribute_t *attr, int element, int flags, cha
 static void	init_data(_cups_testdata_t *data);
 static char	*iso_date(const ipp_uchar_t *date);
 static void	pause_message(const char *message);
-static void	print_attr(cups_file_t *outfile, int output, ipp_attribute_t *attr, ipp_tag_t *group);
+static void	print_attr(cups_file_t *outfile, _cups_output_t output, ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_csv(_cups_testdata_t *data, ipp_t *ipp, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_fatal_error(_cups_testdata_t *data, const char *s, ...) _CUPS_FORMAT(2, 3);
 static void	print_ippserver_attr(_cups_testdata_t *data, ipp_attribute_t *attr, int indent);
@@ -1150,7 +1150,7 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
     if (httpGetVersion(data->http) != HTTP_1_1)
     {
-      int version = httpGetVersion(data->http);
+      int version = (int)httpGetVersion(data->http);
 
       add_stringf(data->errors, "Bad HTTP version (%d.%d)", version / 100, version % 100);
     }
@@ -2280,7 +2280,7 @@ pause_message(const char *message)	/* I - Message */
 
 static void
 print_attr(cups_file_t     *outfile,	/* I  - Output file */
-           int             output,	/* I  - Output format */
+           _cups_output_t  output,	/* I  - Output format */
            ipp_attribute_t *attr,	/* I  - Attribute to print */
            ipp_tag_t       *group)	/* IO - Current group */
 {
@@ -4777,6 +4777,8 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  * Value is an extended, case-sensitive POSIX regular expression...
 	  */
 
+	  void		*adata;		/* Pointer to octetString data */
+	  int		adatalen;	/* Length of octetString */
 	  regex_t	re;		/* Regular expression */
 
           if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
@@ -4793,16 +4795,13 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
 	  for (i = 0; i < count; i ++)
 	  {
-	    void	*data;		/* Pointer to octetString data */
-            int		datalen;	/* Length of octetString */
-
-            if ((data = ippGetOctetString(attr, i, &datalen)) == NULL || datalen >= (int)sizeof(temp))
+            if ((adata = ippGetOctetString(attr, i, &adatalen)) == NULL || adatalen >= (int)sizeof(temp))
             {
               match = 0;
               break;
             }
-            memcpy(temp, data, (size_t)datalen);
-            temp[datalen] = '\0';
+            memcpy(temp, adata, (size_t)adatalen);
+            temp[adatalen] = '\0';
 
 	    if (!regexec(&re, temp, 0, NULL, 0))
 	    {
@@ -4828,9 +4827,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  {
 	    for (i = 0; i < count; i ++)
 	    {
-	      int	adatalen;
-	      void	*adata = ippGetOctetString(attr, i, &adatalen);
-
+	      adata = ippGetOctetString(attr, i, &adatalen);
 	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
 	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
 	    }

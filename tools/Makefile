@@ -13,14 +13,14 @@ include ../Makedefs
 
 
 OBJS		=	\
+			ippeveprinter.o \
 			ippevesubmit.o \
 			ippfind.o \
-			ippserver.o \
 			ipptool.o
 TARGETS		=	\
+			ippeveprinter \
 			ippevesubmit \
 			ippfind \
-			ippserver \
 			ipptool
 
 
@@ -48,6 +48,15 @@ depend:
 
 
 #
+# ippeveprinter
+#
+
+ippeveprinter:	ippeveprinter.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippeveprinter.o $(LIBS)
+
+
+#
 # ippevesubmit
 #
 
@@ -63,15 +72,6 @@ ippevesubmit:	ippevesubmit.o ../cups/libcups.a
 ippfind:	ippfind.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ ippfind.o $(LIBS)
-
-
-#
-# ippserver
-#
-
-ippserver:	ippserver.o ../cups/libcups.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ippserver.o $(LIBS)
 
 
 #

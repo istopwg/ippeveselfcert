@@ -9,8 +9,8 @@ Certification Tools.
 > of the tools to generate the results for the portal.
 
 
-Prerequisites
--------------
+Building on Linux/macOS
+-----------------------
 
 You'll need an ANSI-compliant C compiler plus a make program and POSIX-compliant
 shell (/bin/sh).  The GNU compiler tools and Bash work well and we have tested
@@ -25,7 +25,7 @@ support "include".
 Besides these tools you'll want the following libraries:
 
 - Avahi (Linux) or mDNSResponder (all others) for DNS-SD (Bonjour) support
-- GNU TLS for encryption support on platforms other than iOS, macOS, or Windows
+- GNU TLS for encryption support on platforms other than macOS
 - ZLIB for compression support
 
 On a stock Debian/Ubuntu install, the following command will install most of the
@@ -33,10 +33,6 @@ required prerequisites:
 
     sudo apt-get install build-essential autoconf avahi-daemon avahi-utils \
         libavahi-client-dev libgnutls28-dev libnss-mdns zlib1g-dev
-
-
-Configuration
--------------
 
 CUPS uses GNU autoconf, so you should find the usual `configure` script in the
 main CUPS source directory.  To configure the code for your system, type:
@@ -76,15 +72,17 @@ or if you have FreeBSD, NetBSD, or OpenBSD type:
 to build the software.
 
 
-Running Tests
--------------
+Building on Windows
+-------------------
 
-The `runtests.sh` script can be used to run any of the IPP Everywhere Printer
-Self-Certification Manual tests using the locally-built tools.  For example:
+A Visual Studio project file can be found in the "vcnet" directory.  You'll
+need the following minimum software:
 
-    ./runtests.sh dnssd-tests.sh 'My Printer'
-    ./runtests.sh ipp-tests.sh 'My Printer'
-    ./runtests.sh document-tests.sh 'My Printer'
+- Visual Studio 2017 Community Edition
+- Advanced Installer 15.4
+- Windows SDK 10.0.17763.0
+
+Open the "ippeveselfcert.sln" file and then build the installer target.
 
 
 Getting Debug Logging
