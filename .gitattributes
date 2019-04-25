@@ -1,5 +1,7 @@
 * text=auto
 *.ac text
+*.aip text eol=crlf
+*.aiproj text eol=crlf
 *.bat text eol=crlf
 *.c text
 *.cxx text

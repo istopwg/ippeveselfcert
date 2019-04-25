@@ -49,12 +49,12 @@
 
 
 /*
- * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
- * and strnicmp() functions...
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32
+ * _stricmp() and _strnicmp() functions...
  */
 
-#define strcasecmp	stricmp
-#define strncasecmp	strnicmp
+#define strcasecmp	_stricmp
+#define strncasecmp	_strnicmp
 
 
 /*
@@ -119,6 +119,7 @@ typedef unsigned long useconds_t;
 #define CUPS_CACHEDIR "C:/CUPS/cache"
 #define CUPS_DATADIR "C:/CUPS/share"
 #define CUPS_LOCALEDIR "C:/CUPS/locale"
+#define CUPS_SERVERBIN "C:/CUPS/lib"
 #define CUPS_SERVERROOT "C:/CUPS/etc"
 #define CUPS_STATEDIR "C:/CUPS/run"
 
@@ -227,8 +228,8 @@ typedef unsigned long useconds_t;
 
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
-#define HAVE_SSPISSL
-#define HAVE_SSL
+#define HAVE_SSPISSL 1
+#define HAVE_SSL 1
 
 
 /*
@@ -250,21 +251,9 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_AUTHORIZATION_H */
-/* #undef HAVE_SECBASEPRIV_H */
 /* #undef HAVE_SECCERTIFICATE_H */
-/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
 /* #undef HAVE_SECITEM_H */
-/* #undef HAVE_SECITEMPRIV_H */
 /* #undef HAVE_SECPOLICY_H */
-/* #undef HAVE_SECPOLICYPRIV_H */
-/* #undef HAVE_SECURETRANSPORTPRIV_H */
-
-
-/*
- * Do we have the cssmErrorString function?
- */
-
-/* #undef HAVE_CSSMERRORSTRING */
 
 
 /*
@@ -282,6 +271,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+/* #undef HAVE_SSLSETENABLEDCIPHERS */
+
+
+/*
  * Do we have mDNSResponder for DNS Service Discovery (aka Bonjour)?
  */
 
@@ -292,7 +288,7 @@ typedef unsigned long useconds_t;
  * Do we have Avahi for DNS Service Discovery (aka Bonjour)?
  */
 
-#undef HAVE_AVAHI
+/* #undef HAVE_AVAHI */
 
 
 /*
@@ -366,12 +362,10 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have CoreFoundation public and private headers?
+ * Do we have CoreFoundation public headers?
  */
 
 /* #undef HAVE_COREFOUNDATION_H */
-/* #undef HAVE_CFPRIV_H */
-/* #undef HAVE_CFBUNDLEPRIV_H */
 
 
 /*
@@ -421,7 +415,7 @@ typedef unsigned long useconds_t;
 
 #ifdef HAVE_ARC4RANDOM
 #  define CUPS_RAND() arc4random()
-#  define CUPS_SRAND(v) arc4random_stir()
+#  define CUPS_SRAND(v)
 #elif defined(HAVE_RANDOM)
 #  define CUPS_RAND() random()
 #  define CUPS_SRAND(v) srandom(v)
@@ -454,7 +448,7 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
 /* #undef CUPS_BUNDLEDIR */
