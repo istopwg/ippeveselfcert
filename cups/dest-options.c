@@ -1,7 +1,7 @@
 /*
  * Destination option/media support for CUPS.
  *
- * Copyright © 2012-2018 by Apple Inc.
+ * Copyright © 2012-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -28,7 +28,7 @@
 
 static void		cups_add_dconstres(cups_array_t *a, ipp_t *collection);
 static int		cups_collection_contains(ipp_t *test, ipp_t *match);
-static size_t		cups_collection_string(ipp_attribute_t *attr, char *buffer, size_t bufsize);
+static size_t		cups_collection_string(ipp_attribute_t *attr, char *buffer, size_t bufsize) _CUPS_NONNULL((1,2));
 static int		cups_compare_dconstres(_cups_dconstres_t *a,
 			                       _cups_dconstres_t *b);
 static int		cups_compare_media_db(_cups_media_db_t *a,
@@ -179,6 +179,7 @@ cupsCheckDestSupported(
   ipp_res_t		units_value;	/* Resolution units */
   ipp_attribute_t	*attr;		/* Attribute */
   _ipp_value_t		*attrval;	/* Current attribute value */
+  _ipp_option_t		*map;		/* Option mapping information */
 
 
  /*
@@ -270,9 +271,14 @@ cupsCheckDestSupported(
     * Check literal values...
     */
 
+    map = _ippFindOption(option);
+
     switch (attr->value_tag)
     {
       case IPP_TAG_INTEGER :
+          if (map && map->value_tag == IPP_TAG_STRING)
+            return (strlen(value) <= (size_t)attr->values[0].integer);
+
       case IPP_TAG_ENUM :
           int_value = atoi(value);
 
@@ -285,7 +291,10 @@ cupsCheckDestSupported(
           return (attr->values[0].boolean);
 
       case IPP_TAG_RANGE :
-          int_value = atoi(value);
+          if (map && map->value_tag == IPP_TAG_STRING)
+            int_value = (int)strlen(value);
+          else
+            int_value = atoi(value);
 
           for (i = 0; i < attr->num_values; i ++)
             if (int_value >= attr->values[i].range.lower &&
@@ -1618,7 +1627,7 @@ cups_collection_string(
 		  else
 		    snprintf(temp, sizeof(temp), "%04u-%02u-%02uT%02u:%02u:%02u%c%02u%02u", year, date[2], date[3], date[4], date[5], date[6], date[8], date[9], date[10]);
 
-		  if (buffer && bufptr < bufend)
+		  if (bufptr < bufend)
 		    strlcpy(bufptr, temp, (size_t)(bufend - bufptr + 1));
 
 		  bufptr += strlen(temp);
@@ -1638,7 +1647,7 @@ cups_collection_string(
 		  else
                     snprintf(temp, sizeof(temp), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
 
-		  if (buffer && bufptr < bufend)
+		  if (bufptr < bufend)
 		    strlcpy(bufptr, temp, (size_t)(bufend - bufptr + 1));
 
 		  bufptr += strlen(temp);
@@ -1654,7 +1663,7 @@ cups_collection_string(
 
 		  snprintf(temp, sizeof(temp), "%d-%d", lower, upper);
 
-		  if (buffer && bufptr < bufend)
+		  if (bufptr < bufend)
 		    strlcpy(bufptr, temp, (size_t)(bufend - bufptr + 1));
 
 		  bufptr += strlen(temp);
@@ -2513,8 +2522,10 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
       strlcpy(size->media, best->key, sizeof(size->media));
     else if (best->size_name)
       strlcpy(size->media, best->size_name, sizeof(size->media));
-    else
+    else if (pwg && pwg->pwg)
       strlcpy(size->media, pwg->pwg, sizeof(size->media));
+    else
+      strlcpy(size->media, "unknown", sizeof(size->media));
 
     size->width  = best->width;
     size->length = best->length;
