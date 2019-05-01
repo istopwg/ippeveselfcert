@@ -77,10 +77,10 @@
     <ROW File="ipptests.test" Component_="README.md" FileName="IPP-TE~1.TES|ipp-tests.test" Attributes="0" SourcePath="..\tests\ipp-tests.test" SelfReg="false" NextFile="onepagea4.pdf"/>
     <ROW File="ipptool.exe" Component_="ipptool_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ipptool.exe&gt;" SelfReg="false" NextFile="libcups2.dll" DigSign="true"/>
     <ROW File="libcups2.dll" Component_="libcups2_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libcups2.dll&gt;" SelfReg="false" NextFile="manippfind.html"/>
-    <ROW File="manippfind.html" Component_="README.md" FileName="MAN-IP~1.HTM|man-ippfind.html" Attributes="0" SourcePath="..\doc\man-ippfind.html" SelfReg="false" NextFile="manippeveprinter.html"/>
-    <ROW File="manippeveprinter.html" Component_="README.md" FileName="MAN-IP~2.HTM|man-ippeveprinter.html" Attributes="0" SourcePath="..\doc\man-ippeveprinter.html" SelfReg="false" NextFile="manipptool.html"/>
-    <ROW File="manipptool.html" Component_="README.md" FileName="MAN-IP~3.HTM|man-ipptool.html" Attributes="0" SourcePath="..\doc\man-ipptool.html" SelfReg="false" NextFile="manipptoolfile.html"/>
-    <ROW File="manipptoolfile.html" Component_="README.md" FileName="MAN-IP~4.HTM|man-ipptoolfile.html" Attributes="0" SourcePath="..\doc\man-ipptoolfile.html" SelfReg="false" NextFile="bonjouraccesstests.test"/>
+    <ROW File="manippfind.html" Component_="README.md" FileName="MAN-IP~1.HTM|ippfind.html" Attributes="0" SourcePath="..\man\ippfind.html" SelfReg="false" NextFile="manippeveprinter.html"/>
+    <ROW File="manippeveprinter.html" Component_="README.md" FileName="MAN-IP~2.HTM|ippeveprinter.html" Attributes="0" SourcePath="..\man\ippeveprinter.html" SelfReg="false" NextFile="manipptool.html"/>
+    <ROW File="manipptool.html" Component_="README.md" FileName="MAN-IP~3.HTM|ipptool.html" Attributes="0" SourcePath="..\man\ipptool.html" SelfReg="false" NextFile="manipptoolfile.html"/>
+    <ROW File="manipptoolfile.html" Component_="README.md" FileName="MAN-IP~4.HTM|ipptoolfile.html" Attributes="0" SourcePath="..\man\ipptoolfile.html" SelfReg="false" NextFile="bonjouraccesstests.test"/>
     <ROW File="onepagea4.pdf" Component_="README.md" FileName="ONEPAG~1.PDF|onepage-a4.pdf" Attributes="0" SourcePath="..\tests\onepage-a4.pdf" SelfReg="false" NextFile="onepageletter.pdf"/>
     <ROW File="onepageletter.pdf" Component_="README.md" FileName="ONEPAG~2.PDF|onepage-letter.pdf" Attributes="0" SourcePath="..\tests\onepage-letter.pdf" SelfReg="false" NextFile="README.md"/>
     <ROW File="setdebug.bat" Component_="README.md" FileName="setdebug.bat" Attributes="0" SourcePath="setdebug.bat" SelfReg="false"/>
