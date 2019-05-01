@@ -60,7 +60,7 @@ mkdir $pkgdir || exit 1
 
 echo Copying package files
 cp LICENSE.md $pkgdir
-cp doc/*.html $pkgdir
+cp man/*.html $pkgdir
 cp tests/README.md $pkgdir
 cp tests/*.jpg $pkgdir
 cp tests/*.pdf $pkgdir

@@ -5,6 +5,7 @@ config.log
 config.status
 cups/libcups.a
 sw-ippeveselfcert11-*
+man/mantohtml
 tests/pwg-raster-samples-*
 tools/ippeveprinter
 tools/ippevesubmit
