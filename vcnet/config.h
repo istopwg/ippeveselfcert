@@ -2,15 +2,12 @@
  * Configuration file for the IPP Everywhere Printer Self-Certification tools
  * on Windows.
  *
- * Copyright 2015-2016 by the ISTO Printer Working Group.
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2014-2019 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -46,10 +43,8 @@
 #define open		_open
 #define read	        _read
 #define rmdir		_rmdir
-#define snprintf 	_snprintf
 #define strdup		_strdup
 #define unlink		_unlink
-#define vsnprintf 	_vsnprintf
 #define write		_write
 
 
@@ -96,8 +91,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "IPPEVESELFCERT v20161013"
-#define CUPS_MINIMAL "IPPEVESELFCERT/20161013"
+#define CUPS_SVERSION "IPPEVESELFCERT v20190425"
+#define CUPS_MINIMAL "IPPEVESELFCERT/20190425"
 
 
 /*
@@ -198,8 +193,9 @@ typedef unsigned long useconds_t;
  * Do we have the (v)snprintf() functions?
  */
 
-#define HAVE_SNPRINTF 1
-#define HAVE_VSNPRINTF 1
+/* Windows snprintf/vsnprintf are non-conforming */
+/* #def HAVE_SNPRINTF */
+/* #undef HAVE_VSNPRINTF */
 
 
 /*
