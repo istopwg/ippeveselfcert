@@ -1260,8 +1260,8 @@ create_printer(
   int			num_formats;	/* Number of supported document formats */
   const char		*formats[100],	/* Supported document formats */
 			*format;	/* Current format */
-  int			num_job_attrs;	/* Number of supported job attributes */
-  const char		*job_attrs[100];/* Job attributes */
+  int			num_sup_attrs;	/* Number of supported attributes */
+  const char		*sup_attrs[100];/* Supported attributes */
   char			xxx_supported[256];
 					/* Name of -supported attribute */
   _cups_globals_t	*cg = _cupsGlobals();
@@ -1319,21 +1319,67 @@ create_printer(
   static const char * const job_creation[] =
   {					/* job-creation-attributes-supported values */
     "copies",
+    "document-access",
+    "document-charset",
+    "document-format",
+    "document-message",
+    "document-metadata",
+    "document-name",
+    "document-natural-language",
     "document-password",
     "finishings",
     "finishings-col",
+    "ipp-attribute-fidelity",
+    "job-account-id",
+    "job-account-type",
+    "job-accouunting-sheets",
+    "job-accounting-user-id",
+    "job-authorization-uri",
+    "job-error-action",
+    "job-error-sheet",
+    "job-hold-until",
+    "job-hold-until-time",
+    "job-mandatory-attributes",
+    "job-message-to-operator",
+    "job-name",
+    "job-pages-per-set",
     "job-password",
     "job-password-encryption",
+    "job-phone-number",
+    "job-priority",
+    "job-recipient-name",
+    "job-resource-ids",
+    "job-sheet-message",
+    "job-sheets",
+    "job-sheets-col",
+    "media",
+    "media-col",
+    "multiple-document-handling",
+    "number-up",
     "orientation-requested",
     "output-bin",
+    "output-device",
     "overrides",
+    "page-delivery",
     "page-ranges",
+    "presentation-direction-number-up",
     "print-color-mode",
     "print-content-optimize",
-    "print-rendering-intent",
     "print-quality",
+    "print-rendering-intent",
+    "print-scaling",
     "printer-resolution",
-    "sides"
+    "proof-print",
+    "separator-sheets",
+    "sides",
+    "x-image-position",
+    "x-image-shift",
+    "x-side1-image-shift",
+    "x-side2-image-shift",
+    "y-image-position",
+    "y-image-shift",
+    "y-side1-image-shift",
+    "y-side2-image-shift"
   };
   static const char * const media_col_supported[] =
   {					/* media-col-supported values */
@@ -1403,7 +1449,7 @@ create_printer(
     }
     else
     {
-      snprintf(path, sizeof(path), "%s/ippeveprinter/%s", cg->cups_serverbin, command);
+      snprintf(path, sizeof(path), "%s/command/%s", cg->cups_serverbin, command);
 
       if (access(command, X_OK))
       {
@@ -1542,19 +1588,23 @@ create_printer(
   * Get the list of attributes that can be used when creating a job...
   */
 
-  num_job_attrs = 0;
-  job_attrs[num_job_attrs ++] = "ipp-attribute-fidelity";
-  job_attrs[num_job_attrs ++] = "job-name";
-  job_attrs[num_job_attrs ++] = "job-priority";
-  job_attrs[num_job_attrs ++] = "media";
-  job_attrs[num_job_attrs ++] = "media-col";
-  job_attrs[num_job_attrs ++] = "multiple-document-handling";
+  num_sup_attrs = 0;
+  sup_attrs[num_sup_attrs ++] = "document-access";
+  sup_attrs[num_sup_attrs ++] = "document-charset";
+  sup_attrs[num_sup_attrs ++] = "document-format";
+  sup_attrs[num_sup_attrs ++] = "document-message";
+  sup_attrs[num_sup_attrs ++] = "document-metadata";
+  sup_attrs[num_sup_attrs ++] = "document-name";
+  sup_attrs[num_sup_attrs ++] = "document-natural-language";
+  sup_attrs[num_sup_attrs ++] = "ipp-attribute-fidelity";
+  sup_attrs[num_sup_attrs ++] = "job-name";
+  sup_attrs[num_sup_attrs ++] = "job-priority";
 
-  for (i = 0; i < (int)(sizeof(job_creation) / sizeof(job_creation[0])) && num_job_attrs < (int)(sizeof(job_attrs) / sizeof(job_attrs[0])); i ++)
+  for (i = 0; i < (int)(sizeof(job_creation) / sizeof(job_creation[0])) && num_sup_attrs < (int)(sizeof(sup_attrs) / sizeof(sup_attrs[0])); i ++)
   {
     snprintf(xxx_supported, sizeof(xxx_supported), "%s-supported", job_creation[i]);
     if (ippFindAttribute(attrs, xxx_supported, IPP_TAG_ZERO))
-      job_attrs[num_job_attrs ++] = job_creation[i];
+      sup_attrs[num_sup_attrs ++] = job_creation[i];
   }
 
  /*
@@ -1598,7 +1648,7 @@ create_printer(
     ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", (int)(sizeof(versions) / sizeof(versions[0])), NULL, versions);
 
   /* job-creation-attributes-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", num_job_attrs, NULL, job_attrs);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", num_sup_attrs, NULL, sup_attrs);
 
   /* job-ids-supported */
   ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-ids-supported", 1);
@@ -4419,15 +4469,15 @@ load_legacy_attributes(
   /* printer-input-tray */
   if (ppm_color > 0)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], strlen(printer_input_tray_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], (int)strlen(printer_input_tray_color[0]));
     for (i = 1; i < (int)(sizeof(printer_input_tray_color) / sizeof(printer_input_tray_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], strlen(printer_input_tray_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], (int)strlen(printer_input_tray_color[i]));
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], strlen(printer_input_tray[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], (int)strlen(printer_input_tray[0]));
     for (i = 1; i < (int)(sizeof(printer_input_tray) / sizeof(printer_input_tray[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], strlen(printer_input_tray[i]));
+      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], (int)strlen(printer_input_tray[i]));
   }
 
   /* printer-make-and-model */
@@ -4443,17 +4493,17 @@ load_legacy_attributes(
   /* printer-supply and printer-supply-description */
   if (ppm_color > 0)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], strlen(printer_supply_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], (int)strlen(printer_supply_color[0]));
     for (i = 1; i < (int)(sizeof(printer_supply_color) / sizeof(printer_supply_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], strlen(printer_supply_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], (int)strlen(printer_supply_color[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description_color) / sizeof(printer_supply_description_color[0])), NULL, printer_supply_description_color);
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], strlen(printer_supply[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], (int)strlen(printer_supply[0]));
     for (i = 1; i < (int)(sizeof(printer_supply) / sizeof(printer_supply[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply[i], strlen(printer_supply[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply[i], (int)strlen(printer_supply[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description) / sizeof(printer_supply_description[0])), NULL, printer_supply_description);
   }
@@ -5105,17 +5155,17 @@ load_ppd_attributes(
   /* printer-supply and printer-supply-description */
   if (ppd->color_device)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], strlen(printer_supply_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], (int)strlen(printer_supply_color[0]));
     for (i = 1; i < (int)(sizeof(printer_supply_color) / sizeof(printer_supply_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], strlen(printer_supply_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], (int)strlen(printer_supply_color[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description_color) / sizeof(printer_supply_description_color[0])), NULL, printer_supply_description_color);
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], strlen(printer_supply[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], (int)strlen(printer_supply[0]));
     for (i = 1; i < (int)(sizeof(printer_supply) / sizeof(printer_supply[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply[i], strlen(printer_supply[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply[i], (int)strlen(printer_supply[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description) / sizeof(printer_supply_description[0])), NULL, printer_supply_description);
   }
@@ -6318,7 +6368,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
     * Sleep for a random amount of time to simulate job processing.
     */
 
-    sleep((unsigned)(5 + (rand() % 11)));
+    sleep((unsigned)(5 + (CUPS_RAND() % 11)));
   }
 
   if (job->cancel)
@@ -6982,8 +7032,8 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 			*tray_ptr;	/* Pointer into value */
   int			tray_len;	/* Length of printer-input-tray value */
   int			ready_sheets;	/* printer-input-tray sheets value */
-  int			num_options;	/* Number of form options */
-  cups_option_t		*options;	/* Form options */
+  int			num_options = 0;/* Number of form options */
+  cups_option_t		*options = NULL;/* Form options */
   static const int	sheets[] =	/* Number of sheets */
   {
     250,
@@ -7056,8 +7106,6 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 
   if (printer->web_forms)
     num_options = parse_options(client, &options);
-  else
-    num_options = 0;
 
   if (num_options > 0)
   {
@@ -7382,8 +7430,8 @@ show_supplies(
 		num_supply;		/* Number of supplies */
   ipp_attribute_t *supply,		/* printer-supply attribute */
 		*supply_desc;		/* printer-supply-description attribute */
-  int		num_options;		/* Number of form options */
-  cups_option_t	*options;		/* Form options */
+  int		num_options = 0;	/* Number of form options */
+  cups_option_t	*options = NULL;	/* Form options */
   int		supply_len,		/* Length of supply value */
 		level;			/* Supply level */
   const char	*supply_value;		/* Supply value */
@@ -7450,8 +7498,6 @@ show_supplies(
 
   if (printer->web_forms)
     num_options = parse_options(client, &options);
-  else
-    num_options = 0;
 
   if (num_options > 0)
   {
