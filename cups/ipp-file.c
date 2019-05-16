@@ -1,7 +1,7 @@
 /*
  * IPP data file parsing functions.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -303,7 +303,10 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       * Start of quoted text or regular expression...
       */
 
-      quote = ch;
+      if (ch == '<')
+        quote = '>';
+      else
+        quote = ch;
 
       DEBUG_printf(("1_ippFileReadToken: Start of quoted string, quote=%c, pos=%ld", quote, (long)cupsFileTell(f->fp)));
     }
@@ -549,8 +552,11 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
             ipp_attribute_t  **attr,	/* IO - IPP attribute */
             int              element)	/* I  - Element number */
 {
-  char	value[1024],			/* Value string */
-	temp[1024];			/* Temporary string */
+  char		value[2049],		/* Value string */
+		*valueptr,		/* Pointer into value string */
+		temp[2049],		/* Temporary string */
+		*tempptr;		/* Pointer into temporary string */
+  size_t	valuelen;		/* Length of value */
 
 
   if (!_ippFileReadToken(f, temp, sizeof(temp)))
@@ -583,8 +589,80 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 		utc_offset = 0;		/* Timezone offset from UTC */
           ipp_uchar_t date[11];		/* dateTime value */
 
-          if (sscanf(value, "%d-%d-%dT%d:%d:%d%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          if (*value == 'P')
           {
+           /*
+            * Time period...
+            */
+
+            time_t	curtime;	/* Current time in seconds */
+            int		period = 0,	/* Current period value */
+			saw_T = 0;	/* Saw time separator */
+
+            curtime = time(NULL);
+
+            for (valueptr = value + 1; *valueptr; valueptr ++)
+            {
+              if (isdigit(*valueptr & 255))
+              {
+                period = strtol(valueptr, &valueptr, 10);
+
+                if (!valueptr || period < 0)
+                {
+		  report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+		  return (0);
+		}
+              }
+
+              if (*valueptr == 'Y')
+              {
+                curtime += 365 * 86400 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'M')
+              {
+                if (saw_T)
+                  curtime += 60 * period;
+                else
+                  curtime += 30 * 86400 * period;
+
+                period = 0;
+              }
+              else if (*valueptr == 'D')
+              {
+                curtime += 86400 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'H')
+              {
+                curtime += 3600 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'S')
+              {
+                curtime += period;
+                period = 0;
+              }
+              else if (*valueptr == 'T')
+              {
+                saw_T  = 1;
+                period = 0;
+              }
+              else
+	      {
+		report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+		return (0);
+	      }
+	    }
+
+	    return (ippSetDate(ipp, attr, element, ippTimeToDate(curtime)));
+          }
+          else if (sscanf(value, "%d-%d-%dT%d:%d:%d%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          {
+           /*
+            * Date/time value did not parse...
+            */
+
 	    report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
 	    return (0);
           }
@@ -658,7 +736,44 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 	break;
 
     case IPP_TAG_STRING :
-        return (ippSetOctetString(ipp, attr, element, value, (int)strlen(value)));
+        valuelen = strlen(value);
+
+        if (value[0] == '<' && value[strlen(value) - 1] == '>')
+        {
+          if (valuelen & 1)
+          {
+	    report_error(f, v, user_data, "Bad ATTR octetString value on line %d of \"%s\".", f->linenum, f->filename);
+	    return (0);
+          }
+
+          valueptr = value + 1;
+          tempptr  = temp;
+
+          while (*valueptr && *valueptr != '>')
+          {
+	    if (!isxdigit(valueptr[0] & 255) || !isxdigit(valueptr[1] & 255))
+	    {
+	      report_error(f, v, user_data, "Bad ATTR octetString value on line %d of \"%s\".", f->linenum, f->filename);
+	      return (0);
+	    }
+
+            if (valueptr[0] >= '0' && valueptr[0] <= '9')
+              *tempptr = (char)((valueptr[0] - '0') << 4);
+	    else
+              *tempptr = (char)((tolower(valueptr[0]) - 'a' + 10) << 4);
+
+            if (valueptr[1] >= '0' && valueptr[1] <= '9')
+              *tempptr |= (valueptr[1] - '0');
+	    else
+              *tempptr |= (tolower(valueptr[1]) - 'a' + 10);
+
+            tempptr ++;
+          }
+
+          return (ippSetOctetString(ipp, attr, element, temp, (int)(tempptr - temp)));
+        }
+        else
+          return (ippSetOctetString(ipp, attr, element, value, (int)valuelen));
         break;
 
     case IPP_TAG_TEXTLANG :
