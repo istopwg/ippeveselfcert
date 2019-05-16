@@ -64,9 +64,9 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="LICENSE.md" Component_="README.md" FileName="LICENSE.md" Attributes="0" SourcePath="..\LICENSE.md" SelfReg="false" NextFile="setdebug.bat"/>
     <ROW File="README.md" Component_="README.md" FileName="README.md" Attributes="0" SourcePath="..\tests\README.md" SelfReg="false" NextFile="LICENSE.md"/>
-    <ROW File="bonjouraccesstests.test" Component_="README.md" FileName="BONJOU~1.TES|bonjour-access-tests.test" Attributes="0" SourcePath="..\tests\bonjour-access-tests.test" SelfReg="false" NextFile="bonjourtests.bat"/>
-    <ROW File="bonjourtests.bat" Component_="README.md" FileName="BONJOU~1.BAT|bonjour-tests.bat" Attributes="0" SourcePath="..\tests\bonjour-tests.bat" SelfReg="false" NextFile="bonjourvaluetests.test"/>
-    <ROW File="bonjourvaluetests.test" Component_="README.md" FileName="BONJOU~2.TES|bonjour-value-tests.test" Attributes="0" SourcePath="..\tests\bonjour-value-tests.test" SelfReg="false" NextFile="color.jpg"/>
+    <ROW File="bonjouraccesstests.test" Component_="README.md" FileName="BONJOU~1.TES|dnssd-access-tests.test" Attributes="0" SourcePath="..\tests\dnssd-access-tests.test" SelfReg="false" NextFile="bonjourtests.bat"/>
+    <ROW File="bonjourtests.bat" Component_="README.md" FileName="BONJOU~1.BAT|dnssd-tests.bat" Attributes="0" SourcePath="..\tests\dnssd-tests.bat" SelfReg="false" NextFile="bonjourvaluetests.test"/>
+    <ROW File="bonjourvaluetests.test" Component_="README.md" FileName="BONJOU~2.TES|dnssd-value-tests.test" Attributes="0" SourcePath="..\tests\dnssd-value-tests.test" SelfReg="false" NextFile="color.jpg"/>
     <ROW File="color.jpg" Component_="README.md" FileName="color.jpg" Attributes="0" SourcePath="..\tests\color.jpg" SelfReg="false" NextFile="color.jpg4x6.pdf"/>
     <ROW File="color.jpg4x6.pdf" Component_="README.md" FileName="COLORJ~1.PDF|color.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\color.jpg-4x6.pdf" SelfReg="false" NextFile="documenta4.pdf"/>
     <ROW File="documenta4.pdf" Component_="README.md" FileName="DOCUME~1.PDF|document-a4.pdf" Attributes="0" SourcePath="..\tests\document-a4.pdf" SelfReg="false" NextFile="documentletter.pdf"/>
