@@ -47,6 +47,12 @@
       <Private>True</Private>
       <OutputsToImport>PrimaryOutput</OutputsToImport>
     </ProjectReference>
+    <ProjectReference Include="..\vcnet\regex.vcxproj">
+      <Name>regex</Name>
+      <Project>{18950a1b-d37a-40c7-b2df-c12986c0526e}</Project>
+      <Private>True</Private>
+      <OutputsToImport>PrimaryOutput</OutputsToImport>
+    </ProjectReference>
   </ItemGroup>
   <Target Name="Build">
     <Error Text="This project requires Advanced Installer tool. Please download it from https://www.advancedinstaller.com/download.html" />
