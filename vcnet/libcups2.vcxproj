@@ -163,10 +163,12 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\cups\ipp-file.c" />
     <ClCompile Include="..\cups\ipp-support.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\cups\ipp-vars.c" />
     <ClCompile Include="..\cups\ipp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -193,6 +195,9 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\cups\pwg-media.c" />
+    <ClCompile Include="..\cups\raster-error.c" />
+    <ClCompile Include="..\cups\raster-stream.c" />
+    <ClCompile Include="..\cups\raster-stubs.c" />
     <ClCompile Include="..\cups\request.c" />
     <ClCompile Include="..\cups\snprintf.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -245,6 +250,8 @@
     <ClInclude Include="..\cups\md5-private.h" />
     <ClInclude Include="..\cups\pwg-private.h" />
     <ClInclude Include="..\cups\pwg.h" />
+    <ClInclude Include="..\cups\raster-private.h" />
+    <ClInclude Include="..\cups\raster.h" />
     <ClInclude Include="..\cups\string-private.h" />
     <ClInclude Include="..\cups\thread-private.h" />
     <ClInclude Include="..\cups\transcode.h" />
