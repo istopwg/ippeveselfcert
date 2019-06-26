@@ -3,6 +3,7 @@
 *.aip text eol=crlf
 *.aiproj text eol=crlf
 *.bat text eol=crlf
+*.bat.in text eol=crlf
 *.c text
 *.cxx text
 *.h text
