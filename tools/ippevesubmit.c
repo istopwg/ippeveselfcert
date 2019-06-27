@@ -1157,7 +1157,7 @@ usage(void)
   puts("  -m models.txt	       Specify a list of models, one per line.");
   puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
   puts("		       to the standard output.");
-  puts("  -p \"product family\"	 Specify the product family.");
+  puts("  -p \"product family\"  Specify the product family.");
   puts("  -s		       Submit for a print server.");
   puts("  -u URL	       Specify the product family web page.");
   puts("  -y		       Answer yes to the checklist questions.");
