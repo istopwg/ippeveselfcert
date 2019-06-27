@@ -28,6 +28,9 @@ ippevesubmit - prepare a submission for self-certification results.
 ] [
 <b>-s</b>
 ] [
+<b>-t</b>
+<i>{printer|server}</i>
+] [
 <b>-u</b>
 <i>URL</i>
 ] [
@@ -46,13 +49,15 @@ The following options are recognized by
 <dd style="margin-left: 5.0em">Specifies a file containing a list of printer models, one per line, that are being submitted for certification.
 <dt><b>-o </b><i>filename.json</i>
 <dd style="margin-left: 5.0em">Specifies a JSON output file.
-If not specified, the JSON file is sent to the standard output.
+If not specified, the JSON file is sent to a file named 'printer name.json'.
 <dt><b>-p "</b><i>product family</i><b>"</b>
 <dd style="margin-left: 5.0em">Specifies the product family for the models being submitted.
 If not specified,
 <b>ippevesubmit</b>
 will ask for the family name.
-<dt><b>-s</b>
+<dt><b>-t</b><b>printer</b>
+<dd style="margin-left: 5.0em">Specifies that the submission is for a standalone printer.
+<dt><b>-t</b><b>server</b>
 <dd style="margin-left: 5.0em">Specifies that the submission is for a print server product and not a standalone printer.
 <dt><b>-u </b><i>URL</i>
 <dd style="margin-left: 5.0em">Specifies a product web page for the models being submitted.

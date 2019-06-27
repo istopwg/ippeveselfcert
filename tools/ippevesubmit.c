@@ -16,7 +16,7 @@
  *    --help		   Show help.
  *    -m models.txt	   Specify list of models, one per line.
  *    -o filename.json	   Specify the JSON output file, otherwise JSON is sent
- *			   to the standard output.
+ *			   to 'printer name.json'.
  *    -p "product family"  Specify the product family.
  *    -t {printer|server}  Submit for a printer or print server.
  *    -u URL		   Specify the product family web page.
@@ -147,8 +147,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		submission_version[4];	/* Version of the cert tools */
   media_format_t media_format = MEDIA_FORMAT_SMALL;
 					/* Size class */
+  FILE		*fp;			/* Output file */
   static const char * const media_formats[] =
-  {
+  {					/* Size classes */
     "Small",
     "Medium",
     "Large"
@@ -475,30 +476,32 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Write JSON file for submission...
   */
 
-  if (json)
+  if (!json)
   {
-    FILE *fp = fopen(json, "w");	/* Output file */
-
-    if (!fp)
-    {
-      printf("ippevesubmit: Unable to create '%s': %s\n", json, strerror(errno));
-      return (1);
-    }
-
-    if (override_tests)
-      fputs("/* Note: submitted with --override */\n", fp);
-
-    json_write_plist(fp, submission);
-    fclose(fp);
-
-    printf("\nWrote submission to '%s'.\n", json);
+    snprintf(filename, sizeof(filename), "%s.json", printer);
+    json = filename;
   }
-  else
-  {
-    if (override_tests)
-      puts("/* Note: submitted with --override */");
 
-    json_write_plist(stdout, submission);
+  if (!strcmp(json, "-"))
+    fp = stdout;
+  else
+    fp = fopen(json, "w");
+
+  if (!fp)
+  {
+    printf("ippevesubmit: Unable to create '%s': %s\n", json, strerror(errno));
+    return (1);
+  }
+
+  if (override_tests)
+    fputs("/* Note: submitted with --override */\n", fp);
+
+  json_write_plist(fp, submission);
+
+  if (fp != stdout)
+  {
+    fclose(fp);
+    printf("\nWrote submission to '%s'.\n", json);
   }
 
   puts("\nNow continue with your submission at:\n\n    https://www.pwg.org/ippeveselfcert\n");
@@ -1167,7 +1170,7 @@ usage(void)
   puts("  --help	       Show help.");
   puts("  -m models.txt	       Specify a list of models, one per line.");
   puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
-  puts("		       to the standard output.");
+  puts("		       to 'printer name.json'.");
   puts("  -p \"product family\"  Specify the product family.");
   puts("  -t {printer|server}  Submit for a printer or print server.");
   puts("  -u URL	       Specify the product family web page.");
