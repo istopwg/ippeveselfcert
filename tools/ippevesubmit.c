@@ -18,7 +18,7 @@
  *    -o filename.json	   Specify the JSON output file, otherwise JSON is sent
  *			   to the standard output.
  *    -p "product family"  Specify the product family.
- *    -s		   Submit for a print server.
+ *    -t {printer|server}  Submit for a printer or print server.
  *    -u URL		   Specify the product family web page.
  *    -y		   Answer yes to the checklist questions.
  */
@@ -118,7 +118,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*printer = NULL,	/* Printer being tested */
 		*webpage = NULL;	/* Product family web page */
   int		override_tests = 0,	/* Test results were overridden */
-		print_server = 0,	/* Product is a print server */
+		print_server = -1,	/* Product is a print server */
 		yes_to_all = 0;		/* Answer "yes" to all checklist questions */
   char		filename[1024];		/* plist filename */
   int		ok = 1;			/* Are test results OK? */
@@ -224,8 +224,16 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      family = argv[i];
 	      break;
 
-	  case 's' : /* -s (print server) */
-	      print_server = 1;
+	  case 't' : /* -t {printer|server} */
+	      i ++;
+	      if (i >= argc || (strcmp(argv[i], "printer") && strcmp(argv[i], "server")))
+	      {
+		puts("ippevesubmit: Expected 'printer' or 'server' after '-t'.");
+		usage();
+		return (1);
+	      }
+
+	      print_server = !strcmp(argv[i], "server");
 	      break;
 
 	  case 'u' : /* -u URL */
@@ -303,6 +311,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!yes_to_all && !read_boolean("Did all output print correctly"))
     return (1);
+
+  if (print_server < 0)
+    print_server = read_boolean("Is this a print server");
 
   if (!family)
   {
@@ -1158,7 +1169,7 @@ usage(void)
   puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
   puts("		       to the standard output.");
   puts("  -p \"product family\"  Specify the product family.");
-  puts("  -s		       Submit for a print server.");
+  puts("  -t {printer|server}  Submit for a printer or print server.");
   puts("  -u URL	       Specify the product family web page.");
   puts("  -y		       Answer yes to the checklist questions.");
 }
