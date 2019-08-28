@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol functions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -33,12 +33,8 @@ static ipp_attribute_t	*ipp_add_attr(ipp_t *ipp, const char *name,
 			              int num_values);
 static void		ipp_free_values(ipp_attribute_t *attr, int element,
 			                int count);
-static char		*ipp_get_code(const char *locale, char *buffer,
-			              size_t bufsize)
-			              __attribute__((nonnull(1,2)));
-static char		*ipp_lang_code(const char *locale, char *buffer,
-			               size_t bufsize)
-			               __attribute__((nonnull(1,2)));
+static char		*ipp_get_code(const char *locale, char *buffer, size_t bufsize) _CUPS_NONNULL((1, 2));
+static char		*ipp_lang_code(const char *locale, char *buffer, size_t bufsize) _CUPS_NONNULL((1, 2));
 static size_t		ipp_length(ipp_t *ipp, int collection);
 static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
 			              size_t length);
@@ -3048,8 +3044,13 @@ ippReadIO(void       *src,		/* I - Data source */
 
           DEBUG_printf(("2ippReadIO: name length=%d", n));
 
-          if (n == 0 && tag != IPP_TAG_MEMBERNAME &&
-	      tag != IPP_TAG_END_COLLECTION)
+          if (n && parent)
+          {
+            _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Invalid named IPP attribute in collection."), 1);
+            DEBUG_puts("1ippReadIO: bad attribute name in collection.");
+            return (IPP_STATE_ERROR);
+          }
+          else if (n == 0 && tag != IPP_TAG_MEMBERNAME && tag != IPP_TAG_END_COLLECTION)
 	  {
 	   /*
 	    * More values for current attribute...
@@ -3756,8 +3757,7 @@ ippSetDate(ipp_t             *ipp,	/* I  - IPP message */
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_DATE ||
-      element < 0 || element > (*attr)->num_values || !datevalue)
+  if (!ipp || !attr || !*attr || ((*attr)->value_tag != IPP_TAG_DATE && (*attr)->value_tag != IPP_TAG_NOVALUE && (*attr)->value_tag != IPP_TAG_UNKNOWN) || element < 0 || element > (*attr)->num_values || !datevalue)
     return (0);
 
  /*
@@ -3840,9 +3840,7 @@ ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr ||
-      ((*attr)->value_tag != IPP_TAG_INTEGER && (*attr)->value_tag != IPP_TAG_ENUM) ||
-      element < 0 || element > (*attr)->num_values)
+  if (!ipp || !attr || !*attr || ((*attr)->value_tag != IPP_TAG_INTEGER && (*attr)->value_tag != IPP_TAG_ENUM && (*attr)->value_tag != IPP_TAG_NOVALUE && (*attr)->value_tag != IPP_TAG_UNKNOWN) || element < 0 || element > (*attr)->num_values)
     return (0);
 
  /*
@@ -3850,7 +3848,12 @@ ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
   */
 
   if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    if ((*attr)->value_tag != IPP_TAG_ENUM)
+      (*attr)->value_tag = IPP_TAG_INTEGER;
+
     value->integer = intvalue;
+  }
 
   return (value != NULL);
 }
@@ -3927,9 +3930,7 @@ ippSetOctetString(
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_STRING ||
-      element < 0 || element > (*attr)->num_values ||
-      datalen < 0 || datalen > IPP_MAX_LENGTH)
+  if (!ipp || !attr || !*attr || ((*attr)->value_tag != IPP_TAG_STRING && (*attr)->value_tag != IPP_TAG_NOVALUE && (*attr)->value_tag != IPP_TAG_UNKNOWN) || element < 0 || element > (*attr)->num_values || datalen < 0 || datalen > IPP_MAX_LENGTH)
     return (0);
 
  /*
@@ -3952,6 +3953,8 @@ ippSetOctetString(
      /*
       * Copy the data...
       */
+
+      (*attr)->value_tag = IPP_TAG_STRING;
 
       if (value->unknown.data)
       {
@@ -4044,8 +4047,7 @@ ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_RANGE ||
-      element < 0 || element > (*attr)->num_values || lowervalue > uppervalue)
+  if (!ipp || !attr || !*attr || ((*attr)->value_tag != IPP_TAG_RANGE && (*attr)->value_tag != IPP_TAG_NOVALUE && (*attr)->value_tag != IPP_TAG_UNKNOWN) || element < 0 || element > (*attr)->num_values || lowervalue > uppervalue)
     return (0);
 
  /*
@@ -4054,6 +4056,7 @@ ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
 
   if ((value = ipp_set_value(ipp, attr, element)) != NULL)
   {
+    (*attr)->value_tag = IPP_TAG_RANGE;
     value->range.lower = lowervalue;
     value->range.upper = uppervalue;
   }
@@ -4126,9 +4129,7 @@ ippSetResolution(
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_RESOLUTION ||
-      element < 0 || element > (*attr)->num_values || xresvalue <= 0 || yresvalue <= 0 ||
-      unitsvalue < IPP_RES_PER_INCH || unitsvalue > IPP_RES_PER_CM)
+  if (!ipp || !attr || !*attr || ((*attr)->value_tag != IPP_TAG_RESOLUTION && (*attr)->value_tag != IPP_TAG_NOVALUE && (*attr)->value_tag != IPP_TAG_UNKNOWN) || element < 0 || element > (*attr)->num_values || xresvalue <= 0 || yresvalue <= 0 || unitsvalue < IPP_RES_PER_INCH || unitsvalue > IPP_RES_PER_CM)
     return (0);
 
  /*
@@ -4137,6 +4138,7 @@ ippSetResolution(
 
   if ((value = ipp_set_value(ipp, attr, element)) != NULL)
   {
+    (*attr)->value_tag      = IPP_TAG_RESOLUTION;
     value->resolution.units = unitsvalue;
     value->resolution.xres  = xresvalue;
     value->resolution.yres  = yresvalue;
@@ -4238,10 +4240,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
   else
     value_tag = IPP_TAG_ZERO;
 
-  if (!ipp || !attr || !*attr ||
-      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
-       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
-      element < 0 || element > (*attr)->num_values || !strvalue)
+  if (!ipp || !attr || !*attr || (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG && value_tag != IPP_TAG_NAMELANG && value_tag != IPP_TAG_NOVALUE && value_tag != IPP_TAG_UNKNOWN) || value_tag > IPP_TAG_MIMETYPE || element < 0 || element > (*attr)->num_values || !strvalue)
     return (0);
 
  /*
@@ -4250,6 +4249,9 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
 
   if ((value = ipp_set_value(ipp, attr, element)) != NULL)
   {
+    if (value_tag == IPP_TAG_NOVALUE || value_tag == IPP_TAG_UNKNOWN)
+      (*attr)->value_tag = IPP_TAG_KEYWORD;
+
     if (element > 0)
       value->string.language = (*attr)->values[0].string.language;
 
@@ -4350,10 +4352,7 @@ ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
   else
     value_tag = IPP_TAG_ZERO;
 
-  if (!ipp || !attr || !*attr ||
-      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
-       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
-      !format)
+  if (!ipp || !attr || !*attr || (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG && value_tag != IPP_TAG_NAMELANG && value_tag != IPP_TAG_NOVALUE && value_tag != IPP_TAG_UNKNOWN) || value_tag > IPP_TAG_MIMETYPE || !format)
     return (0);
 
  /*
@@ -4405,6 +4404,8 @@ ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
         max_bytes = IPP_MAX_CHARSET;
         break;
 
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_UNKNOWN :
     case IPP_TAG_KEYWORD :
         max_bytes = IPP_MAX_KEYWORD;
         break;
@@ -4552,9 +4553,7 @@ ippSetValueTag(
         break;
 
     case IPP_TAG_NAME :
-        if (temp_tag != IPP_TAG_KEYWORD && temp_tag != IPP_TAG_URI &&
-            temp_tag != IPP_TAG_URISCHEME && temp_tag != IPP_TAG_LANGUAGE &&
-            temp_tag != IPP_TAG_MIMETYPE)
+        if (temp_tag != IPP_TAG_KEYWORD)
           return (0);
 
         (*attr)->value_tag = (ipp_tag_t)(IPP_TAG_NAME | ((*attr)->value_tag & IPP_TAG_CUPS_CONST));
@@ -4562,10 +4561,7 @@ ippSetValueTag(
 
     case IPP_TAG_NAMELANG :
     case IPP_TAG_TEXTLANG :
-        if (value_tag == IPP_TAG_NAMELANG &&
-            (temp_tag != IPP_TAG_NAME && temp_tag != IPP_TAG_KEYWORD &&
-             temp_tag != IPP_TAG_URI && temp_tag != IPP_TAG_URISCHEME &&
-             temp_tag != IPP_TAG_LANGUAGE && temp_tag != IPP_TAG_MIMETYPE))
+        if (value_tag == IPP_TAG_NAMELANG && (temp_tag != IPP_TAG_NAME && temp_tag != IPP_TAG_KEYWORD))
           return (0);
 
         if (value_tag == IPP_TAG_TEXTLANG && temp_tag != IPP_TAG_TEXT)
@@ -4979,30 +4975,24 @@ ippValidateAttribute(
 	  {
 	    if ((*ptr & 0xe0) == 0xc0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80)
 	        break;
+
+	      ptr ++;
 	    }
 	    else if ((*ptr & 0xf0) == 0xe0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 2;
 	    }
 	    else if ((*ptr & 0xf8) == 0xf0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80 || (ptr[3] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 3;
 	    }
 	    else if (*ptr & 0x80)
 	      break;
@@ -5044,30 +5034,24 @@ ippValidateAttribute(
 	  {
 	    if ((*ptr & 0xe0) == 0xc0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80)
 	        break;
+
+	      ptr ++;
 	    }
 	    else if ((*ptr & 0xf0) == 0xe0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 2;
 	    }
 	    else if ((*ptr & 0xf8) == 0xf0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80 || (ptr[3] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 3;
 	    }
 	    else if (*ptr & 0x80)
 	      break;
