@@ -1,7 +1,7 @@
 #
 # IPP tool makefile for CUPS.
 #
-# Copyright 2015 by the ISTO Printer Working Group.
+# Copyright 2015-2019 by the ISTO Printer Working Group.
 # Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
@@ -16,10 +16,12 @@ include ../Makedefs
 
 
 OBJS		=	\
+			ippevesubmit.o \
 			ippfind.o \
 			ippserver.o \
 			ipptool.o
 TARGETS		=	\
+			ippevesubmit \
 			ippfind \
 			ippserver \
 			ipptool
@@ -46,6 +48,15 @@ clean:
 
 depend:
 	$(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
+
+
+#
+# ippevesubmit
+#
+
+ippevesubmit:	ippevesubmit.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippevesubmit.o $(LIBS)
 
 
 #
