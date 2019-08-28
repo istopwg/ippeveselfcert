@@ -1856,8 +1856,8 @@ xml_unescape(char *buffer)		/* I - Buffer */
 	  * Two-byte UTF-8
 	  */
 
-	  *outptr++ = 0xc0 | (ch >> 6);
-	  *outptr++ = 0x80 | (ch & 0x3f);
+	  *outptr++ = (char)(0xc0 | (ch >> 6));
+	  *outptr++ = (char)(0x80 | (ch & 0x3f));
 	}
 	else if (ch < 0x10000)
 	{
@@ -1865,9 +1865,9 @@ xml_unescape(char *buffer)		/* I - Buffer */
 	  * Three-byte UTF-8
 	  */
 
-	  *outptr++ = 0xe0 | (ch >> 12);
-	  *outptr++ = 0x80 | ((ch >> 6) & 0x3f);
-	  *outptr++ = 0x80 | (ch & 0x3f);
+	  *outptr++ = (char)(0xe0 | (ch >> 12));
+	  *outptr++ = (char)(0x80 | ((ch >> 6) & 0x3f));
+	  *outptr++ = (char)(0x80 | (ch & 0x3f));
 	}
 	else
 	{
@@ -1875,10 +1875,10 @@ xml_unescape(char *buffer)		/* I - Buffer */
 	  * Four-byte UTF-8
 	  */
 
-	  *outptr++ = 0xf0 | (ch >> 18);
-	  *outptr++ = 0x80 | ((ch >> 12) & 0x3f);
-	  *outptr++ = 0x80 | ((ch >> 6) & 0x3f);
-	  *outptr++ = 0x80 | (ch & 0x3f);
+	  *outptr++ = (char)(0xf0 | (ch >> 18));
+	  *outptr++ = (char)(0x80 | ((ch >> 12) & 0x3f));
+	  *outptr++ = (char)(0x80 | ((ch >> 6) & 0x3f));
+	  *outptr++ = (char)(0x80 | (ch & 0x3f));
 	}
 
 	inptr = strchr(inptr, ';') + 1;
