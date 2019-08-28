@@ -8,6 +8,7 @@ config.status
 cups/libcups.a
 sw-ippeveselfcert10-*
 tests/pwg-raster-samples-*
+tools/ippevesubmit
 tools/ippfind
 tools/ippserver
 tools/ipptool
