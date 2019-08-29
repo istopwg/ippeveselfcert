@@ -23,17 +23,26 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\vcnet\ippevesubmit.vcxproj">
+      <Name>ippevesubmit</Name>
+      <Project>{769507b7-0960-498e-80ce-1085d63db835}</Project>
+      <Private>True</Private>
+      <CreateShortcut>False</CreateShortcut>
+      <OutputsToImport>PrimaryOutput</OutputsToImport>
+    </ProjectReference>
     <ProjectReference Include="..\vcnet\ippfind.vcxproj">
       <Name>ippfind</Name>
       <Project>{b484da0c-62c8-4c32-83b6-cceb58968b85}</Project>
       <Private>True</Private>
       <OutputsToImport>PrimaryOutput</OutputsToImport>
+      <CreateShortcut>False</CreateShortcut>
     </ProjectReference>
     <ProjectReference Include="..\vcnet\ippserver.vcxproj">
       <Name>ippserver</Name>
       <Project>{82a03bc7-0746-4b85-8908-3c7a3faa58a9}</Project>
       <Private>True</Private>
       <OutputsToImport>PrimaryOutput</OutputsToImport>
+      <CreateShortcut>False</CreateShortcut>
     </ProjectReference>
     <ProjectReference Include="..\vcnet\ipptool.vcxproj">
       <Name>ipptool</Name>
@@ -44,6 +53,12 @@
     <ProjectReference Include="..\vcnet\libcups2.vcxproj">
       <Name>libcups2</Name>
       <Project>{cb4aa6f2-3e84-45be-b505-95cd375e8be3}</Project>
+      <Private>True</Private>
+      <OutputsToImport>PrimaryOutput</OutputsToImport>
+    </ProjectReference>
+    <ProjectReference Include="..\vcnet\regex.vcxproj">
+      <Name>regex</Name>
+      <Project>{18950a1b-d37a-40c7-b2df-c12986c0526e}</Project>
       <Private>True</Private>
       <OutputsToImport>PrimaryOutput</OutputsToImport>
     </ProjectReference>
