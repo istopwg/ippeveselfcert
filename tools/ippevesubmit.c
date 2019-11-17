@@ -142,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		finishings_staple = 0,	/* Stapling? */
 		finishings_trim = 0;	/* Trimming/cutting? */
   time_t	submission_time;	/* Date/time of submission (seconds) */
-  struct tm	*submission_tm;		/* Date/time of submission (tm data) */
+  struct tm	submission_tm;		/* Date/time of submission (tm data) */
   char		submission_date[32],	/* Date/time of submission (string) */
 		submission_version[4];	/* Version of the cert tools */
   media_format_t media_format = MEDIA_FORMAT_SMALL;
@@ -406,10 +406,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   submission = plist_add(NULL, PLIST_TYPE_ARRAY, NULL);
 
-  submission_time = time(NULL);
-  submission_tm	  = gmtime(&submission_time);
+  time(&submission_time);
+  gmtime_r(&submission_time, &submission_tm);
 
-  snprintf(submission_date, sizeof(submission_date), "%04d-%02d-%02dT%02d:%02d:%02dZ", submission_tm->tm_year + 1900, submission_tm->tm_mon + 1, submission_tm->tm_mday, submission_tm->tm_hour, submission_tm->tm_min, submission_tm->tm_sec);
+  snprintf(submission_date, sizeof(submission_date), "%04d-%02d-%02dT%02d:%02d:%02dZ", submission_tm.tm_year + 1900, submission_tm.tm_mon + 1, submission_tm.tm_mday, submission_tm.tm_hour, submission_tm.tm_min, submission_tm.tm_sec);
 
   if (models)
   {
