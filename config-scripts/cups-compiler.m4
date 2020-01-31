@@ -1,6 +1,7 @@
 dnl
 dnl Compiler stuff for CUPS.
 dnl
+dnl Copyright 2020 by the ISTO Printer Working Group.
 dnl Copyright 2007-2014 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
@@ -89,6 +90,9 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
+WARNING_OPTIONS=""
+AC_SUBST(WARNING_OPTIONS)
+
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
 	if test -z "$OPTIM"; then
@@ -145,41 +149,21 @@ if test -n "$GCC"; then
 		CFLAGS="$OLDCFLAGS"
 	fi
 
-	if test "x$with_optim" = x; then
-		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+	# Add useful warning options for tracking down problems...
+	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion -Wno-deprecated-declarations"
 
-		AC_MSG_CHECKING(whether compiler supports -Wno-unused-result)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-unused-result"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-unused-result"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
+	# Test GCC version for certain warning flags since -Werror
+	# doesn't trigger...
+	gccversion=`$CC --version | head -1 | awk '{print $NF}'`
+	case "$gccversion" in
+		7.* | 8.*)
+			WARNING_OPTIONS="$WARNING_OPTIONS -Wno-format-truncation -Wno-tautological-compare"
+			;;
+	esac
 
-		AC_MSG_CHECKING(whether compiler supports -Wsign-conversion)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wsign-conversion"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wsign-conversion"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
-		AC_MSG_CHECKING(whether compiler supports -Wno-tautological-compare)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-tautological-compare"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
-		# Additional warning options for development testing...
-		if test -d .git; then
-			OPTIM="-Werror $OPTIM"
-		fi
+	# Additional warning options for development testing...
+	if test -d .git; then
+		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
 	fi
 
 	case "$uname" in
@@ -193,11 +177,7 @@ if test -n "$GCC"; then
 
 			# -mmacosx-version-min=10.10 tells the compiler to
 			# build for macOS 10.10 or later.
-			CFLAGS="$CFLAGS -mmacosx-version-min=10.10"
-
-			# -macosx_version_min 10.10 tells the linker to
-			# link for macOS 10.10 or later.
-			LDFLAGS="$LDFLAGS -Wl,-macosx_version_min,10.10"
+			OPTIM="$OPTIM -mmacosx-version-min=10.10"
 			;;
 
 		Linux*)
