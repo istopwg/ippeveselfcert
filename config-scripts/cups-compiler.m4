@@ -1,6 +1,7 @@
 dnl
 dnl Compiler stuff for CUPS.
 dnl
+dnl Copyright 2020 by the ISTO Printer Working Group.
 dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
@@ -153,7 +154,7 @@ if test -n "$GCC"; then
 	fi
 
 	# Add useful warning options for tracking down problems...
-	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion"
+	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion -Wno-deprecated-declarations"
 
 	# Test GCC version for certain warning flags since -Werror
 	# doesn't trigger...

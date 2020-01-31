@@ -1,7 +1,7 @@
 #
 # Common makefile definitions for CUPS.
 #
-# Copyright 2015-2019 by the ISTO Printer Working Group.
+# Copyright 2015-2020 by the ISTO Printer Working Group.
 # Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -53,7 +53,7 @@ ALL_CXXFLAGS	=	-I.. -D_CUPS_SOURCE -DCUPS_LITE $(CXXFLAGS) $(SSLFLAGS) \
 			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
-CFLAGS		=	@CPPFLAGS@ @CFLAGS@
+CFLAGS		=	@CPPFLAGS@ @CFLAGS@ @WARNING_OPTIONS@
 COMMONLIBS	=	@LIBS@
 DNSSDLIBS	=	@DNSSDLIBS@
 LDFLAGS		=	@LDARCHFLAGS@ @LDFLAGS@ $(OPTIM)
