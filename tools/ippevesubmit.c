@@ -1,7 +1,7 @@
 /*
  * IPP Everywhere Printer Self-Certification submission tool
  *
- * Copyright © 2019 by the ISTO Printer Working Group.
+ * Copyright © 2019-2020 by the ISTO Printer Working Group.
  * Copyright © 2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.	See the file "LICENSE" for more
@@ -14,6 +14,9 @@
  * Options:
  *
  *    --help		   Show help.
+ *    --override           Override test results for granted exception.
+ *    -f standard          The standard firmware includes IPP Everywhere support.
+ *    -f update            A firmware update may be needed.
  *    -m models.txt	   Specify list of models, one per line.
  *    -o filename.json	   Specify the JSON output file, otherwise JSON is sent
  *			   to 'printer name.json'.
@@ -95,9 +98,9 @@ static plist_t	*plist_read(const char *filename);
 static int	read_boolean(const char *prompt);
 static char	*read_string(const char *prompt, FILE *fp, char *buffer, size_t bufsize);
 static void	usage(void);
-static int	validate_dnssd_results(const char *filename, plist_t *results, int print_server);
-static int	validate_document_results(const char *filename, plist_t *results, int print_server);
-static int	validate_ipp_results(const char *filename, plist_t *results, int print_server);
+static int	validate_dnssd_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
+static int	validate_document_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
+static int	validate_ipp_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
 static char	*xml_gets(FILE *fp, char *buffer, size_t bufsize, int *linenum);
 static void	xml_unescape(char *buffer);
 
@@ -119,6 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*webpage = NULL;	/* Product family web page */
   int		override_tests = 0,	/* Test results were overridden */
 		print_server = -1,	/* Product is a print server */
+		firmware_update = -1,	/* Is a firmware update needed? */
 		yes_to_all = 0;		/* Answer "yes" to all checklist questions */
   char		filename[1024];		/* plist filename */
   int		ok = 1;			/* Are test results OK? */
@@ -126,6 +130,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*ipp_results,		/* IPP test results */
 		*document_results,	/* Document test results */
 		*submission = NULL;	/* Submission data */
+  char		dnssd_errors[1024],	/* DNS-SD tests that failed, if any */
+		ipp_errors[1024],	/* IPP tests that failed, if any */
+		document_errors[1024];	/* Document tests that failed, if any */
   char		response[1024];		/* Response from user */
   FILE		*models_fp;		/* Models file */
   const char	*models_prompt;		/* Prompt for models */
@@ -183,6 +190,18 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
 	switch (*opt)
 	{
+	  case 'f' : /* -f {standard|update} */
+	      i ++;
+	      if (i >= argc || (strcmp(argv[i], "standard") && strcmp(argv[i], "update")))
+	      {
+	        puts("ippevesubmit: Expected 'standard' or 'update' after '-f'.");
+	        usage();
+	        return (1);
+	      }
+
+	      firmware_update = !strcmp(argv[i], "update");
+	      break;
+	      
 	  case 'm' : /* -m models.txt */
 	      i ++;
 	      if (i >= argc)
@@ -284,21 +303,31 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   snprintf(filename, sizeof(filename), "%s DNS-SD Results.plist", printer);
   dnssd_results = plist_read(filename);
-  if (!validate_dnssd_results(filename, dnssd_results, print_server))
+  if (!validate_dnssd_results(filename, dnssd_results, print_server, dnssd_errors, sizeof(dnssd_errors)))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s IPP Results.plist", printer);
   ipp_results = plist_read(filename);
-  if (!validate_ipp_results(filename, ipp_results, print_server))
+  if (!validate_ipp_results(filename, ipp_results, print_server, ipp_errors, sizeof(ipp_errors)))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s Document Results.plist", printer);
   document_results = plist_read(filename);
-  if (!validate_document_results(filename, document_results, print_server))
+  if (!validate_document_results(filename, document_results, print_server, document_errors, sizeof(document_errors)))
     ok = 0;
 
   if (!ok && !override_tests)
+  {
+    puts("Unable to submit IPP Everywhere self-certification due to errors.\n");
+    if (dnssd_errors[0])
+      printf("DNS-SD errors:\n%s\n", dnssd_errors);
+    if (ipp_errors[0])
+      printf("IPP errors:\n%s\n", ipp_errors);
+    if (document_errors[0])
+      printf("Document errors:\n%s\n", document_errors);
+
     return (1);
+  }
 
  /*
   * Collect all information we need for the submission...
@@ -315,6 +344,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (print_server < 0)
     print_server = read_boolean("Is this a print server");
+
+  if (firmware_update < 0)
+    firmware_update = read_boolean("Is IPP Everywhere support part of a firmware update");
 
   if (!family)
   {
@@ -462,6 +494,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     plist_add(dict, PLIST_TYPE_KEY, "ipps");
     plist_add(dict, PLIST_TYPE_STRING, ipps_supported ? "1" : "0");
 
+    plist_add(dict, PLIST_TYPE_KEY, "firmware_update");
+    plist_add(dict, PLIST_TYPE_STRING, firmware_update ? "1" : "0");
+
     plist_add(dict, PLIST_TYPE_KEY, "media");
     plist_add(dict, PLIST_TYPE_STRING, media_formats[media_format]);
 
@@ -494,7 +529,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   if (override_tests)
+  {
     fputs("/* Note: submitted with --override */\n", fp);
+
+    if (dnssd_errors[0])
+      fprintf(fp, "/* DNS-SD errors:\n%s*/\n", dnssd_errors);
+    if (ipp_errors[0])
+      fprintf(fp, "/* IPP errors:\n%s*/\n", ipp_errors);
+    if (document_errors[0])
+      fprintf(fp, "/* Document errors:\n%s*/\n", document_errors);
+  }
 
   json_write_plist(fp, submission);
 
@@ -764,6 +808,13 @@ plist_find(plist_t    *parent,		/* I - Parent node */
 		*next;			/* Next pointer into path */
   int		n;			/* Number in path */
 
+
+ /*
+  * Range check input...
+  */
+
+  if (!parent || !path)
+    return (NULL);
 
  /*
   * Copy the path and loop through it to find the various nodes...
@@ -1168,6 +1219,8 @@ usage(void)
   puts("");
   puts("Options:");
   puts("  --help	       Show help.");
+  puts("  -f standard          The standard firmware supports IPP Everywhere.");
+  puts("  -f update            The firmware may need to be updated.");
   puts("  -m models.txt	       Specify a list of models, one per line.");
   puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
   puts("		       to 'printer name.json'.");
@@ -1186,7 +1239,9 @@ static int				/* O - 1 on success, 0 on failure */
 validate_dnssd_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - DNS-SD results */
-    int	       print_server)		/* I - Certifying a print server? */
+    int	       print_server,		/* I - Certifying a print server? */
+    char       *errors,			/* O - Error buffer */
+    size_t     errsize)			/* I - Size of error buffer */
 {
   int		result = 1;		/* Success/fail result */
   plist_t	*fileid,		/* FileId value */
@@ -1195,43 +1250,50 @@ validate_dnssd_results(
 		*test;			/* Current test */
   int		number,			/* Test number */
 		tests_count = 0;	/* Number of tests */
+  char		*errptr = errors;	/* Pointer into errors */
 
+
+  *errors = '\0';
 
   if ((fileid = plist_find(results, "Tests/0/FileId")) == NULL)
   {
-    printf("%s: Missing FileId.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing FileId.\n");
     return (0);
   }
   else if (fileid->type != PLIST_TYPE_STRING)
   {
-    printf("%s: FileId is not a string value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
   else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd"))
   {
-    printf("%s: Unsupported FileId '%s'.\n", filename, fileid->value);
+    snprintf(errptr, errsize - (errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
     result = 0;
   }
 
   if ((successful = plist_find(results, "Successful")) == NULL)
   {
-    printf("%s: Missing Successful.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Successful.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (successful->type != PLIST_TYPE_FALSE && successful->type != PLIST_TYPE_TRUE)
   {
-    printf("%s: Successful is not a boolean value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Successful is not a boolean value.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
 
   if ((tests = plist_find(results, "Tests")) == NULL)
   {
-    printf("%s: Missing Tests.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Tests.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (tests->type != PLIST_TYPE_ARRAY)
   {
-    printf("%s: Tests is not an array value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Tests is not an array value.\n");
+    errptr += strlen(errptr);
     result = 0;
     tests  = NULL;
   }
@@ -1240,12 +1302,12 @@ validate_dnssd_results(
 
   if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && tests_count != 10)
   {
-    printf("%s: Wrong number of tests (got %d, expected 10).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 10).\n", tests_count);
     result = 0;
   }
   else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd") && tests_count != 10)
   {
-    printf("%s: Wrong number of tests (got %d, expected 10).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 10).\n", tests_count);
     result = 0;
   }
 
@@ -1263,7 +1325,8 @@ validate_dnssd_results(
 
       if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
       {
-	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	snprintf(errptr, errsize - (errptr - errors), "Missing/bad values for test #%d.\n", number);
+	errptr += strlen(errptr);
 	result = 0;
 	continue;
       }
@@ -1289,7 +1352,9 @@ validate_dnssd_results(
 	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
 	  {
 	    if (terror->type != PLIST_TYPE_STRING)
+	    {
 	      continue;
+	    }
 	    else if (strncmp(terror->value, "rp has bad value", 16))
 	    {
 	     /*
@@ -1299,10 +1364,12 @@ validate_dnssd_results(
 	      if (!show_errors)
 	      {
 		show_errors = 1;
-		printf("%s: FAILED %s\n", filename, tname->value);
+		snprintf(errptr, errsize - (errptr - errors), "FAILED %s\n", tname->value);
+		errptr += strlen(errptr);
 	      }
 
-	      printf("%s: %s\n", filename, terror->value);
+	      snprintf(errptr, errsize - (errptr - errors), "%s\n", terror->value);
+	      errptr += strlen(errptr);
 	    }
 	  }
 
@@ -1322,14 +1389,16 @@ validate_dnssd_results(
 	{
 	  result = 0;
 
-	  printf("%s: FAILED %s\n", filename, tname->value);
+	  snprintf(errptr, errsize - (errptr - errors), "FAILED %s\n", tname->value);
+	  errptr += strlen(errptr);
 
 	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
 	  {
 	    if (terror->type != PLIST_TYPE_STRING)
 	      continue;
 
-	    printf("%s: %s\n", filename, terror->value);
+	    snprintf(errptr, errsize - (errptr - errors), "%s\n", terror->value);
+	    errptr += strlen(errptr);
 	  }
 	}
       }
@@ -1348,7 +1417,9 @@ static int				/* O - 1 on success, 0 on failure */
 validate_document_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - Document results */
-    int	       print_server)		/* I - Certifying a print server? */
+    int	       print_server,		/* I - Certifying a print server? */
+    char       *errors,			/* O - Error buffer */
+    size_t     errsize)			/* I - Size of error buffer */
 {
   int		result = 1;		/* Success/fail result */
   plist_t	*fileid,		/* FileId value */
@@ -1357,43 +1428,51 @@ validate_document_results(
 		*test;			/* Current test */
   int		number,			/* Test number */
 		tests_count = 0;	/* Number of tests */
+  char		*errptr = errors;	/* Pointer into errors */
 
+
+  *errors = '\0';
 
   if ((fileid = plist_find(results, "Tests/0/FileId")) == NULL)
   {
-    printf("%s: Missing FileId.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing FileId.\n");
     return (0);
   }
   else if (fileid->type != PLIST_TYPE_STRING)
   {
-    printf("%s: FileId is not a string value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
   else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.document"))
   {
-    printf("%s: Unsupported FileId '%s'.\n", filename, fileid->value);
+    snprintf(errptr, errsize - (errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
+    errptr += strlen(errptr);
     result = 0;
   }
 
   if ((successful = plist_find(results, "Successful")) == NULL)
   {
-    printf("%s: Missing Successful.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Successful.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (successful->type != PLIST_TYPE_FALSE && successful->type != PLIST_TYPE_TRUE)
   {
-    printf("%s: Successful is not a boolean value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Successful is not a boolean value.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
 
   if ((tests = plist_find(results, "Tests")) == NULL)
   {
-    printf("%s: Missing Tests.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Tests.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (tests->type != PLIST_TYPE_ARRAY)
   {
-    printf("%s: Tests is not an array value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Tests is not an array value.\n");
+    errptr += strlen(errptr);
     result = 0;
     tests  = NULL;
   }
@@ -1402,12 +1481,14 @@ validate_document_results(
 
   if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && tests_count != 34)
   {
-    printf("%s: Wrong number of tests (got %d, expected 34).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 34).\n", tests_count);
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 34)
   {
-    printf("%s: Wrong number of tests (got %d, expected 34).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 34).\n", tests_count);
+    errptr += strlen(errptr);
     result = 0;
   }
 
@@ -1425,7 +1506,8 @@ validate_document_results(
 
       if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
       {
-	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	snprintf(errptr, errsize - (errptr - errors), "Missing/bad values for test #%d.\n", number);
+	errptr += strlen(errptr);
 	result = 0;
 	continue;
       }
@@ -1438,14 +1520,16 @@ validate_document_results(
 
 	result = 0;
 
-	printf("%s: FAILED %s\n", filename, tname->value);
+	snprintf(errptr, errsize - (errptr - errors), "FAILED %s\n", tname->value);
+	errptr += strlen(errptr);
 
 	for (terror = terrors->first_child; terror; terror = terror->next_sibling)
 	{
 	  if (terror->type != PLIST_TYPE_STRING)
 	    continue;
 
-	  printf("%s: %s\n", filename, terror->value);
+	  snprintf(errptr, errsize - (errptr - errors), "%s\n", terror->value);
+	  errptr += strlen(errptr);
 	}
       }
     }
@@ -1463,7 +1547,9 @@ static int				/* O - 1 on success, 0 on failure */
 validate_ipp_results(
     const char *filename,		/* I - plist filename */
     plist_t    *results,		/* I - IPP results */
-    int	       print_server)		/* I - Certifying a print server? */
+    int	       print_server,		/* I - Certifying a print server? */
+    char       *errors,			/* O - Error buffer */
+    size_t     errsize)			/* I - Size of error buffer */
 {
   int		result = 1;		/* Success/fail result */
   plist_t	*fileid,		/* FileId value */
@@ -1472,43 +1558,51 @@ validate_ipp_results(
 		*test;			/* Current test */
   int		number,			/* Test number */
 		tests_count = 0;	/* Number of tests */
+  char		*errptr = errors;	/* Pointer into error buffer */
 
+
+  *errors = '\0';
 
   if ((fileid = plist_find(results, "Tests/0/FileId")) == NULL)
   {
-    printf("%s: Missing FileId.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing FileId.\n");
     return (0);
   }
   else if (fileid->type != PLIST_TYPE_STRING)
   {
-    printf("%s: FileId is not a string value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
   else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp"))
   {
-    printf("%s: Unsupported FileId '%s'.\n", filename, fileid->value);
+    snprintf(errptr, errsize - (errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
+    errptr += strlen(errptr);
     result = 0;
   }
 
   if ((successful = plist_find(results, "Successful")) == NULL)
   {
-    printf("%s: Missing Successful.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Successful.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (successful->type != PLIST_TYPE_FALSE && successful->type != PLIST_TYPE_TRUE)
   {
-    printf("%s: Successful is not a boolean value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Successful is not a boolean value.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
 
   if ((tests = plist_find(results, "Tests")) == NULL)
   {
-    printf("%s: Missing Tests.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Missing Tests.\n");
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (tests->type != PLIST_TYPE_ARRAY)
   {
-    printf("%s: Tests is not an array value.\n", filename);
+    snprintf(errptr, errsize - (errptr - errors), "Tests is not an array value.\n");
+    errptr += strlen(errptr);
     result = 0;
     tests  = NULL;
   }
@@ -1517,12 +1611,14 @@ validate_ipp_results(
 
   if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && tests_count != 27)
   {
-    printf("%s: Wrong number of tests (got %d, expected 27).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 27).\n", tests_count);
+    errptr += strlen(errptr);
     result = 0;
   }
   else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 28)
   {
-    printf("%s: Wrong number of tests (got %d, expected 28).\n", filename, tests_count);
+    snprintf(errptr, errsize - (errptr - errors), "Wrong number of tests (got %d, expected 28).\n",  tests_count);
+    errptr += strlen(errptr);
     result = 0;
   }
 
@@ -1540,7 +1636,8 @@ validate_ipp_results(
 
       if (!tname || tname->type != PLIST_TYPE_STRING || !tsuccessful || (tsuccessful->type != PLIST_TYPE_FALSE && tsuccessful->type != PLIST_TYPE_TRUE))
       {
-	printf("%s: Missing/bad values for test #%d.\n", filename, number);
+	snprintf(errptr, errsize - (errptr - errors), "Missing/bad values for test #%d.\n", number);
+	errptr += strlen(errptr);
 	result = 0;
 	continue;
       }
@@ -1585,10 +1682,12 @@ validate_ipp_results(
 	      if (!show_errors)
 	      {
 		show_errors = 1;
-		printf("%s: FAILED %s\n", filename, tname->value);
+		snprintf(errptr, errsize - (errptr - errors), "FAILED %s\n", tname->value);
+		errptr += strlen(errptr);
 	      }
 
-	      printf("%s: %s\n", filename, terror->value);
+	      snprintf(errptr, errsize - (errptr - errors), "%s\n", terror->value);
+	      errptr += strlen(errptr);
 	    }
 	  }
 
@@ -1616,14 +1715,16 @@ validate_ipp_results(
 	{
 	  result = 0;
 
-	  printf("%s: FAILED %s\n", filename, tname->value);
+	  snprintf(errptr, errsize - (errptr - errors), "FAILED %s\n", tname->value);
+	  errptr += strlen(errptr);
 
 	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
 	  {
 	    if (terror->type != PLIST_TYPE_STRING)
 	      continue;
 
-	    printf("%s: %s\n", filename, terror->value);
+	    snprintf(errptr, errsize - (errptr - errors), "%s\n", terror->value);
+	    errptr += strlen(errptr);
 	  }
 	}
       }
