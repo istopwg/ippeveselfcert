@@ -44,4 +44,4 @@ The tools are provided under the terms of version 2 of the GNU General Public
 License and GNU Library General Public License.  This program is distributed in
 the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
 implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-the file "LICENSE.txt" for more information.
+the file "LICENSE.md" for more information.

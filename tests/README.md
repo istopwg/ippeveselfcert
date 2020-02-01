@@ -1,66 +1,68 @@
-README.md - 20202-02-01
------------------------
+IPP Everywhere™ v1.0 Printer Self-Certification Tools
+=====================================================
 
-INTRODUCTION
+This directory contains the IPP Everywhere™ v1.0 Printer Self-Certification
+tools.
 
-    This directory contains the IPP Everywhere Printer Self-Certification tools.
+In addition to the files in this directory, you must also download and
+extract one or more PWG Raster Format file archives from
+<https://ftp.pwg.org/pub/pwg/ipp/examples/>
 
-    In addition to the files in this directory, you must also download and
-    extract one or more PWG Raster Format file archives from:
+These archives are used for the Document Data tests.
 
-      http://ftp.pwg.org/pub/pwg/ipp/examples/
-
-    These archives are used for the Document Data tests.
-
-
-CONTENTS
-
-    Scripts for running the self-certification tests:
-
-      bonjour-tests.bat   Bonjour Tests for Windows
-      bonjour-tests.sh    Bonjour Tests for Linux and macOS
-
-      ipp-tests.bat       IPP Tests for Windows
-      ipp-tests.sh        IPP Tests for Linux and macOS
-
-      document-tests.bat  Document Data Tests for Windows
-      document-tests.sh   Document Data Tests for Linux and OS X
-
-    Tools:
-
-      ippevesubmit        Submission tool
-      ippfind             Tool for finding printers with Bonjour/DNS-SD
-      ippserver           Sample IPP server, useful for testing
-      ipptool             IPP test tool
-
-    Documentation:
-
-      LICENSE.md         CUPS software license
-      man-*.html         HTML documentation for the tools
-      README.md          This README file
+> Note: Tests are intended to be run on an isolated network, or at least when no
+> other users are printing using the target printer.  Otherwise the test scripts
+> will fail randomly.
 
 
-GETTING SUPPORT AND OTHER RESOURCES
+Contents
+--------
 
-    The IPP Everywhere home page provides access to all information relevant to
-    IPP Eveywhere:
+Scripts for running the self-certification tests:
 
-      http://www.pwg.org/ipp/everywhere.html
+- "bonjour-tests.bat": DNS-SD Tests for Windows
+- "bonjour-tests.sh": DNS-SD Tests for Linux and macOS
 
-    The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere
-    Printer Self-Certification.  You can subscribe from the following page:
+- "ipp-tests.bat": IPP Tests for Windows
+- "ipp-tests.sh": IPP Tests for Linux and macOS
 
-      https://www.pwg.org/mailman/listinfo/ippeveselfcert
+- "document-tests.bat": Document Data Tests for Windows
+- "document-tests.sh": Document Data Tests for Linux and OS X
+
+Tools:
+
+- "ippevesubmit": IPP Everywhere Printer Self-Certification submission tool
+- "ippfind": Tool for finding printers with DNS-SD (Bonjour)
+- "ippserver": Sample IPP Everywhere printer, useful for testing
+- "ipptool": IPP test tool
+
+Documentation:
+
+- "LICENSE.md": Software license
+- "man-*.html": HTML documentation for the tools
+- "README.md": This README file
 
 
-LEGAL STUFF
+Getting Support and Other Resources
+-----------------------------------
 
-    These tools are Copyright © 2014-2020 by The Printer Working Group and
-    Copyright 2007-2019 by Apple Inc.  CUPS and the CUPS logo are trademarks of
-    Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
+The IPP Everywhere home page provides access to all information relevant to
+IPP Eveywhere: <https://www.pwg.org/ipp/everywhere.html>
 
-    CUPS is provided under the terms of version 2 of the GNU General Public
-    License and GNU Library General Public License. This program is distributed
-    in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
-    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the file "LICENSE.txt" for more information.
+The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere
+Printer Self-Certification.  You can subscribe from the following page:
+<https://www.pwg.org/mailman/listinfo/ippeveselfcert>
+
+
+Legal Stuff
+-----------
+
+These tools are Copyright © 2014-2020 by The Printer Working Group and
+Copyright © 2007-2019 by Apple Inc.  CUPS and the CUPS logo are trademarks of
+Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
+
+The tools are provided under the terms of version 2 of the GNU General Public
+License and GNU Library General Public License.  This program is distributed in
+the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+the file "LICENSE.md" for more information.
