@@ -4,38 +4,75 @@ Build Instructions for the IPP Everywhere Printer Self-Certification Tools
 This file describes how to compile and install the IPP Everywhere Printer Self-
 Certification Tools.
 
+> Note: See the file "TESTING.md" for instructions on how to run tests with a
+> local build of the software.
+
 > Note: Certification results posted to the IPP Everywhere portal MUST be
 > generated using the posted binaries.  You cannot build and use your own copy
 > of the tools to generate the results for the portal.
 
 
-Building on Linux/macOS
------------------------
+Prerequisites
+-------------
 
 You'll need an ANSI-compliant C compiler plus a make program and POSIX-compliant
 shell (/bin/sh).  The GNU compiler tools and Bash work well and we have tested
 the current IPP sample code against several versions of Clang and GCC with
 excellent results.
 
-The makefiles used by the project should work with most versions of make.  We've
-tested them with GNU make as well as the make programs shipped by Compaq, HP,
-SGI, and Sun.  BSD users should use GNU make (gmake) since BSD make does not
-support "include".
+The makefiles used by the project should work with most versions of make.  BSD
+users should use GNU make (gmake) since BSD make does not support "include".
 
 Besides these tools you'll want the following libraries:
 
-- Avahi (Linux) or mDNSResponder (all others) for DNS-SD (Bonjour) support
-- GNU TLS for encryption support on platforms other than macOS
+- Avahi (Linux) or mDNSResponder (all others) for Bonjour (DNS-SD) support
+- GNU TLS for encryption support on platforms other than iOS, macOS, or Windows
 - ZLIB for compression support
 
-On a stock Debian/Ubuntu install, the following command will install most of the
-required prerequisites:
+
+Linux
+-----
+
+Packages are targeted for Red Hat Enterprise Linux and Ubuntu.  On a stock
+Ubuntu install, the following command will install the required prerequisites:
 
     sudo apt-get install build-essential autoconf avahi-daemon avahi-utils \
         libavahi-client-dev libgnutls28-dev libnss-mdns zlib1g-dev
 
-CUPS uses GNU autoconf, so you should find the usual `configure` script in the
-main CUPS source directory.  To configure the code for your system, type:
+Run the following to compile the tools:
+
+    ./configure
+    make
+
+
+macOS
+-----
+
+You'll need the current Xcode software and command-line tools to build things.
+Run the following to compile the tools:
+
+    ./configure
+    make
+
+
+Windows
+-------
+
+You'll need the current Visual Studio C++ as well as the code signing tools and
+the PWG code signing certificate (available from the PWG officers for official
+use only) - without the certificate the build will fail unless you disable the
+post-build events that add the code signatures or create a self-signed
+certificate with the name "".
+
+Open the "ippeveselfcert.sln" file in the "vcnet" subdirectory and build the
+installer project.
+
+
+Other Platforms
+---------------
+
+This project uses GNU autoconf, so you should find the usual `configure` script
+in the main source directory.  To configure the code for your system, type:
 
     ./configure
 
@@ -72,30 +109,18 @@ or if you have FreeBSD, NetBSD, or OpenBSD type:
 to build the software.
 
 
-Building on Windows
--------------------
+Packaging
+---------
 
-A Visual Studio project file can be found in the "vcnet" directory.  You'll
-need the following minimum software:
+On Linux run:
 
-- Visual Studio 2017 Community Edition
-- Advanced Installer 15.4
-- Windows SDK 10.0.17763.0
+    make dist
 
-Open the "ippeveselfcert.sln" file and then build the installer target.
+A tar.gz file will be placed in the current directory.
 
+On macOS you'll need the PWG code signing certificate (available from the PWG officers for official use only) or your own certificate loaded into your login keychain.  Then run:
 
-Getting Debug Logging
----------------------
+    CODESIGN_IDENTITY="common name or SHA-1 hash of certificate" make dist
 
-The following environment variables are used to enable and control debug
-logging:
-
-- `CUPS_DEBUG_FILTER`: Specifies a POSIX regular expression to control which
-  messages are logged.
-- `CUPS_DEBUG_LEVEL`: Specifies a number from 0 to 9 to control the verbosity of
-  the logging. The default level is 1.
-- `CUPS_DEBUG_LOG`: Specifies a log file to use.  Specify the name "-" to send
-  the messages to stderr.  Prefix a filename with "+" to append to an existing
-  file.  You can include a single "%d" in the filename to embed the current
-  process ID.
+On Windows just build the installer target in Visual Studio - you'll find the
+package in a MSI file in the "vcnet" directory.
