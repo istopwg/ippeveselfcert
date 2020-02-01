@@ -1,6 +1,12 @@
 # Changes
 
-## v1.0 Update 3 (April 4, 2018)
+## v1.0 Update 4 (Pending)
+
+- Issue #41: Windows IPP Everywhere Self Cert 1.0 Update 3: ipptool fails to
+  run - missing regex.dll
+
+
+## v1.0 Update 3 (October 23, 2018)
 
 - Issue #22: Print service names could match multiple printers.
 - Issue #24: Updated IPP tools to CUPS v2.2.8.

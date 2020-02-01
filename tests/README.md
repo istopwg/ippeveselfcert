@@ -1,4 +1,4 @@
-README.md - 2017-04-28
+README.md - 20202-02-01
 -----------------------
 
 INTRODUCTION
@@ -18,16 +18,17 @@ CONTENTS
     Scripts for running the self-certification tests:
 
       bonjour-tests.bat   Bonjour Tests for Windows
-      bonjour-tests.sh    Bonjour Tests for Linux and OS X
+      bonjour-tests.sh    Bonjour Tests for Linux and macOS
 
       ipp-tests.bat       IPP Tests for Windows
-      ipp-tests.sh        IPP Tests for Linux and OS X
+      ipp-tests.sh        IPP Tests for Linux and macOS
 
       document-tests.bat  Document Data Tests for Windows
       document-tests.sh   Document Data Tests for Linux and OS X
 
     Tools:
 
+      ippevesubmit        Submission tool
       ippfind             Tool for finding printers with Bonjour/DNS-SD
       ippserver           Sample IPP server, useful for testing
       ipptool             IPP test tool
@@ -54,8 +55,8 @@ GETTING SUPPORT AND OTHER RESOURCES
 
 LEGAL STUFF
 
-    These tools are Copyright 2014-2015 by The Printer Working Group and
-    Copyright 2007-2015 by Apple Inc.  CUPS and the CUPS logo are trademarks of
+    These tools are Copyright © 2014-2020 by The Printer Working Group and
+    Copyright 2007-2019 by Apple Inc.  CUPS and the CUPS logo are trademarks of
     Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
 
     CUPS is provided under the terms of version 2 of the GNU General Public
