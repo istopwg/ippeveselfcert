@@ -1,15 +1,12 @@
-README.md - 2019-04-25
-======================
+IPP Everywhere™ v1.1 Printer Self-Certification Tools
+=====================================================
 
-Introduction
-------------
+This directory contains the IPP Everywhere™ v1.1 Printer Self-Certification
+tools.
 
-This directory contains the IPP Everywhere Printer Self-Certification tools.
-
-In addition to the files in this directory, you must also download and extract
-one or more PWG Raster Format file archives from:
-
-    http://ftp.pwg.org/pub/pwg/ipp/examples/
+In addition to the files in this directory, you must also download and
+extract one or more PWG Raster Format file archives from
+<https://ftp.pwg.org/pub/pwg/ipp/examples/>
 
 These archives are used for the Document Data tests.
 
@@ -50,14 +47,11 @@ Getting Support and Other Resources
 -----------------------------------
 
 The IPP Everywhere home page provides access to all information relevant to
-IPP Eveywhere:
-
-    https://www.pwg.org/ipp/everywhere.html
+IPP Eveywhere: <https://www.pwg.org/ipp/everywhere.html>
 
 The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere
 Printer Self-Certification.  You can subscribe from the following page:
-
-    https://www.pwg.org/mailman/listinfo/ippeveselfcert
+<https://www.pwg.org/mailman/listinfo/ippeveselfcert>
 
 
 Legal Stuff
