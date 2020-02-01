@@ -19,9 +19,9 @@ Printer Self-Certification. You can subscribe at
 Issues found in the tools should be reported using the Github issues page at
 <https://github.com/istopwg/ippeveselfcert>.
 
-Note: Tests are intended to be run on an isolated network, or at least when no
-other users are printing using the target printer.  Otherwise the test scripts
-will fail randomly.
+> Note: Tests are intended to be run on an isolated network, or at least when no
+> other users are printing using the target printer.  Otherwise the test scripts
+> will fail randomly.
 
 
 Compiling
