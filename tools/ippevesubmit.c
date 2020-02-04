@@ -31,19 +31,15 @@
  * Include necessary headers...
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifdef _WIN32
-#  include <io.h>
-#  include <direct.h>
-#  define access	_access
-#  define R_OK		04
-#else
+#ifndef _WIN32
 #  include <unistd.h>
-#endif /* _WIN32 */
+#endif /* !_WIN32 */
 #include <cups/cups.h>
 
 
