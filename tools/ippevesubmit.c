@@ -159,6 +159,21 @@ main(int  argc,				/* I - Number of command-line arguments */
   };
 
 
+#if _WIN32
+ /*
+  * On Windows, always run from the user's Desktop directory...
+  */
+
+  const char *userprofile = getenv("USERPROFILE");
+					/* User home directory */
+
+  if (userprofile)
+  {
+    if (!_chdir(userprofile))
+      _chdir("Desktop");
+  }
+#endif /* _WIN32 */
+
  /*
   * Parse command-line...
   */
