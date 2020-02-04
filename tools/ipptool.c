@@ -1,6 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
+ * Copyright @ 2020 by The Printer Working Group.
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
@@ -2047,6 +2048,21 @@ get_filename(const char *testfile,	/* I - Current test file */
       dstptr = dst; /* Should never happen */
 
     strlcpy(dstptr, src, dstsize - (size_t)(dstptr - dst));
+
+#if _WIN32
+    if (_access(dst, 0))
+    {
+     /*
+      * Not available relative to the testfile, see if it can be found on the
+      * desktop...
+      */
+      const char *userprofile = getenv("USERPROFILE");
+					/* User home directory */
+
+      if (userprofile)
+        snprintf(dst, dstsize, "%s/Desktop/%s", userprofile, src);
+    }
+#endif /* _WIN32 */
   }
 
   return (dst);
