@@ -57,7 +57,7 @@ Printer Self-Certification.  You can subscribe from the following page:
 Legal Stuff
 -----------
 
-Copyright © 2014-2019 by the IEEE-ISTO Printer Working Group.
+Copyright © 2014-2020 by the IEEE-ISTO Printer Working Group.
 Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
