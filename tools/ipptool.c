@@ -4120,7 +4120,7 @@ get_filename(const char *testfile,	/* I - Current test file */
     if (*dstptr == '>')
       *dstptr = '\0';
   }
-  else if (*src == '/' || !strchr(testfile, '/')
+  else if (!access(src, R_OK) || *src == '/'
 #ifdef WIN32
            || (isalpha(*src & 255) && src[1] == ':')
 #endif /* WIN32 */
