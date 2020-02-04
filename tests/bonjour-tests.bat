@@ -189,7 +189,7 @@ if "%HAVE_TLS%" == "1" (
 		set /a pass+=1
 	) else (
 		set /a fail+=1
-		echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST"
+		echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST%"
 		ippfind "%name%._ipp._tcp.local." -x ipptool -E -q "{}" bonjour-access-tests.test ";" >>"%PLIST%"
 		echo ^</string^>^</array^> >>"%PLIST%"
 	)
@@ -342,7 +342,7 @@ if "%HAVE_TLS%" == "1" (
 	        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
 	        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";" >>"%PLIST%"
 	        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
-		ippfind "%name%._ipps._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST"
+		ippfind "%name%._ipps._tcp.local." -x ipptool -t "{}" bonjour-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST%"
 	        echo ^</string^>^</array^> >>"%PLIST%"
 	)
 ) else (
