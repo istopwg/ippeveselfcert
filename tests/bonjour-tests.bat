@@ -21,7 +21,7 @@
 
 set name=%1
 set name=%name:~1,-1%
-set PLIST=%name% Bonjour Results.plist
+set PLIST=%USERPROFILE%\Desktop\%name% Bonjour Results.plist
 echo Sending output to "%PLIST%"...
 
 :: Write the standard XML plist header...
