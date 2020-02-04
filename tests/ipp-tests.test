@@ -1,7 +1,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
-# Copyright 2014-2019 by The Printer Working Group.
+# Copyright 2014-2020 by The Printer Working Group.
 # Copyright 2007-2019 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -48,7 +48,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 # Regular expression for printer-alert attribute
 #
 # Generated with help from: http://abnf.msweet.org/
-DEFINE ALERT_REGEX "/^code\=[A-Za-z]+;(index\=[0-9]+;|severity\=[A-Za-z]+;|training\=[A-Za-z]+;|group\=[A-Za-z]+;|groupindex\=[0-9]+;|location\=[0-9]+;|time\=[0-9]+;){0,}$$/"
+DEFINE ALERT_REGEX "/^code\=[A-Za-z]+(;index\=[0-9]+|;severity\=[A-Za-z]+|;training\=[A-Za-z]+|;group\=[A-Za-z]+|;groupindex\=[0-9]+|;location\=[0-9]+|;time\=[0-9]+){0,};?$$/"
 
 # Regular expression for printer-supply attribute
 #
