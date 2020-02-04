@@ -21,7 +21,7 @@
 
 set name=%1
 set name=%name:~1,-1%
-set PLIST=%name% DNS-SD Results.plist
+set PLIST=%USERPROFILE%\Desktop\%name% DNS-SD Results.plist
 echo Sending output to "%PLIST%"...
 
 :: Write the standard XML plist header...
