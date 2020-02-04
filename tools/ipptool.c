@@ -1,6 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
+ * Copyright 2020 by The Printer Working Group.
  * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
@@ -21,7 +22,7 @@
 #include <cups/file-private.h>
 #include <regex.h>
 #include <sys/stat.h>
-#ifdef WIN32
+#if _WIN32
 #  include <windows.h>
 #  ifndef R_OK
 #    define R_OK 0
@@ -29,7 +30,7 @@
 #else
 #  include <signal.h>
 #  include <termios.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
@@ -4144,6 +4145,21 @@ get_filename(const char *testfile,	/* I - Current test file */
       dstptr = dst; /* Should never happen */
 
     strlcpy(dstptr, src, dstsize - (size_t)(dstptr - dst));
+
+#if _WIN32
+    if (_access(dst, 0))
+    {
+     /*
+      * Not available relative to the testfile, see if it can be found on the
+      * desktop...
+      */
+      const char *userprofile = getenv("USERPROFILE");
+					/* User home directory */
+
+      if (userprofile)
+        snprintf(dst, dstsize, "%s/Desktop/%s", userprofile, src);
+    }
+#endif /* _WIN32 */
   }
 
   return (dst);

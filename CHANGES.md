@@ -1,9 +1,13 @@
 # Changes
 
-## v1.0 Update 4 (Pending)
+## v1.0 Update 4 (February 4, 2020)
 
 - Issue #41: Windows IPP Everywhere Self Cert 1.0 Update 3: ipptool fails to
   run - missing regex.dll
+- Updated the Windows test scripts to look for PWG Raster files on the Desktop,
+  and to write the test results to the Desktop since the installation
+  directory is now write-protected on current versions of Windows.
+- Updated libcups and the IPP tools to CUPS v2.2.13.
 
 
 ## v1.0 Update 3 (October 23, 2018)
