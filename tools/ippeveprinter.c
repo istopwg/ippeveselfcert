@@ -4359,8 +4359,35 @@ load_legacy_attributes(
   if (cupsArrayFind(docformats, (void *)"application/pdf"))
     ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "document-password-supported", 1023);
 
+  /* finishing-template-supported */
+  ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishing-template-supported", NULL, "none");
+
+  /* finishings-col-database */
+  col = ippNew();
+  ippAddString(col, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishing-template", NULL, "none");
+  ippAddCollection(attrs, IPP_TAG_PRINTER, "finishings-col-database", col);
+  ippDelete(col);
+
+  /* finishings-col-default */
+  col = ippNew();
+  ippAddString(col, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishing-template", NULL, "none");
+  ippAddCollection(attrs, IPP_TAG_PRINTER, "finishings-col-default", col);
+  ippDelete(col);
+
+  /* finishings-col-ready */
+  col = ippNew();
+  ippAddString(col, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishing-template", NULL, "none");
+  ippAddCollection(attrs, IPP_TAG_PRINTER, "finishings-col-ready", col);
+  ippDelete(col);
+
+  /* finishings-col-supported */
+  ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishings-col-supported", NULL, "finishing-template");
+
   /* finishings-default */
   ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-default", IPP_FINISHINGS_NONE);
+
+  /* finishings-ready */
+  ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-ready", IPP_FINISHINGS_NONE);
 
   /* finishings-supported */
   ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-supported", IPP_FINISHINGS_NONE);
@@ -5000,7 +5027,7 @@ load_ppd_attributes(
   }
 
   /* finishings-col-supported */
-  ippAddString(attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "finishings-col-supported", NULL, "finishing-template");
+  ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "finishings-col-supported", NULL, "finishing-template");
 
   /* finishings-default */
   ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-default", IPP_FINISHINGS_NONE);
