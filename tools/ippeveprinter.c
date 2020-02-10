@@ -1,6 +1,7 @@
 /*
  * IPP Everywhere printer application for CUPS.
  *
+ * Copyright @ 2020 by the ISTO Printer Working Group.
  * Copyright © 2010-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -38,6 +39,7 @@ typedef ULONG nfds_t;
 #else
 extern char **environ;
 
+#  include <spawn.h>
 #  include <sys/fcntl.h>
 #  include <sys/wait.h>
 #  include <poll.h>
@@ -285,6 +287,7 @@ static void		html_footer(ippeve_client_t *client);
 static void		html_header(ippeve_client_t *client, const char *title, int refresh);
 static void		html_printf(ippeve_client_t *client, const char *format, ...) _CUPS_FORMAT(2, 3);
 static void		ipp_cancel_job(ippeve_client_t *client);
+static void		ipp_cancel_my_jobs(ippeve_client_t *client);
 static void		ipp_close_job(ippeve_client_t *client);
 static void		ipp_create_job(ippeve_client_t *client);
 static void		ipp_get_job_attributes(ippeve_client_t *client);
@@ -3124,6 +3127,53 @@ ipp_cancel_job(ippeve_client_t *client)	/* I - Client */
 
 
 /*
+ * 'ipp_cancel_my_jobs()' - Cancel all jobs.
+ *
+ * Note: Since ippeveprinter doesn't do spooling, this really just cancels the
+ * current job.
+ */
+
+static void
+ipp_cancel_my_jobs(
+    ippeve_client_t *client)		/* I - Client */
+{
+  ippeve_job_t		*job;		/* Job information */
+
+
+  _cupsRWLockWrite(&client->printer->rwlock);
+
+  if ((job = client->printer->active_job) != NULL)
+  {
+   /*
+    * See if the job is already completed, canceled, or aborted; if so,
+    * we can't cancel...
+    */
+
+    if (job->state < IPP_JSTATE_CANCELED)
+    {
+     /*
+      * Cancel the job...
+      */
+
+      if (job->state == IPP_JSTATE_PROCESSING || (job->state == IPP_JSTATE_HELD && job->fd >= 0))
+      {
+	job->cancel = 1;
+      }
+      else
+      {
+	job->state     = IPP_JSTATE_CANCELED;
+	job->completed = time(NULL);
+      }
+    }
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+
+  _cupsRWUnlock(&client->printer->rwlock);
+}
+
+
+/*
  * 'ipp_close_job()' - Close an open job.
  */
 
@@ -3550,8 +3600,21 @@ ipp_identify_printer(
 
   if (!actions || ippContainsString(actions, "sound"))
   {
+#ifdef __APPLE__
+    pid_t	pid;			/* Process ID for "afplay" utility */
+    static const char * const afplay[3] =
+    {					/* Arguments for "afplay" utility */
+      "/usr/bin/afplay",
+      "/System/Library/Sounds/Ping.aiff",
+      NULL
+    };
+
+    posix_spawn(&pid, afplay[0], NULL, NULL, (char **)afplay, NULL);
+
+#else
     putchar(0x07);
     fflush(stdout);
+#endif /* __APPLE__ */
   }
 
   if (ippContainsString(actions, "display"))
@@ -6182,6 +6245,10 @@ process_ipp(ippeve_client_t *client)	/* I - Client */
 
 	    case IPP_OP_CANCEL_JOB :
 		ipp_cancel_job(client);
+		break;
+
+	    case IPP_OP_CANCEL_MY_JOBS :
+		ipp_cancel_my_jobs(client);
 		break;
 
 	    case IPP_OP_GET_JOB_ATTRIBUTES :
