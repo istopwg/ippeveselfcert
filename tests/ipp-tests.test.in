@@ -1244,7 +1244,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-12. Print-Job Operation (Print-Job Test)"
+	NAME "I-12. Print-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1288,7 +1288,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-12. Print-Job Operation (Print-Job Test)"
+	NAME "I-12. Print-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1331,7 +1331,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
-	NAME "I-12. Print-Job Operation (Print-Job Test)"
+	NAME "I-12. Print-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1502,7 +1502,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage-letter.pwg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "Print-Job Test"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
