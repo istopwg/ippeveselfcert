@@ -17,11 +17,11 @@
 #
 # This test file depends on document data files available at:
 #
-#   http://ftp.pwg.org/pub/pwg/ipp/examples
+#   https://ftp.pwg.org/pub/pwg/ipp/examples
 #
 # The ZIP files should be extracted in the same directory as the test files,
 # for example the 600dpi files will exist in a directory called
-# "pwg-raster-samples-${RASTER_RESOLUTION}".  The script used to generate the raster
+# "pwg-raster-samples-600dpi".  The script used to generate the raster
 # data is available in the "scripts" subdirectory of the source code.
 #
 
@@ -387,7 +387,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 
 #### JPEG Tests
 {
-	NAME "D-2. JPEG Tests (mandatory)"
+	NAME "D-2. JPEG Tests (if color printing is supported)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -397,9 +397,12 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 
 	STATUS successful-ok
 
-	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
+	EXPECT color-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1 DEFINE-MATCH HAVE_COLOR
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg" IF-DEFINED HAVE_COLOR
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.1 Print color.jpg with defaults"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -415,6 +418,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.2 Print color.jpg with copies=2"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -432,6 +436,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.3 Print color.jpg with print-color-mode=monochrome"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -449,6 +454,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.4 Print color.jpg with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -467,6 +473,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.5 Print color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag

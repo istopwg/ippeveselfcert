@@ -15,9 +15,9 @@
 # History:
 #
 # This test file is loosely based on the IPP/1.1, IPP/2.0 and IPP Everywhere
-# test files from the CUPS "test" directory.  Many of those tests have been
-# combined or removed, and all print tests are performed using a sample JPEG
-# file.  These tests also validate support for the 'media-needed' keyword
+# test files from the CUPS "examples" directory.  Many of those tests have been
+# combined or removed, and all print tests are performed using a sample PWG
+# Raster file.  These tests also validate support for the 'media-needed' keyword
 # in the "printer-state-reasons" Printer attribute.
 #
 
@@ -186,7 +186,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
 	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
 
-	# Default Get-Printer-Attributes MUST NOT return media-col-database, per PWG 5100.11 (JPS2)
+	# Default Get-Printer-Attributes MUST NOT return media-col-database, per PWG 5100.7 (JOBEXT)
 	EXPECT !media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
 
 	#### PWG 5100.14 - Table 6 - Printer Description Attributes that are part of the 'printer-description' group
@@ -316,11 +316,15 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
 
 	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+	EXPECT pwg-raster-document-resolution-supported DEFINE-VALUE RASTER_RESOLUTION
 
 	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^two-sided-(long|short)-edge$$/" DEFINE-MATCH HAVE_DUPLEX
 	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/" IF-DEFINED HAVE_DUPLEX
 
 	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "black_1" DEFINE-MATCH HAVE_BLACK
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "sgray_8" DEFINE-MATCH HAVE_SGRAY
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "srgb_8" DEFINE-MATCH HAVE_SRGB
 
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 
@@ -1245,18 +1249,22 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.1
 {
-	NAME "I-13. Print-Job Operation (color.jpg)"
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "job-color.jpg"
+	ATTR name job-name "onepage-letter.pwg"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "document-color.jpg"
+	ATTR name document-name "One Page Letter"
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR mimeMediaType document-format "image/pwg-raster"
 
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
@@ -1267,7 +1275,94 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
 
-	FILE "color.jpg"
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+
+	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
@@ -1328,13 +1423,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS successful-ok
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
-	EXPECT ?compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -1414,13 +1505,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	DISPLAY job-state
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
-	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
-	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
-	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document-color.jpg"
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -1498,13 +1585,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS successful-ok
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
-	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -1563,18 +1646,22 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.1
 {
-	NAME "I-21. Print-Job Operation (color.jpg)"
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "job2-color.jpg"
+	ATTR name job-name "onepage2-letter.pwg"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "document2-color.jpg"
+	ATTR name document-name "One Page Letter 2"
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR mimeMediaType document-format "image/pwg-raster"
 
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
@@ -1585,7 +1672,92 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
 
-	FILE "color.jpg"
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage2-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter 2"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+
+	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage2-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter 2"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
@@ -1638,13 +1810,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS successful-ok
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
-	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
-	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
-	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document2-color.jpg"
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB2_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -1693,7 +1861,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "job3-color.jpg"
+	ATTR name job-name "onepage3-letter.pwg"
 	ATTR boolean ipp-attribute-fidelity false
 
 	GROUP job-attributes-tag
@@ -1723,8 +1891,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-25. Send-Document Operation (color.jpg)"
+	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
 	OPERATION Send-Document
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1733,11 +1904,56 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR integer job-id $PRINT_JOB3_ID
 	ATTR name requesting-user-name $user
 	ATTR boolean last-document true
-	ATTR name document-name "document3-color.jpg"
+	ATTR name document-name "One Page Letter 3"
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR mimeMediaType document-format "image/pwg-raster"
 
-	FILE "color.jpg"
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+}
+{
+	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name "One Page Letter 3"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+}
+{
+	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+
+	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name "One Page Letter 3"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
@@ -1763,13 +1979,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	DISPLAY job-state
 
 	# PWG 5100.14 - Table 9 - Job Description attributes
-	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
-	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
-	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document3-color.jpg"
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB3_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -1811,20 +2023,24 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.1
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
 	PAUSE "Remove media from printer until this test run is complete."
 
-	NAME "I-27. Print-Job Operation (color.jpg)"
+	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "job4-color.jpg"
+	ATTR name job-name "onepage4-letter.pwg"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "document4-color.jpg"
+	ATTR name document-name "One Page Letter 4"
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR mimeMediaType document-format "image/pwg-raster"
 
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
@@ -1835,7 +2051,98 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
 
-	FILE "color.jpg"
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	PAUSE "Remove media from printer until this test run is complete."
+
+	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage4-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter 4"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+
+	PAUSE "Remove media from printer until this test run is complete."
+
+	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "onepage4-letter.pwg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "One Page Letter 4"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
