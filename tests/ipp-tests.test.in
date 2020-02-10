@@ -159,11 +159,27 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 
+# Test Identify-Printer operation
+#
+# Required by: PWG 5100.14 Section 5.x
+{
+	NAME "I-9. Identify-Printer Operation"
+	OPERATION Identify-Printer
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+}
+
+
 # Test Get-Printer-Attributes operation
 #
 # Required by: PWG 5100.14 Section 5.x
 {
-	NAME "I-9. Get-Printer-Attributes Operation (default)"
+	NAME "I-10. Get-Printer-Attributes Operation (default)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -336,7 +352,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT which-jobs-supported WITH-VALUE "not-completed"
 
 
-
 	#### PWG 5100.14 - Table 6 - Printer Description Attributes that are part of the 'job-template' group
 	EXPECT copies-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
@@ -453,7 +468,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 # Test different values of requested-attributes
 #
 {
-	NAME "I-9.1. Get-Printer-Attributes (requested-attributes='all')"
+	NAME "I-10.1 Get-Printer-Attributes Operation (all)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -570,7 +585,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT sides-supported IF-DEFINED HAVE_DUPLEX
 }
 {
-	NAME "I-9.2. Get-Printer-Attributes (requested-attributes='all','media-col-database')"
+	NAME "I-10.2. Get-Printer-Attributes Operation (all, media-col-database)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -688,7 +703,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 {
-	NAME "I-9.3. Get-Printer-Attributes (requested-attributes='none')"
+	NAME "I-10.3. Get-Printer-Attributes Operation (none)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -806,7 +821,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 {
-	NAME "I-9.4. Get-Printer-Attributes (requested-attributes='media-col-database')"
+	NAME "I-10.4. Get-Printer-Attributes Operation (media-col-database)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -924,7 +939,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 {
-	NAME "I-9.5. Get-Printer-Attributes (requested-attributes='printer-description')"
+	NAME "I-10.5. Get-Printer-Attributes Operation (printer-description)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -1042,7 +1057,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 {
-	NAME "I-9.6. Get-Printer-Attributes (requested-attributes='job-template')"
+	NAME "I-10.6. Get-Printer-Attributes Operation (job-template)"
 
 	OPERATION Get-Printer-Attributes
 
@@ -1164,7 +1179,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.5, PWG 5100.11 (JPS2)
 {
-	NAME "I-10. Get-Printer-Attributes Operation (requested-attributes)"
+	NAME "I-10.7 Get-Printer-Attributes Operation (media-col-database, printer-uri-supported)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1184,34 +1199,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT-ALL ?media-col-database/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
 
 	EXPECT !printer-name
+	EXPECT !printer-state
+	EXPECT !printer-state-message
+	EXPECT !printer-state-reasons
 	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
-}
-
-# Test support for PWG Raster
-#
-# Required by IPP Everywhere v1.0
-{
-	NAME "I-11. PWG Raster Format Tests (mandatory)"
-	OPERATION Get-Printer-Attributes
-	GROUP operation-attributes-tag
-	ATTR charset attributes-charset utf-8
-	ATTR naturalLanguage attributes-natural-language en
-	ATTR uri printer-uri $uri
-	ATTR name requesting-user-name $user
-
-	STATUS successful-ok
-
-	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
-	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
-
-	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
-
-	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag DEFINE-VALUE RASTER_RESOLUTION
-
-	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "black_1" DEFINE-MATCH HAVE_BLACK
-	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "sgray_8" DEFINE-MATCH HAVE_SGRAY
-	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "srgb_8" DEFINE-MATCH HAVE_SRGB
-	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "cmyk_8" DEFINE-MATCH HAVE_CMYK
 }
 
 
@@ -1219,7 +1210,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.3
 {
-	NAME "I-12 Validate-Job Operation"
+	NAME "I-11. Validate-Job Operation"
 	OPERATION Validate-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1253,16 +1244,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
+	NAME "I-12. Print-Job Operation (Print-Job Test)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage-letter.pwg"
+	ATTR name job-name "Print-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter"
+	ATTR name document-name "Print-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1297,16 +1288,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	NAME "I-12. Print-Job Operation (Print-Job Test)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage-letter.pwg"
+	ATTR name job-name "Print-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter"
+	ATTR name document-name "Print-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1340,16 +1331,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
-	NAME "I-13. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	NAME "I-12. Print-Job Operation (Print-Job Test)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage-letter.pwg"
+	ATTR name job-name "Print-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter"
+	ATTR name document-name "Print-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1388,7 +1379,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-14. Get-Jobs Operation (default)"
+	NAME "I-13. Get-Jobs Operation (default)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1411,7 +1402,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-15. Get-Jobs Operation (requested-attributes)"
+	NAME "I-13.1 Get-Jobs Operation (requested-attributes)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1469,7 +1460,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
 
-	NAME "I-16. Get-Jobs Operation (which-jobs=not-completed)"
+	NAME "I-13.2 Get-Jobs Operation (which-jobs=not-completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1491,7 +1482,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB_ID
 
-	NAME "I-17. Get-Job-Attributes Until Job Complete"
+	NAME "I-14. Get-Job-Attributes Operation (until job complete)"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1549,7 +1540,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.6
 {
-	NAME "I-18. Get-Jobs Operation (which-jobs=completed)"
+	NAME "I-15. Get-Jobs Operation (which-jobs=completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1572,7 +1563,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.6
 {
-	NAME "I-19. Get-Jobs Operation (which-jobs, requested-attributes)"
+	NAME "I-15.1 Get-Jobs Operation (which-jobs, requested-attributes)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1629,7 +1620,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.3.3
 {
-	NAME "I-20. Cancel-Job Operation (completed job)"
+	NAME "I-16. Cancel-Job Operation (completed job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1650,16 +1641,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
+	NAME "I-16.1 Cancel-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage2-letter.pwg"
+	ATTR name job-name "Cancel-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 2"
+	ATTR name document-name "Cancel-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1681,7 +1672,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+	EXPECT job-id DEFINE-VALUE CANCEL_JOB_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 
@@ -1693,16 +1684,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	NAME "I-16.1 Cancel-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage2-letter.pwg"
+	ATTR name job-name "Cancel-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 2"
+	ATTR name document-name "Cancel-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1724,7 +1715,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+	EXPECT job-id DEFINE-VALUE CANCEL_JOB_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 
@@ -1735,16 +1726,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
-	NAME "I-21. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	NAME "I-16.1 Cancel-Job Operation (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage2-letter.pwg"
+	ATTR name job-name "Cancel-Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 2"
+	ATTR name document-name "Cancel-Job Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1766,7 +1757,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+	EXPECT job-id DEFINE-VALUE CANCEL_JOB_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 
@@ -1780,13 +1771,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.3.3
 {
-	NAME "I-22. Cancel-Job Operation (pending/processing job)"
+	NAME "I-16.2. Cancel-Job Operation (pending/processing job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB2_ID
+	ATTR integer job-id $CANCEL_JOB_ID
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
@@ -1798,13 +1789,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.3.4
 {
-	NAME "I-23. Get-Job-Attributes Operation"
+	NAME "I-16.3 Cancel-Job Operations (Get-Job-Attributes)"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB2_ID
+	ATTR integer job-id $CANCEL_JOB_ID
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
@@ -1813,10 +1804,209 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB2_ID
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $CANCEL_JOB_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage2-letter.pwg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "Cancel-Job Test"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6,<10
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "1"
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
+	EXPECT !page-ranges
+	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
+	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
+	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
+	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
+	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
+}
+
+
+# Test Cancel-My-Jobs operation
+#
+# Required by: IPP Everywhere
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-17. Cancel-My-Jobs Operation (Print-Job onepage-letter.pwg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "Cancel-My-Jobs Test"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "Cancel-My-Jobs Document"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE CANCEL_MY_JOBS_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-DEFINED HAVE_SRGB
+
+	NAME "I-17. Cancel-My-Jobs Operation (Print-Job onepage-letter.pwg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "Cancel-My-Jobs Test"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "Cancel-My-Jobs Document"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE CANCEL_MY_JOBS_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+
+	NAME "I-17. Cancel-My-Jobs Operation (Print-Job onepage-letter.pwg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "Cancel-My-Jobs Test"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "Cancel-My-Jobs Document"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/pwg-raster"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE CANCEL_MY_JOBS_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+{
+	NAME "I-17.1 Cancel-My-Jobs Operation (Cancel-My-Jobs)"
+	OPERATION Cancel-My-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS client-error-not-possible
+}
+
+{
+	NAME "I-17.2 Cancel-My-Jobs Operations (Get-Job-Attributes)"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $CANCEL_MY_JOBS_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $CANCEL_MY_JOBS_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "Cancel-My-Jobs Test"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
@@ -1854,14 +2044,14 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Defined by: RFC 8011 section 4.2.4 and 4.3.1
 {
-	NAME "I-24. Create-Job Operation"
+	NAME "I-18. Create-Job + Send-Document Operations (Create-Job)"
 	OPERATION Create-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage3-letter.pwg"
+	ATTR name job-name "Create-Job + Send-Document Test"
 	ATTR boolean ipp-attribute-fidelity false
 
 	GROUP job-attributes-tag
@@ -1880,7 +2070,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB3_ID
+	EXPECT job-id DEFINE-VALUE CREATE_SEND_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
 
@@ -1890,21 +2080,21 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 {
-	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED CREATE_SEND_ID
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
+	NAME "I-18.1 Create-Job + Send-Document Operations (Send-Document onepage-letter.pwg)"
 	OPERATION Send-Document
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR integer job-id $CREATE_SEND_ID
 	ATTR name requesting-user-name $user
 	ATTR boolean last-document true
-	ATTR name document-name "One Page Letter 3"
+	ATTR name document-name "Create-Job + Send-Document Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1914,20 +2104,20 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS server-error-job-canceled
 }
 {
-	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED CREATE_SEND_ID
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	NAME "I-18.1 Create-Job + Send-Document Operations (Send-Document onepage-letter.pwg)"
 	OPERATION Send-Document
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR integer job-id $CREATE_SEND_ID
 	ATTR name requesting-user-name $user
 	ATTR boolean last-document true
-	ATTR name document-name "One Page Letter 3"
+	ATTR name document-name "Create-Job + Send-Document Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1937,19 +2127,19 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS server-error-job-canceled
 }
 {
-	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED CREATE_SEND_ID
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
-	NAME "I-25. Send-Document Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	NAME "I-18.1 Create-Job + Send-Document Operations (Send-Document onepage-letter.pwg)"
 	OPERATION Send-Document
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR integer job-id $CREATE_SEND_ID
 	ATTR name requesting-user-name $user
 	ATTR boolean last-document true
-	ATTR name document-name "One Page Letter 3"
+	ATTR name document-name "Create-Job + Send-Document Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1959,18 +2149,17 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	STATUS server-error-job-canceled
 }
 
-
 # Wait for job to complete...
 {
-	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+	SKIP-IF-NOT-DEFINED CREATE_SEND_ID
 
-	NAME "I-26. Get-Job-Attributes Until Job Complete"
+	NAME "I-18.2 Create-Job + Send-Document Operations (Get-Job-Attributes until job complete)"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR integer job-id $CREATE_SEND_ID
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
@@ -1982,10 +2171,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT date-time-at-completed OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-creation OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
 	EXPECT date-time-at-processing OF-TYPE dateTime|no-value|unknown IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB3_ID
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $CREATE_SEND_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage3-letter.pwg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "Create-Job + Send-Document Test"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
@@ -2019,7 +2208,84 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 }
 
 
-# Test Print-Job operation
+# Test Close-Job operation
+#
+# Create an empty job using Create-Job and Close-Job operations, and then
+# cancel the job to clean it up.
+{
+	NAME "I-19. Close-Job Test (Create-Job Operation)"
+
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "Close-Job Test Job"
+	ATTR boolean ipp-attribute-fidelity false
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE CLOSE_JOB_ID
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+{
+	SKIP-IF-NOT-DEFINED CLOSE_JOB_ID
+
+	NAME "I-19.1 Close-Job Test (Close-Job Operation)"
+	OPERATION Close-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $CLOSE_JOB_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+}
+
+{
+	SKIP-IF-NOT-DEFINED CLOSE_JOB_ID
+
+	NAME "I-19.2 Close-Job Test (Get-Job-Attributes Operation)"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $CLOSE_JOB_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "Close-Job Test Job"
+}
+
+{
+	SKIP-IF-NOT-DEFINED CLOSE_JOB_ID
+
+	NAME "I-19.3. Close-Job Test (Cancel-Job Operation)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $CLOSE_JOB_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS client-error-not-possible
+}
+
+
+# Test Print-Job operation for media-needed
 #
 # Required by: RFC 8011 section 4.2.1
 {
@@ -2029,16 +2295,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	PAUSE "Remove media from printer until this test run is complete."
 
-	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, black_1)"
+	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage4-letter.pwg"
+	ATTR name job-name "media-needed Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 4"
+	ATTR name document-name "media-needed Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -2060,7 +2326,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+	EXPECT job-id DEFINE-VALUE MEDIA_NEEDED_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
@@ -2075,16 +2341,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	PAUSE "Remove media from printer until this test run is complete."
 
-	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, sgray_8)"
+	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage4-letter.pwg"
+	ATTR name job-name "media-needed Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 4"
+	ATTR name document-name "media-needed Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -2106,7 +2372,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+	EXPECT job-id DEFINE-VALUE MEDIA_NEEDED_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
@@ -2120,16 +2386,16 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	PAUSE "Remove media from printer until this test run is complete."
 
-	NAME "I-27. Print-Job Operation (onepage-letter.pwg @ $RASTER_RESOLUTION, srgb_8)"
+	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "onepage4-letter.pwg"
+	ATTR name job-name "media-needed Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "One Page Letter 4"
+	ATTR name document-name "media-needed Document"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -2151,7 +2417,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
-	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+	EXPECT job-id DEFINE-VALUE MEDIA_NEEDED_ID
 
 	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
@@ -2161,12 +2427,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 
-
 # Test 'media-needed' reason
 {
 	DELAY 5
 
-	NAME "I-28. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
+	NAME "I-20.1 media-needed (Get-Printer-Attributes)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
