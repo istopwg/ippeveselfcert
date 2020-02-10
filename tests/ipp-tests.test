@@ -1226,9 +1226,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "IPP-Validate-Job-test-color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black_1"
+	ATTR name job-name "Validate Job Test"
 	ATTR boolean ipp-attribute-fidelity false
-	ATTR name document-name "color.jpg-4x6-black-1-${RASTER_RESOLUTION}.pwg"
+	ATTR name document-name "Validate Document Test"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format "image/pwg-raster"
 
@@ -1511,7 +1511,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job-color.jpg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage-letter.pwg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
@@ -1816,7 +1816,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB2_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job2-color.jpg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage2-letter.pwg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
@@ -1985,7 +1985,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB3_ID
 	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job3-color.jpg"
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "onepage3-letter.pwg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"

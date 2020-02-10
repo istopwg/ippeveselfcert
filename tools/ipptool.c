@@ -918,6 +918,18 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
     return (0);
 
  /*
+  * Show any PAUSE message, as needed...
+  */
+
+  if (data->pause[0])
+  {
+    if (!data->skip_test)
+      pause_message(data->pause);
+
+    data->pause[0] = '\0';
+  }
+
+ /*
   * Take over control of the attributes in the request...
   */
 
@@ -1003,12 +1015,6 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
       cupsFilePuts(cupsFileStdout(), "SKIP]\n");
 
     goto skip_error;
-  }
-
-  if (data->pause[0])
-  {
-    pause_message(data->pause);
-    data->pause[0] = '\0';
   }
 
   vars->password_tries = 0;
