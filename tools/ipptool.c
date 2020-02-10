@@ -141,6 +141,7 @@ typedef struct _cups_testdata_s		/**** Test Data ****/
 		file_id[1024];		/* File identifier */
   int		ignore_errors;		/* Ignore test failures? */
   char		name[1024];		/* Test name */
+  char		pause[1024];		/* PAUSE value */
   useconds_t	repeat_interval;	/* Repeat interval (delay) */
   int		request_id;		/* Current request ID */
   char		resource[512];		/* Resource for request */
@@ -1002,6 +1003,12 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
       cupsFilePuts(cupsFileStdout(), "SKIP]\n");
 
     goto skip_error;
+  }
+
+  if (data->pause[0])
+  {
+    pause_message(data->pause);
+    data->pause[0] = '\0';
   }
 
   vars->password_tries = 0;
@@ -3148,7 +3155,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-        pause_message(temp);
+        strlcpy(data->pause, temp, sizeof(data->pause));
       }
       else
       {
