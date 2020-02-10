@@ -212,7 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      firmware_update = !strcmp(argv[i], "update");
 	      break;
-	      
+
 	  case 'm' : /* -m models.txt */
 	      i ++;
 	      if (i >= argc)
@@ -1626,9 +1626,9 @@ validate_ipp_results(
     errptr += strlen(errptr);
     result = 0;
   }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 28)
+  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 51)
   {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 28).\n",  tests_count);
+    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 51).\n",  tests_count);
     errptr += strlen(errptr);
     result = 0;
   }
@@ -1661,7 +1661,7 @@ validate_ipp_results(
 
 	int show_errors = 1;		/* Show error messages? */
 
-	if (print_server && (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") || !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp")) && number == 9 && terrors)
+	if (print_server && terrors && ((!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 9) || (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && number == 10)))
 	{
 	 /*
 	  * Inspect errors for the current auto-exceptions for Print Servers:
@@ -1678,12 +1678,12 @@ validate_ipp_results(
 	  {
 	    if (terror->type != PLIST_TYPE_STRING)
 	      continue;
-	    else if (strncmp(terror->value, "EXPECTED: media-col-ready", 25) &&
+	    else if (strncmp(terror->value, "EXPECTED: identify-actions-", 27) &&
+		     strncmp(terror->value, "EXPECTED: media-col-ready", 25) &&
 		     strncmp(terror->value, "EXPECTED: media-ready", 21) &&
-		     strncmp(terror->value, "EXPECTED: identify-actions-", 27) &&
+		     strncmp(terror->value, "EXPECTED: operations-supported WITH-VALUE \"0x003c\"", 50) &&
 		     strncmp(terror->value, "EXPECTED: printer-device-id", 27) &&
 		     strncmp(terror->value, "EXPECTED: printer-supply", 24) &&
-		     strncmp(terror->value, "EXPECTED: operations-supported WITH-VALUE \"0x003c\"", 50) &&
 		     strncmp(terror->value, "GOT: printer-supply=", 20))
 	    {
 	     /*
@@ -1714,6 +1714,14 @@ validate_ipp_results(
 	  }
 	}
 	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
+	{
+	 /*
+	  * Print Servers also do not need to support 'media-needed'.
+	  */
+
+	  show_errors = 0;
+	}
+	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && number == 51)
 	{
 	 /*
 	  * Print Servers also do not need to support 'media-needed'.
