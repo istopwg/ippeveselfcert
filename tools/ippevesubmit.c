@@ -1661,7 +1661,7 @@ validate_ipp_results(
 
 	int show_errors = 1;		/* Show error messages? */
 
-	if (print_server && terrors && ((!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 9) || (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && number == 10)))
+	if (print_server && terrors && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 9)
 	{
 	 /*
 	  * Inspect errors for the current auto-exceptions for Print Servers:
@@ -1714,14 +1714,6 @@ validate_ipp_results(
 	  }
 	}
 	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
-	{
-	 /*
-	  * Print Servers also do not need to support 'media-needed'.
-	  */
-
-	  show_errors = 0;
-	}
-	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && number == 51)
 	{
 	 /*
 	  * Print Servers also do not need to support 'media-needed'.

@@ -163,6 +163,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: PWG 5100.14 Section 5.x
 {
+	SKIP-IF-NOT-DEFINED HAVE_IDENTIFY_PRINTER
+
 	NAME "I-9. Identify-Printer Operation"
 	OPERATION Identify-Printer
 	GROUP operation-attributes-tag
@@ -189,6 +191,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	STATUS successful-ok
 
+	# ipp-features-supported
+	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-everywhere"
+	EXPECT ipp-features-supported WITH-VALUE "ipp-everywhere-server" DEFINE-MATCH IPP_EVERYWHERE_SERVER
+
 	##### PWG 5100.14 - Table 5 - Operations
 	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0002 # Print-Job
 	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
@@ -201,6 +207,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
 	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
 	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+		IF-NOT-DEFINED IPP_EVERYWHERE_SERVER DEFINE-MATCH HAVE_IDENTIFY_PRINTER
 
 	# Default Get-Printer-Attributes MUST NOT return media-col-database, per PWG 5100.7 (JOBEXT)
 	EXPECT !media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
@@ -227,10 +234,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	EXPECT generated-natural-language-supported OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag
 
-	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/"
-	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/"
-
-	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-everywhere"
+	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/" IF-DEFINED HAVE_IDENTIFY_PRINTER
+	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/" IF-DEFINED HAVE_IDENTIFY_PRINTER
 
 	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "2.0"
 
@@ -297,6 +302,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 
 	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
+	EXPECT printer-more-info WITH-HOSTNAME "$hostname"
 	# EXPECT !printer-more-info WITH-HOSTNAME "$LINK_LOCAL"
 	# TODO: Provide warnings when hostname doesn't match
 
@@ -316,12 +322,13 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX"
+	EXPECT ?printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX"
+	EXPECT printer-supply DEFINE-MATCH HAVE_PRINTER_SUPPLY
 
-	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply
+	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply IF-DEFINED HAVE_PRINTER_SUPPLY
 
-	EXPECT printer-supply-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
-	EXPECT printer-supply-info-uri WITH-HOSTNAME "$hostname"
+	EXPECT printer-supply-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME" IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-info-uri WITH-HOSTNAME "$hostname" IF-DEFINED HAVE_PRINTER_SUPPLY
 	# EXPECT !printer-supply-info-uri WITH-HOSTNAME "$LINK_LOCAL"
 
 	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
@@ -387,21 +394,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	EXPECT media-bottom-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
 
-	EXPECT media-col-default OF-TYPE collection IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT media-col-default/media-size OF-TYPE collection COUNT 1
-	EXPECT media-col-default/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-default/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT media-col-default/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
-	EXPECT media-col-default/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
-
-	EXPECT media-col-ready OF-TYPE collection|no-value IN-GROUP printer-attributes-tag
-	EXPECT-ALL media-col-ready/media-size OF-TYPE collection COUNT 1
-	EXPECT-ALL media-col-ready/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT-ALL media-col-ready/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
-	EXPECT-ALL media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
-	EXPECT-ALL ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
-	EXPECT-ALL media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
-
 	EXPECT media-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT media-col-supported WITH-VALUE "media-size"
 
@@ -428,6 +420,21 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT media-type-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_MEDIA_TYPE
 	EXPECT media-col-supported WITH-VALUE "media-type" IF-DEFINED HAVE_MEDIA_TYPE
 
+	EXPECT media-col-default OF-TYPE collection IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT media-col-default/media-size OF-TYPE collection COUNT 1
+	EXPECT media-col-default/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-default/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-default/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT media-col-default/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+
+	EXPECT media-col-ready OF-TYPE collection|no-value IN-GROUP printer-attributes-tag
+	EXPECT-ALL media-col-ready/media-size OF-TYPE collection COUNT 1
+	EXPECT-ALL media-col-ready/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-ready/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT-ALL ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
+	EXPECT-ALL media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+
 	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "orientation-requested-supported"
 	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6,7
 
@@ -443,9 +450,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT print-color-mode-default DEFINE-VALUE DEFAULT_PRINT_COLOR_MODE
 	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
 
-	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-content-optimize-supported"
-	EXPECT print-content-optimize-default DEFINE-VALUE DEFAULT_PRINT_CONTENT_OPTIMIZE
-	EXPECT print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)$/"
+	EXPECT ?print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)$/"
+	EXPECT print-content-optimize-supported DEFINE-MATCH HAVE_PRINT_CONTENT_OPTIMIZE
+	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-content-optimize-supported" IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
 
 	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-quality-supported"
 	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
@@ -462,6 +469,39 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "sides-supported"
 	EXPECT sides-default DEFINE-VALUE DEFAULT_SIDES
 	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+
+	# Recommended attributes
+	EXPECT ?job-account-type-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "job-account-type-supported"
+	EXPECT ?job-account-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?job-authorization-uri-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT ?job-mandatory-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT ?job-password-repertoire-configured OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "job-password-repertoire-supported"
+	EXPECT ?job-password-repertoire-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?job-presets-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT ?job-privacy-attributes OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT ?job-privacy-scope OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(all|default|owner|none)$$/"
+	EXPECT ?printer-privacy-policy-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT ?jpeg-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT ?jpeg-k-octets-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?jpeg-x-dimension-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?jpeg-y-dimension-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT ?pdf-k-octets-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?pdf-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?print-scaling-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE-FROM "print-scaling-supported"
+	EXPECT ?print-scaling-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT ?printer-dns-sd-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT ?printer-input-tray OF-TYPE octetString IN-GROUP printer-attributes-tag SAME-COUNT-AS "media-source-supported"
+	EXPECT ?printer-output-tray OF-TYPE octetString IN-GROUP printer-attributes-tag SAME-COUNT-AS "output-bin-supported"
 }
 
 #
@@ -573,8 +613,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT page-ranges-supported IF-DEFINED HAVE_PDF
 	EXPECT print-color-mode-default
 	EXPECT print-color-mode-supported
-	EXPECT print-content-optimize-default
-	EXPECT print-content-optimize-supported
+	EXPECT print-content-optimize-default IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
+	EXPECT print-content-optimize-supported IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
 	EXPECT print-quality-default
 	EXPECT print-quality-supported
 	EXPECT print-rendering-intent-default IF-DEFINED HAVE_ICC_PROFILES
@@ -690,8 +730,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT page-ranges-supported IF-DEFINED HAVE_PDF
 	EXPECT print-color-mode-default
 	EXPECT print-color-mode-supported
-	EXPECT print-content-optimize-default
-	EXPECT print-content-optimize-supported
+	EXPECT print-content-optimize-default IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
+	EXPECT print-content-optimize-supported IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
 	EXPECT print-quality-default
 	EXPECT print-quality-supported
 	EXPECT print-rendering-intent-default IF-DEFINED HAVE_ICC_PROFILES
@@ -1162,8 +1202,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT page-ranges-supported IF-DEFINED HAVE_PDF
 	EXPECT print-color-mode-default
 	EXPECT print-color-mode-supported
-	EXPECT print-content-optimize-default
-	EXPECT print-content-optimize-supported
+	EXPECT print-content-optimize-default IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
+	EXPECT print-content-optimize-supported IF-DEFINED HAVE_PRINT_CONTENT_OPTIMIZE
 	EXPECT print-quality-default
 	EXPECT print-quality-supported
 	EXPECT print-rendering-intent-default IF-DEFINED HAVE_ICC_PROFILES
@@ -1226,8 +1266,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1260,8 +1298,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1304,8 +1340,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1347,8 +1381,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1446,9 +1478,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?page-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
 	EXPECT ?print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 }
@@ -1528,9 +1558,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
 	EXPECT !page-ranges
 	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
-	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
 	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
-	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
 	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
 	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
 }
@@ -1608,9 +1636,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?page-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
 	EXPECT ?print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 }
@@ -1657,8 +1683,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1700,8 +1724,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1742,8 +1764,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1833,9 +1853,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
 	EXPECT !page-ranges
 	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
-	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
 	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
-	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
 	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
 	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
 }
@@ -1865,8 +1883,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1908,8 +1924,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -1950,8 +1964,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -2032,9 +2044,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
 	EXPECT !page-ranges
 	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
-	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
 	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
-	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
 	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
 	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
 }
@@ -2057,8 +2067,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -2200,9 +2208,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
 	EXPECT !page-ranges
 	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
-	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
 	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
-	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
 	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
 	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
 }
@@ -2289,6 +2295,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 #
 # Required by: RFC 8011 section 4.2.1
 {
+	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
@@ -2311,8 +2318,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -2336,6 +2341,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
@@ -2357,8 +2363,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -2382,6 +2386,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
 	PAUSE "Remove media from printer until this test run is complete."
@@ -2402,8 +2407,6 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	GROUP job-attributes-tag
 	ATTR keyword media "$DEFAULT_MEDIA"
 	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
-	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
-	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
 	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
 	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
 	ATTR keyword sides "one-sided"
@@ -2429,6 +2432,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 # Test 'media-needed' reason
 {
+	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
+
 	DELAY 5
 
 	NAME "I-20.1 media-needed (Get-Printer-Attributes)"
