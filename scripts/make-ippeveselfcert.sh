@@ -2,7 +2,7 @@
 #
 # Make an IPP Everywhere Printer self-certification package.
 #
-# Copyright 2014-2019 by the ISTO Printer Working Group.
+# Copyright 2014-2020 by the ISTO Printer Working Group.
 # Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -20,7 +20,7 @@ if test ! -f scripts/make-ippeveselfcert.sh; then
 fi
 
 if test $# -lt 1 -o $# -gt 3; then
-	echo "Usage: everywhere/make-ippeveselfcert.sh ippeveselfcertNN [yyyymmdd] [platform]"
+	echo "Usage: scripts/make-ippeveselfcert.sh ippeveselfcertNN [yyyymmdd] [platform]"
 	exit 1
 fi
 
@@ -59,7 +59,7 @@ test -d $pkgdir && rm -r $pkgdir
 mkdir $pkgdir || exit 1
 
 echo Copying package files
-cp LICENSE.md $pkgdir
+cp LICENSE NOTICE $pkgdir
 cp man/*.html $pkgdir
 cp tests/README.md $pkgdir
 cp tests/*.jpg $pkgdir
