@@ -1,7 +1,7 @@
 /*
  * IPP Everywhere printer application for CUPS.
  *
- * Copyright @ 2020 by the ISTO Printer Working Group.
+ * Copyright @ 2020 by the IEEE-ISTO Printer Working Group.
  * Copyright © 2010-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -187,6 +187,7 @@ typedef struct ippeve_printer_s		/**** Printer data ****/
   char			*dnssd_name,	/* printer-dnssd-name */
 			*name,		/* printer-name */
 			*icon,		/* Icon filename */
+			*strings,	/* Strings filename */
 			*directory,	/* Spool directory */
 			*hostname,	/* Hostname */
 			*uri,		/* printer-uri-supported */
@@ -266,7 +267,7 @@ static int		create_job_file(ippeve_job_t *job, char *fname, size_t fnamesize, co
 static int		create_listener(const char *name, int port, int family);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int bottom, int left, int right, int top);
 static ipp_t		*create_media_size(int width, int length);
-static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *device_uri, const char *output_format, ipp_t *attrs);
+static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, const char *strings, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *device_uri, const char *output_format, ipp_t *attrs);
 static void		debug_attributes(const char *title, ipp_t *ipp, int response);
 static void		delete_client(ippeve_client_t *client);
 static void		delete_job(ippeve_job_t *job);
@@ -371,6 +372,7 @@ main(int  argc,				/* I - Number of command-line args */
 #if !CUPS_LITE
 		*ppdfile = NULL,	/* PPD file */
 #endif /* !CUPS_LITE */
+		*strings = NULL,	/* Strings file */
 		*subtypes = "_print";	/* DNS-SD service subtype */
   int		legacy = 0,		/* Legacy mode? */
 		duplex = 0,		/* Duplex mode */
@@ -477,6 +479,14 @@ main(int  argc,				/* I - Number of command-line args */
               ppdfile = argv[i];
               break;
 #endif /* !CUPS_LITE */
+
+	  case 'S' : /* -S filename.strings */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+	      strings = argv[i];
+	      break;
 
           case 'V' : /* -V max-version */
 	      i ++;
@@ -702,7 +712,7 @@ main(int  argc,				/* I - Number of command-line args */
   else
     attrs = load_legacy_attributes(make, model, ppm, ppm_color, duplex, docformats);
 
-  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, device_uri, output_format, attrs)) == NULL)
+  if ((printer = create_printer(servername, serverport, name, location, icon, strings, docformats, subtypes, directory, command, device_uri, output_format, attrs)) == NULL)
     return (1);
 
   printer->web_forms = web_forms;
@@ -1389,6 +1399,7 @@ create_printer(
     const char   *name,			/* I - printer-name */
     const char   *location,		/* I - printer-location */
     const char   *icon,			/* I - printer-icons */
+    const char   *strings,		/* I - printer-strings-uri */
     cups_array_t *docformats,		/* I - document-format-supported */
     const char   *subtypes,		/* I - Bonjour service subtype(s) */
     const char   *directory,		/* I - Spool directory */
@@ -1408,6 +1419,8 @@ create_printer(
 			*uris[2],	/* All URIs */
 #endif /* HAVE_SSL */
 			icons[1024],	/* printer-icons URI */
+			stringsurl[1024],
+					/* printer-strings-uri URI */
 			adminurl[1024],	/* printer-more-info URI */
 			supplyurl[1024],/* printer-supply-info-uri URI */
 			uuid[128];	/* printer-uuid */
@@ -1641,6 +1654,7 @@ create_printer(
   printer->output_format = output_format ? strdup(output_format) : NULL;
   printer->directory     = strdup(directory);
   printer->icon          = icon ? strdup(icon) : NULL;
+  printer->strings       = strings ? strdup(strings) : NULL;
   printer->port          = serverport;
   printer->start_time    = time(NULL);
   printer->config_time   = printer->start_time;
@@ -1693,6 +1707,7 @@ create_printer(
 
   httpAssembleURI(HTTP_URI_CODING_ALL, icons, sizeof(icons), WEB_SCHEME, NULL, printer->hostname, printer->port, "/icon.png");
   httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/");
+  httpAssembleURI(HTTP_URI_CODING_ALL, stringsurl, sizeof(stringsurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/en.strings");
   httpAssembleURI(HTTP_URI_CODING_ALL, supplyurl, sizeof(supplyurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/supplies");
   httpAssembleUUID(printer->hostname, serverport, name, 0, uuid, sizeof(uuid));
 
@@ -1885,6 +1900,12 @@ create_printer(
 
   /* printer-organizational-unit */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organizational-unit", NULL, "");
+
+  /* printer-strings-languages-supported */
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE, "printer-strings-languages-supported", NULL, "en");
+
+  /* printer-strings-uri */
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-strings-uri", NULL, stringsurl);
 
   /* printer-supply-info-uri */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-supply-info-uri", NULL, supplyurl);
@@ -2109,6 +2130,8 @@ delete_printer(ippeve_printer_t *printer)	/* I - Printer */
     free(printer->name);
   if (printer->icon)
     free(printer->icon);
+  if (printer->strings)
+    free(printer->strings);
   if (printer->command)
     free(printer->command);
   if (printer->device_uri)
@@ -5877,7 +5900,9 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	return (respond_http(client, HTTP_STATUS_OK, NULL, NULL, 0));
 
     case HTTP_STATE_HEAD :
-        if (!strcmp(client->uri, "/icon.png"))
+        if (!strcmp(client->uri, "/en.strings"))
+	  return (respond_http(client, HTTP_STATUS_OK, NULL, "text/strings", 0));
+        else if (!strcmp(client->uri, "/icon.png"))
 	  return (respond_http(client, HTTP_STATUS_OK, NULL, "image/png", 0));
 	else if (!strcmp(client->uri, "/") || !strcmp(client->uri, "/media") || !strcmp(client->uri, "/supplies"))
 	  return (respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0));
@@ -5885,7 +5910,41 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
 
     case HTTP_STATE_GET :
-        if (!strcmp(client->uri, "/icon.png"))
+        if (!strcmp(client->uri, "/en.strings"))
+	{
+	 /*
+	  * Send strings file.
+	  */
+
+          if (client->printer->strings)
+          {
+	    int		fd;		/* Icon file */
+	    struct stat	fileinfo;	/* Icon file information */
+	    char	buffer[4096];	/* Copy buffer */
+	    ssize_t	bytes;		/* Bytes */
+
+	    if (!stat(client->printer->strings, &fileinfo) && (fd = open(client->printer->strings, O_RDONLY)) >= 0)
+	    {
+	      if (!respond_http(client, HTTP_STATUS_OK, NULL, "text/strings", (size_t)fileinfo.st_size))
+	      {
+		close(fd);
+		return (0);
+	      }
+
+	      while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+		httpWrite2(client->http, buffer, (size_t)bytes);
+
+	      httpFlushWrite(client->http);
+
+	      close(fd);
+	    }
+	    else
+	      return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
+	  }
+	  else
+	    return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
+        }
+        else if (!strcmp(client->uri, "/icon.png"))
 	{
 	 /*
 	  * Send PNG icon file.
@@ -5897,8 +5956,6 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	    struct stat	fileinfo;	/* Icon file information */
 	    char	buffer[4096];	/* Copy buffer */
 	    ssize_t	bytes;		/* Bytes */
-
-	    fprintf(stderr, "Icon file is \"%s\".\n", client->printer->icon);
 
 	    if (!stat(client->printer->icon, &fileinfo) && (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	    {
@@ -8026,7 +8083,10 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(stdout, _("-K keypath              Set location of server X.509 certificates and keys."));
 #endif /* HAVE_SSL */
   _cupsLangPuts(stdout, _("-M manufacturer         Set manufacturer name (default=Test)"));
+#if !CUPS_LITE
   _cupsLangPuts(stdout, _("-P filename.ppd         Load printer attributes from PPD file"));
+#endif /* !CUPS_LITE */
+  _cupsLangPuts(stdout, _("-S filename.strings     Set strings file"));
   _cupsLangPuts(stdout, _("-V version              Set default IPP version"));
   _cupsLangPuts(stdout, _("-a filename.conf        Load printer attributes from conf file"));
   _cupsLangPuts(stdout, _("-c command              Set print command"));
