@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="15.4" Modules="simple" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="16.7" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
-    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent"/>
+    <ROW Name="HiddenItems" Value="AppXAppDetailsComponent;FixupComponent;AppXCapabilitiesComponent;AppXDependenciesComponent;AppXProductDetailsComponent;AppXVisualAssetsComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Debug"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Debug"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ipptool.exe" Value="x64\Debug"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_libcups2.dll" Value="x64\Debug"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_regex.dll" Value="x64\Debug"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ipptool.exe" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_libcups2.dll" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_regex.dll" Value="x64\Release"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe" Value="ippeveprinter.exe"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe" Value="ippfind.exe"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe" Value="ipptool.exe"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll" Value="libcups2.dll"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_regex.dll" Value="regex.dll"/>
+    <ROW Property="AI_RUN_AS_ADMIN" Value="0"/>
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="The IPP Everywhere Printer self-certification tools allow you to test the conformance of a printer against the IPP Everywhere specification." ValueLocId="*"/>
     <ROW Property="ARPCONTACT" Value="ippeveselfcert@pwg.org"/>
@@ -23,10 +24,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
     <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
-    <ROW Property="ProductCode" Value="1033:{6CE50C1A-7DB9-43EF-8001-C583535C9C34} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{C9E6C143-1EC8-4B76-9201-44507D762F45} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="IPP Everywhere v1.1 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="1.1.0" Type="32"/>
+    <ROW Property="ProductVersion" Value="11.0.2" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
@@ -37,16 +38,19 @@
     <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
     <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
     <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
-    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
-    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
     <ROW Property="WindowsTypeNTDisplay" MultiBuildValue="DefaultBuild:32-bit Windows versions" ValueLocId="-"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
+    <ROW Directory="ProgramMenuFolder" Directory_Parent="TARGETDIR" DefaultDir="PROGRA~1|ProgramMenuFolder" IsPseudoRoot="1"/>
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="APPDIR" ComponentId="{DF87209C-5157-4842-B0D6-8299BBF06653}" Directory_="APPDIR" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{2B162345-0F11-4BDE-BC54-01E42FFAC42B}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="README.md" ComponentId="{C464C0F0-8E05-4611-9998-6066E0D52917}" Directory_="APPDIR" Attributes="0" KeyPath="README.md" Type="0"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{377395B3-B0EE-47CC-B6A9-1266192D5368}" Directory_="SHORTCUTDIR" Attributes="0"/>
@@ -56,38 +60,38 @@
     <ROW Component="libcups2_PrimaryOutput" ComponentId="{7BA0107B-BF98-47AF-BEA9-D545E9FE679C}" Directory_="APPDIR" Attributes="256" KeyPath="libcups2.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="ProductInformation README.md SHORTCUTDIR ippeveprinter_PrimaryOutput ippfind_PrimaryOutput ipptool_PrimaryOutput libcups2_PrimaryOutput"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="LICENSE.md" Component_="README.md" FileName="LICENSE" Attributes="0" SourcePath="..\LICENSE" SelfReg="false" NextFile="setdebug.bat"/>
+    <ROW File="ippfind.exe" Component_="ippfind_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippfind.exe&gt;" SelfReg="false" DigSign="true"/>
+    <ROW File="ippeveprinter.exe" Component_="ippeveprinter_PrimaryOutput" FileName="IPPSER~1.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippeveprinter.exe&gt;" SelfReg="false" DigSign="true"/>
+    <ROW File="ipptool.exe" Component_="ipptool_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ipptool.exe&gt;" SelfReg="false" DigSign="true"/>
+    <ROW File="libcups2.dll" Component_="libcups2_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libcups2.dll&gt;" SelfReg="false"/>
+    <ROW File="manippfind.html" Component_="README.md" FileName="MAN-IP~1.HTM|ippfind.html" Attributes="0" SourcePath="..\man\ippfind.html" SelfReg="false"/>
+    <ROW File="manippeveprinter.html" Component_="README.md" FileName="MAN-IP~2.HTM|ippeveprinter.html" Attributes="0" SourcePath="..\man\ippeveprinter.html" SelfReg="false"/>
+    <ROW File="manipptool.html" Component_="README.md" FileName="MAN-IP~3.HTM|ipptool.html" Attributes="0" SourcePath="..\man\ipptool.html" SelfReg="false"/>
+    <ROW File="manipptoolfile.html" Component_="README.md" FileName="MAN-IP~4.HTM|ipptoolfile.html" Attributes="0" SourcePath="..\man\ipptoolfile.html" SelfReg="false"/>
+    <ROW File="bonjouraccesstests.test" Component_="README.md" FileName="BONJOU~1.TES|dnssd-access-tests.test" Attributes="0" SourcePath="..\tests\dnssd-access-tests.test" SelfReg="false"/>
+    <ROW File="bonjourtests.bat" Component_="README.md" FileName="BONJOU~1.BAT|dnssd-tests.bat" Attributes="0" SourcePath="..\tests\dnssd-tests.bat" SelfReg="false"/>
+    <ROW File="bonjourvaluetests.test" Component_="README.md" FileName="BONJOU~2.TES|dnssd-value-tests.test" Attributes="0" SourcePath="..\tests\dnssd-value-tests.test" SelfReg="false"/>
+    <ROW File="color.jpg" Component_="README.md" FileName="color.jpg" Attributes="0" SourcePath="..\tests\color.jpg" SelfReg="false"/>
+    <ROW File="color.jpg4x6.pdf" Component_="README.md" FileName="COLORJ~1.PDF|color.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\color.jpg-4x6.pdf" SelfReg="false"/>
+    <ROW File="documenta4.pdf" Component_="README.md" FileName="DOCUME~1.PDF|document-a4.pdf" Attributes="0" SourcePath="..\tests\document-a4.pdf" SelfReg="false"/>
+    <ROW File="documentletter.pdf" Component_="README.md" FileName="DOCUME~2.PDF|document-letter.pdf" Attributes="0" SourcePath="..\tests\document-letter.pdf" SelfReg="false"/>
+    <ROW File="documenttests.bat" Component_="README.md" FileName="DOCUME~1.BAT|document-tests.bat" Attributes="0" SourcePath="..\tests\document-tests.bat" SelfReg="false"/>
+    <ROW File="documenttests.test" Component_="README.md" FileName="DOCUME~1.TES|document-tests.test" Attributes="0" SourcePath="..\tests\document-tests.test" SelfReg="false"/>
+    <ROW File="gray.jpg" Component_="README.md" FileName="gray.jpg" Attributes="0" SourcePath="..\tests\gray.jpg" SelfReg="false"/>
+    <ROW File="gray.jpg4x6.pdf" Component_="README.md" FileName="GRAYJP~1.PDF|gray.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\gray.jpg-4x6.pdf" SelfReg="false"/>
+    <ROW File="ipptests.bat" Component_="README.md" FileName="IPP-TE~1.BAT|ipp-tests.bat" Attributes="0" SourcePath="..\tests\ipp-tests.bat" SelfReg="false"/>
+    <ROW File="ipptests.test" Component_="README.md" FileName="IPP-TE~1.TES|ipp-tests.test" Attributes="0" SourcePath="..\tests\ipp-tests.test" SelfReg="false"/>
+    <ROW File="onepagea4.pdf" Component_="README.md" FileName="ONEPAG~1.PDF|onepage-a4.pdf" Attributes="0" SourcePath="..\tests\onepage-a4.pdf" SelfReg="false"/>
+    <ROW File="onepageletter.pdf" Component_="README.md" FileName="ONEPAG~2.PDF|onepage-letter.pdf" Attributes="0" SourcePath="..\tests\onepage-letter.pdf" SelfReg="false"/>
+    <ROW File="README.md" Component_="README.md" FileName="README.md" Attributes="0" SourcePath="..\tests\README.md" SelfReg="false"/>
+    <ROW File="LICENSE.md" Component_="README.md" FileName="LICENSE" Attributes="0" SourcePath="..\LICENSE" SelfReg="false"/>
+    <ROW File="setdebug.bat" Component_="README.md" FileName="setdebug.bat" Attributes="0" SourcePath="setdebug.bat" SelfReg="false"/>
+    <ROW File="regex.dll" Component_="README.md" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_regex.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_regex.dll&gt;" SelfReg="false"/>
     <ROW File="NOTICE" Component_="README.md" FileName="NOTICE" Attributes="0" SourcePath="..\NOTICE" SelfReg="false"/>
-    <ROW File="README.md" Component_="README.md" FileName="README.md" Attributes="0" SourcePath="..\tests\README.md" SelfReg="false" NextFile="LICENSE.md"/>
-    <ROW File="bonjouraccesstests.test" Component_="README.md" FileName="BONJOU~1.TES|dnssd-access-tests.test" Attributes="0" SourcePath="..\tests\dnssd-access-tests.test" SelfReg="false" NextFile="bonjourtests.bat"/>
-    <ROW File="bonjourtests.bat" Component_="README.md" FileName="BONJOU~1.BAT|dnssd-tests.bat" Attributes="0" SourcePath="..\tests\dnssd-tests.bat" SelfReg="false" NextFile="bonjourvaluetests.test"/>
-    <ROW File="bonjourvaluetests.test" Component_="README.md" FileName="BONJOU~2.TES|dnssd-value-tests.test" Attributes="0" SourcePath="..\tests\dnssd-value-tests.test" SelfReg="false" NextFile="color.jpg"/>
-    <ROW File="color.jpg" Component_="README.md" FileName="color.jpg" Attributes="0" SourcePath="..\tests\color.jpg" SelfReg="false" NextFile="color.jpg4x6.pdf"/>
-    <ROW File="color.jpg4x6.pdf" Component_="README.md" FileName="COLORJ~1.PDF|color.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\color.jpg-4x6.pdf" SelfReg="false" NextFile="documenta4.pdf"/>
-    <ROW File="documenta4.pdf" Component_="README.md" FileName="DOCUME~1.PDF|document-a4.pdf" Attributes="0" SourcePath="..\tests\document-a4.pdf" SelfReg="false" NextFile="documentletter.pdf"/>
-    <ROW File="documentletter.pdf" Component_="README.md" FileName="DOCUME~2.PDF|document-letter.pdf" Attributes="0" SourcePath="..\tests\document-letter.pdf" SelfReg="false" NextFile="documenttests.bat"/>
-    <ROW File="documenttests.bat" Component_="README.md" FileName="DOCUME~1.BAT|document-tests.bat" Attributes="0" SourcePath="..\tests\document-tests.bat" SelfReg="false" NextFile="documenttests.test"/>
-    <ROW File="documenttests.test" Component_="README.md" FileName="DOCUME~1.TES|document-tests.test" Attributes="0" SourcePath="..\tests\document-tests.test" SelfReg="false" NextFile="gray.jpg"/>
-    <ROW File="gray.jpg" Component_="README.md" FileName="gray.jpg" Attributes="0" SourcePath="..\tests\gray.jpg" SelfReg="false" NextFile="gray.jpg4x6.pdf"/>
-    <ROW File="gray.jpg4x6.pdf" Component_="README.md" FileName="GRAYJP~1.PDF|gray.jpg-4x6.pdf" Attributes="0" SourcePath="..\tests\gray.jpg-4x6.pdf" SelfReg="false" NextFile="ipptests.bat"/>
-    <ROW File="ippeveprinter.exe" Component_="ippeveprinter_PrimaryOutput" FileName="IPPSER~1.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippeveprinter.exe&gt;" SelfReg="false" NextFile="ipptool.exe" DigSign="true"/>
-    <ROW File="ippfind.exe" Component_="ippfind_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ippfind.exe&gt;" SelfReg="false" NextFile="ippeveprinter.exe" DigSign="true"/>
-    <ROW File="ipptests.bat" Component_="README.md" FileName="IPP-TE~1.BAT|ipp-tests.bat" Attributes="0" SourcePath="..\tests\ipp-tests.bat" SelfReg="false" NextFile="ipptests.test"/>
-    <ROW File="ipptests.test" Component_="README.md" FileName="IPP-TE~1.TES|ipp-tests.test" Attributes="0" SourcePath="..\tests\ipp-tests.test" SelfReg="false" NextFile="onepagea4.pdf"/>
-    <ROW File="ipptool.exe" Component_="ipptool_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_ipptool.exe&gt;" SelfReg="false" NextFile="libcups2.dll" DigSign="true"/>
-    <ROW File="libcups2.dll" Component_="libcups2_PrimaryOutput" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_libcups2.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libcups2.dll&gt;" SelfReg="false" NextFile="manippfind.html"/>
-    <ROW File="manippeveprinter.html" Component_="README.md" FileName="MAN-IP~2.HTM|ippeveprinter.html" Attributes="0" SourcePath="..\man\ippeveprinter.html" SelfReg="false" NextFile="manipptool.html"/>
-    <ROW File="manippfind.html" Component_="README.md" FileName="MAN-IP~1.HTM|ippfind.html" Attributes="0" SourcePath="..\man\ippfind.html" SelfReg="false" NextFile="manippeveprinter.html"/>
-    <ROW File="manipptool.html" Component_="README.md" FileName="MAN-IP~3.HTM|ipptool.html" Attributes="0" SourcePath="..\man\ipptool.html" SelfReg="false" NextFile="manipptoolfile.html"/>
-    <ROW File="manipptoolfile.html" Component_="README.md" FileName="MAN-IP~4.HTM|ipptoolfile.html" Attributes="0" SourcePath="..\man\ipptoolfile.html" SelfReg="false" NextFile="bonjouraccesstests.test"/>
-    <ROW File="onepagea4.pdf" Component_="README.md" FileName="ONEPAG~1.PDF|onepage-a4.pdf" Attributes="0" SourcePath="..\tests\onepage-a4.pdf" SelfReg="false" NextFile="onepageletter.pdf"/>
-    <ROW File="onepageletter.pdf" Component_="README.md" FileName="ONEPAG~2.PDF|onepage-letter.pdf" Attributes="0" SourcePath="..\tests\onepage-letter.pdf" SelfReg="false" NextFile="README.md"/>
-    <ROW File="regex.dll" Component_="README.md" FileName="[|AI_PROPPATH_FILENAME_PERBUILD_regex.dll]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_regex.dll&gt;" SelfReg="false" NextFile="NOTICE"/>
-    <ROW File="setdebug.bat" Component_="README.md" FileName="setdebug.bat" Attributes="0" SourcePath="setdebug.bat" SelfReg="false" NextFile="regex.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AppPathsComponent">
     <ROW Name="AI_APPPATH_PERBUILD_ippeveprinter.exe" Path="[|AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe]\[|AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe]" Type="2" Content="0"/>
@@ -100,11 +104,17 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="sw-ippeveselfcert10-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="sw-ippeveselfcert11-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.CacheComponent">
+    <ATTRIBUTE name="Enable" value="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
     <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DigCertStoreComponent">
+    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="2f6a836abe9a42a428b7065b37aa751288187763 Subject: IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION&#10;Issuer: Go Daddy Secure Certificate Authority - G2&#10;Valid from 06/29/2018 to 06/29/2020&#10;User\MY"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
     <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
@@ -149,6 +159,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
@@ -163,6 +174,16 @@
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][ProductName]"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
+    <ROW Feature_="MainFeature" Component_="ProductInformation"/>
+    <ROW Feature_="MainFeature" Component_="README.md"/>
+    <ROW Feature_="MainFeature" Component_="SHORTCUTDIR"/>
+    <ROW Feature_="MainFeature" Component_="ippeveprinter_PrimaryOutput"/>
+    <ROW Feature_="MainFeature" Component_="ippfind_PrimaryOutput"/>
+    <ROW Feature_="MainFeature" Component_="ipptool_PrimaryOutput"/>
+    <ROW Feature_="MainFeature" Component_="libcups2_PrimaryOutput"/>
+    <ROW Feature_="MainFeature" Component_="APPDIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="ippeverywhere.ico" SourcePath="ipp-everywhere.ico" Index="0"/>
@@ -183,9 +204,9 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR VersionNT64 )" Description="[ProductName] cannot be installed on [WindowsTypeNTDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
-    <ROW Condition="(VersionNT64 OR ((VersionNT &lt;&gt; 501) OR (ServicePackLevel = 3))) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel = 2))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
@@ -193,7 +214,9 @@
     <ROW Registry="Version" Root="2" Key="Software\cups.org" Name="version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="ippeveprinter" Directory_="SHORTCUTDIR" Name="IPPSER~1|ippeveprinter" Component_="ippeveprinter_PrimaryOutput" Target="[#ippeveprinter.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="IPPEverywherePrinterSelfCertifica_1" Directory_="DesktopFolder" Name="IPPEVE~1|IPP Everywhere Printer Self-Certification Tools" Component_="libcups2_PrimaryOutput" Target="C:\Windows\System32\cmd.exe" Arguments="Your Arguments" Hotkey="0" Icon_="ippeverywhere.ico" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="IPPEverywherePrinterSelfCertificati" Directory_="SHORTCUTDIR" Name="IPPEVE~1|IPP Everywhere Printer Self-Certification Tools" Component_="ProductInformation" Target="C:\Windows\System32\cmd.exe" Arguments="Your Arguments" Hotkey="0" Icon_="ippeverywhere.ico" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="ippeveprinter" Directory_="SHORTCUTDIR" Name="IPPEVE~2|ippeveprinter" Component_="ippeveprinter_PrimaryOutput" Target="[#ippeveprinter.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
     <ROW Shortcut="ippfind" Directory_="SHORTCUTDIR" Name="ippfind" Component_="ippfind_PrimaryOutput" Target="[#ippfind.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
     <ROW Shortcut="ipptool" Directory_="SHORTCUTDIR" Name="ipptool" Component_="ipptool_PrimaryOutput" Target="[#ipptool.exe]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
   </COMPONENT>
