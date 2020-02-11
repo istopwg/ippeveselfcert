@@ -322,8 +322,11 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT ?printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX"
 	EXPECT printer-supply DEFINE-MATCH HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-description DEFINE-MATCH HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-info-uri DEFINE-MATCH HAVE_PRINTER_SUPPLY
+
+	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX" IF-DEFINED HAVE_PRINTER_SUPPLY
 
 	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply IF-DEFINED HAVE_PRINTER_SUPPLY
 
@@ -573,9 +576,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-state-change-time
 	EXPECT printer-state-message
 	EXPECT printer-state-reasons
-	EXPECT printer-supply
-	EXPECT printer-supply-description
-	EXPECT printer-supply-info-uri
+	EXPECT printer-supply IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-description IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-info-uri IF-DEFINED HAVE_PRINTER_SUPPLY
 	EXPECT printer-up-time
 	EXPECT printer-uri-supported
 	EXPECT printer-uuid
@@ -690,9 +693,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-state-change-time
 	EXPECT printer-state-message
 	EXPECT printer-state-reasons
-	EXPECT printer-supply
-	EXPECT printer-supply-description
-	EXPECT printer-supply-info-uri
+	EXPECT printer-supply IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-description IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-info-uri IF-DEFINED HAVE_PRINTER_SUPPLY
 	EXPECT printer-up-time
 	EXPECT printer-uri-supported
 	EXPECT printer-uuid
@@ -1044,9 +1047,9 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-state-change-time
 	EXPECT printer-state-message
 	EXPECT printer-state-reasons
-	EXPECT printer-supply
-	EXPECT printer-supply-description
-	EXPECT printer-supply-info-uri
+	EXPECT printer-supply IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-description IF-DEFINED HAVE_PRINTER_SUPPLY
+	EXPECT printer-supply-info-uri IF-DEFINED HAVE_PRINTER_SUPPLY
 	EXPECT printer-up-time
 	EXPECT printer-uri-supported
 	EXPECT printer-uuid
