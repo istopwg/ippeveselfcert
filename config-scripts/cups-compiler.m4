@@ -169,6 +169,14 @@ if test -n "$GCC"; then
 	if test -d .git; then
 		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
 	fi
+
+	case $host_os_name in
+		darwin*)
+			# -mmacosx-version-min=10.13 tells the compiler to
+			# build for macOS 10.13 or later.
+			OPTIM="$OPTIM -mmacosx-version-min=10.13"
+			;;
+	esac
 else
 	# Add vendor-specific compiler options...
 	case $host_os_name in
