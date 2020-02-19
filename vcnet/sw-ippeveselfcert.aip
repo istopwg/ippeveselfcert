@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="16.7" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
-  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
-    <ROW Name="HiddenItems" Value="AppXAppDetailsComponent;FixupComponent;AppXCapabilitiesComponent;AppXDependenciesComponent;AppXProductDetailsComponent;AppXVisualAssetsComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent"/>
-  </COMPONENT>
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="16.8" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Release"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Release"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ipptool.exe" Value="x64\Release"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_libcups2.dll" Value="x64\Release"/>
-    <ROW Property="AI_PROPPATH_DIR_PERBUILD_regex.dll" Value="x64\Release"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Debug"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Debug"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_ipptool.exe" Value="x64\Debug"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_libcups2.dll" Value="x64\Debug"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_regex.dll" Value="x64\Debug"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe" Value="ippeveprinter.exe"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe" Value="ippfind.exe"/>
     <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe" Value="ipptool.exe"/>
@@ -24,10 +21,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
     <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
-    <ROW Property="ProductCode" Value="1033:{C9E6C143-1EC8-4B76-9201-44507D762F45} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{DAE78772-FD6B-4BB2-9032-F5FD21B915EB} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="IPP Everywhere v1.1 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="11.0.2" Type="32"/>
+    <ROW Property="ProductVersion" Value="11.0.3" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
@@ -104,7 +101,7 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="sw-ippeveselfcert11-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder=".." PackageFileName="sw-ippeveselfcert11-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.CacheComponent">
     <ATTRIBUTE name="Enable" value="false"/>
