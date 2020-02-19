@@ -1,7 +1,7 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2015 by the ISTO Printer Working Group.
+dnl Copyright 2015-2020 by the IEEE-ISTO Printer Working Group.
 dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
