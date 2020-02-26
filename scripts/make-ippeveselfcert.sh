@@ -65,30 +65,48 @@ cp tests/README.md $pkgdir
 cp tests/*.jpg $pkgdir
 cp tests/*.pdf $pkgdir
 cp tests/*.sh $pkgdir
-cp tests/*.test $pkgdir
-cp tools/ippeveprinter $pkgdir
-cp tools/ippevesubmit $pkgdir
-cp tools/ippfind $pkgdir/ippfind
-cp tools/ipptool $pkgdir/ipptool
-
 chmod +x $pkgdir/*.sh
+cp tests/*.test $pkgdir
+
+TOOLS="ippeveprinter ippevesubmit ippfind ipptool"
+for tool in $TOOLS; do
+	cp tools/$tool $pkgdir;
+done
 
 if test x$platform = xmacos; then
 	# Sign executables...
 	if test "x$CODESIGN_IDENTITY" = x; then
-		CODESIGN_IDENTITY="IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION"
+#		CODESIGN_IDENTITY="IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION"
+		CODESIGN_IDENTITY="Developer ID Application"
 	fi
 
-	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippeveprinter
-	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippevesubmit
-	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ippfind
-	codesign -s "$CODESIGN_IDENTITY" -fv $pkgdir/ipptool
+	for tool in $TOOLS; do
+		xcrun codesign -s "$CODESIGN_IDENTITY" -fv \
+			--prefix org.pwg.$pkgname. \
+			-o runtime --timestamp \
+			$pkgdir/$tool;
+	done
 
 	# Make ZIP archive...
 	pkgfile="$pkgdir-macos.zip"
 	echo Creating ZIP file $pkgfile...
 	test -f $pkgfile && rm $pkgfile
 	zip -r9 $pkgfile $pkgdir || exit 1
+
+	# Notarize package...
+	if test "x$TEAMID" = x; then
+		echo "Set the TEAMID environment variable to your Apple Developer Team ID (from your"
+		echo "Developer ID Application certificate)"
+		exit 1
+	fi
+
+	if test "x$APPLEID" = x; then
+		echo "Set the APPLEID environment variable to your Apple ID."
+		exit 1
+	fi
+
+	echo Notarizing ZIP file $pkgfile...
+	xcrun altool --notarize-app -f $pkgfile --primary-bundle-id org.pwg.$pkgname --username $APPLEID --password '@keychain:AC_PASSWORD' --asc-provider $TEAMID
 else
 	# Make archive...
 	pkgfile="$pkgdir-$platform.tar.gz"
