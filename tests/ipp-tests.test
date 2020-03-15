@@ -53,7 +53,7 @@ DEFINE ALERT_REGEX "/^code\=[A-Za-z]+(;index\=[0-9]+|;severity\=[A-Za-z]+|;train
 # Regular expression for printer-supply attribute
 #
 # Generated with help from: http://abnf.msweet.org/
-DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1}[0-9]+;|index\=[0-9]+;|markerindex\=[0-9]+;|class\=[A-Za-z]+;|unit\=[A-Za-z]+;|colorantindex\=[0-9]+;|colorantrole\=[A-Za-z]+;|colorantname\=[A-Za-z]+;|coloranttonality\=[0-9]+;){0,}$$/"
+DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1}[0-9]+;|index\=[0-9]+;|markerindex\=[0-9]+;|class\=[A-Za-z]+;|unit\=[A-Za-z]+;|colorantindex\=[0-9]+;|colorantrole\=[A-Za-z]+;|colorantname\=[-_.A-Za-z0-9]+;|coloranttonality\=[0-9]+;){0,}$$/"
 
 # Test that a request-id value of 0 is not accepted.
 #
