@@ -118,15 +118,6 @@ if test x$platform = xmacos; then
 	done
 
 	rm -f .notarize
-
-	echo "Stapling tools..."
-	for tool in $TOOLS; do
-		xcrun stapler staple $pkgdir/$tool;
-	done
-
-	echo "Creating final ZIP file $pkgfile..."
-	test -f $pkgfile && rm $pkgfile
-	zip -r9 $pkgfile $pkgdir || exit 1
 else
 	# Make archive...
 	pkgfile="$pkgdir-$platform.tar.gz"
