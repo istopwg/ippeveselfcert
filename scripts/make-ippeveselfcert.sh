@@ -110,14 +110,14 @@ if test x$platform = xmacos; then
 	fi
 
 	echo "Notarizing ZIP file $pkgfile..."
-	xcrun altool --notarize-app -f $pkgfile --primary-bundle-id org.pwg.$pkgname --username $APPLEID --password '@keychain:AC_PASSWORD' --asc-provider $TEAMID | tee .notarize
+	xcrun altool --notarize-app -f $pkgfile --primary-bundle-id org.pwg.$pkgname --username $APPLEID --password '@keychain:AC_$TEAMID' --asc-provider $TEAMID | tee .notarize
 	uuid=`grep RequestUUID .notarize | awk '{print $3}'`
 
 	echo Waiting for notarization to complete...
 	approved="in progress"
 	while test "$status" = "in progress"; do
 		sleep 10
-		xcrun altool --notarization-info $uuid --username $APPLEID --password "@keychain:AC_PASSWORD" --asc-provider $TEAMID | tee .notarize
+		xcrun altool --notarization-info $uuid --username $APPLEID --password "@keychain:AC_$TEAMID" --asc-provider $TEAMID | tee .notarize
 		status="`grep Status: .notarize | cut -b14-`"
 	done
 
