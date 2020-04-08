@@ -5,7 +5,7 @@
 There are no known issues in this release.
 
 
-## v1.0 Update 4 (Pending)
+## v1.0 Update 4 (April 8, 2020)
 
 There are no known issues in this release.
 
