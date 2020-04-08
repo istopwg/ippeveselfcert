@@ -1,6 +1,6 @@
 # Changes
 
-## v1.0 Update 4 (February 4, 2020)
+## v1.0 Update 4 (April 8, 2020)
 
 - Issue #41: Windows IPP Everywhere Self Cert 1.0 Update 3: ipptool fails to
   run - missing regex.dll
