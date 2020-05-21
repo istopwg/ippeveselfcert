@@ -10,7 +10,9 @@
 #
 # Usage:
 #
-#   ./ipptool -tI printer-uri ipp-tests.test
+#   ./ipptool [-d STRICT=1] -tI printer-uri ipp-tests.test
+#
+# The "-d STRICT=1" option makes certain tests more strict/pedantic.
 #
 # History:
 #
@@ -884,104 +886,104 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	## Issue #50: Relax Get-Printer-Attributes tests
 	# 'printer-description' attributes
-	# EXPECT !charset-configured
-	# EXPECT !charset-supported
-	# EXPECT !color-supported
-	# EXPECT !compression-supported
-	# EXPECT !document-format-default
-	# EXPECT !document-format-supported
-	# EXPECT !generated-natural-language-supported
-	# EXPECT !identify-actions-default
-	# EXPECT !identify-actions-supported
-	# EXPECT !ipp-features-supported
-	# EXPECT !ipp-versions-supported
-	# EXPECT !job-constraints-supported
-	# EXPECT !job-creation-attributes-supported
-	# EXPECT !job-ids-supported
-	# EXPECT !job-password-supported
-	# EXPECT !job-password-encryption-supported
-	# EXPECT !job-resolvers-supported
-	# EXPECT !multiple-document-jobs-supported
-	# EXPECT !multiple-operation-time-out
-	# EXPECT !multiple-operation-time-out-action
-	# EXPECT !natural-language-configured
-	# EXPECT !operations-supported
-	# EXPECT !pages-per-minute
-	# EXPECT !pages-per-minute-color
-	# EXPECT !!pages-per-minute-color
-	# EXPECT !pdl-override-supported
-	# EXPECT !preferred-attributes-supported
-	# EXPECT !printer-charge-info-uri
-	# EXPECT !printer-config-change-date-time
-	# EXPECT !printer-config-change-time
-	# EXPECT !printer-current-time
-	# EXPECT !printer-geo-location
-	# EXPECT !printer-get-attributes-supported
-	# EXPECT !printer-icc-profiles-supported
-	# EXPECT !printer-icons
-	# EXPECT !printer-info
-	# EXPECT !printer-is-accepting-jobs
-	# EXPECT !printer-location
-	# EXPECT !printer-make-and-model
-	# EXPECT !printer-more-info
-	# EXPECT !printer-name
-	# EXPECT !printer-organization
-	# EXPECT !printer-organizational-unit
-	# EXPECT !printer-state
-	# EXPECT !printer-state-change-date-time
-	# EXPECT !printer-state-change-time
-	# EXPECT !printer-state-message
-	# EXPECT !printer-state-reasons
-	# EXPECT !printer-supply
-	# EXPECT !printer-supply-description
-	# EXPECT !printer-supply-info-uri
-	# EXPECT !printer-up-time
-	# EXPECT !printer-uri-supported
-	# EXPECT !printer-uuid
-	# EXPECT !pwg-raster-document-resolution-supported
-	# EXPECT !pwg-raster-document-sheet-back
-	# EXPECT !pwg-raster-document-type-supported
-	# EXPECT !queued-job-count
-	# EXPECT !uri-authentication-supported
-	# EXPECT !uri-security-supported
-	# EXPECT !which-jobs-supported
+	EXPECT !charset-configured IF-DEFINED STRICT
+	EXPECT !charset-supported IF-DEFINED STRICT
+	EXPECT !color-supported IF-DEFINED STRICT
+	EXPECT !compression-supported IF-DEFINED STRICT
+	EXPECT !document-format-default IF-DEFINED STRICT
+	EXPECT !document-format-supported IF-DEFINED STRICT
+	EXPECT !generated-natural-language-supported IF-DEFINED STRICT
+	EXPECT !identify-actions-default IF-DEFINED STRICT
+	EXPECT !identify-actions-supported IF-DEFINED STRICT
+	EXPECT !ipp-features-supported IF-DEFINED STRICT
+	EXPECT !ipp-versions-supported IF-DEFINED STRICT
+	EXPECT !job-constraints-supported IF-DEFINED STRICT
+	EXPECT !job-creation-attributes-supported IF-DEFINED STRICT
+	EXPECT !job-ids-supported IF-DEFINED STRICT
+	EXPECT !job-password-supported IF-DEFINED STRICT
+	EXPECT !job-password-encryption-supported IF-DEFINED STRICT
+	EXPECT !job-resolvers-supported IF-DEFINED STRICT
+	EXPECT !multiple-document-jobs-supported IF-DEFINED STRICT
+	EXPECT !multiple-operation-time-out IF-DEFINED STRICT
+	EXPECT !multiple-operation-time-out-action IF-DEFINED STRICT
+	EXPECT !natural-language-configured IF-DEFINED STRICT
+	EXPECT !operations-supported IF-DEFINED STRICT
+	EXPECT !pages-per-minute IF-DEFINED STRICT
+	EXPECT !pages-per-minute-color IF-DEFINED STRICT
+	EXPECT !!pages-per-minute-color IF-DEFINED STRICT
+	EXPECT !pdl-override-supported IF-DEFINED STRICT
+	EXPECT !preferred-attributes-supported IF-DEFINED STRICT
+	EXPECT !printer-charge-info-uri IF-DEFINED STRICT
+	EXPECT !printer-config-change-date-time IF-DEFINED STRICT
+	EXPECT !printer-config-change-time IF-DEFINED STRICT
+	EXPECT !printer-current-time IF-DEFINED STRICT
+	EXPECT !printer-geo-location IF-DEFINED STRICT
+	EXPECT !printer-get-attributes-supported IF-DEFINED STRICT
+	EXPECT !printer-icc-profiles-supported IF-DEFINED STRICT
+	EXPECT !printer-icons IF-DEFINED STRICT
+	EXPECT !printer-info IF-DEFINED STRICT
+	EXPECT !printer-is-accepting-jobs IF-DEFINED STRICT
+	EXPECT !printer-location IF-DEFINED STRICT
+	EXPECT !printer-make-and-model IF-DEFINED STRICT
+	EXPECT !printer-more-info IF-DEFINED STRICT
+	EXPECT !printer-name IF-DEFINED STRICT
+	EXPECT !printer-organization IF-DEFINED STRICT
+	EXPECT !printer-organizational-unit IF-DEFINED STRICT
+	EXPECT !printer-state IF-DEFINED STRICT
+	EXPECT !printer-state-change-date-time IF-DEFINED STRICT
+	EXPECT !printer-state-change-time IF-DEFINED STRICT
+	EXPECT !printer-state-message IF-DEFINED STRICT
+	EXPECT !printer-state-reasons IF-DEFINED STRICT
+	EXPECT !printer-supply IF-DEFINED STRICT
+	EXPECT !printer-supply-description IF-DEFINED STRICT
+	EXPECT !printer-supply-info-uri IF-DEFINED STRICT
+	EXPECT !printer-up-time IF-DEFINED STRICT
+	EXPECT !printer-uri-supported IF-DEFINED STRICT
+	EXPECT !printer-uuid IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-resolution-supported IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-sheet-back IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-type-supported IF-DEFINED STRICT
+	EXPECT !queued-job-count IF-DEFINED STRICT
+	EXPECT !uri-authentication-supported IF-DEFINED STRICT
+	EXPECT !uri-security-supported IF-DEFINED STRICT
+	EXPECT !which-jobs-supported IF-DEFINED STRICT
 
 	# 'job-template' attributes
-	# EXPECT !copies-default
-	# EXPECT !copies-supported
-	# EXPECT !finishings-default
-	# EXPECT !finishings-supported
-	# EXPECT !media-bottom-margin-supported
-	# EXPECT !media-col-default
-	# EXPECT !media-col-ready
-	# EXPECT !media-col-supported
-	# EXPECT !media-default
-	# EXPECT !media-left-margin-supported
-	# EXPECT !media-ready
-	# EXPECT !media-right-margin-supported
-	# EXPECT !media-size-supported
-	# EXPECT !media-source-supported
-	# EXPECT !media-supported
-	# EXPECT !media-top-margin-supported
-	# EXPECT !media-type-supported
-	# EXPECT !orientation-requested-default
-	# EXPECT !orientation-requested-supported
-	# EXPECT !output-bin-default
-	# EXPECT !output-bin-supported
-	# EXPECT !overrides-supported
-	# EXPECT !page-ranges-supported
-	# EXPECT !print-color-mode-default
-	# EXPECT !print-color-mode-supported
-	# EXPECT !print-content-optimize-default
-	# EXPECT !print-content-optimize-supported
-	# EXPECT !print-quality-default
-	# EXPECT !print-quality-supported
-	# EXPECT !print-rendering-intent-default
-	# EXPECT !print-rendering-intent-supported
-	# EXPECT !printer-resolution-default
-	# EXPECT !printer-resolution-supported
-	# EXPECT !sides-default IF-DEFINED HAVE_DUPLEX
-	# EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX
+	EXPECT !copies-default IF-DEFINED STRICT
+	EXPECT !copies-supported IF-DEFINED STRICT
+	EXPECT !finishings-default IF-DEFINED STRICT
+	EXPECT !finishings-supported IF-DEFINED STRICT
+	EXPECT !media-bottom-margin-supported IF-DEFINED STRICT
+	EXPECT !media-col-default IF-DEFINED STRICT
+	EXPECT !media-col-ready IF-DEFINED STRICT
+	EXPECT !media-col-supported IF-DEFINED STRICT
+	EXPECT !media-default IF-DEFINED STRICT
+	EXPECT !media-left-margin-supported IF-DEFINED STRICT
+	EXPECT !media-ready IF-DEFINED STRICT
+	EXPECT !media-right-margin-supported IF-DEFINED STRICT
+	EXPECT !media-size-supported IF-DEFINED STRICT
+	EXPECT !media-source-supported IF-DEFINED STRICT
+	EXPECT !media-supported IF-DEFINED STRICT
+	EXPECT !media-top-margin-supported IF-DEFINED STRICT
+	EXPECT !media-type-supported IF-DEFINED STRICT
+	EXPECT !orientation-requested-default IF-DEFINED STRICT
+	EXPECT !orientation-requested-supported IF-DEFINED STRICT
+	EXPECT !output-bin-default IF-DEFINED STRICT
+	EXPECT !output-bin-supported IF-DEFINED STRICT
+	EXPECT !overrides-supported IF-DEFINED STRICT
+	EXPECT !page-ranges-supported IF-DEFINED STRICT
+	EXPECT !print-color-mode-default IF-DEFINED STRICT
+	EXPECT !print-color-mode-supported IF-DEFINED STRICT
+	EXPECT !print-content-optimize-default IF-DEFINED STRICT
+	EXPECT !print-content-optimize-supported IF-DEFINED STRICT
+	EXPECT !print-quality-default IF-DEFINED STRICT
+	EXPECT !print-quality-supported IF-DEFINED STRICT
+	EXPECT !print-rendering-intent-default IF-DEFINED STRICT
+	EXPECT !print-rendering-intent-supported IF-DEFINED STRICT
+	EXPECT !printer-resolution-default IF-DEFINED STRICT
+	EXPECT !printer-resolution-supported IF-DEFINED STRICT
+	EXPECT !sides-default IF-DEFINED HAVE_DUPLEX IF-DEFINED STRICT
+	EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX IF-DEFINED STRICT
 }
 
 {
@@ -1066,41 +1068,41 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	## Issue #50: Relax Get-Printer-Attributes tests
 	# 'job-template' attributes
-	# EXPECT !copies-default
-	# EXPECT !copies-supported
-	# EXPECT !finishings-default
-	# EXPECT !finishings-supported
-	# EXPECT !media-bottom-margin-supported
-	# EXPECT !media-col-default
-	# EXPECT !media-col-ready
-	# EXPECT !media-col-supported
-	# EXPECT !media-default
-	# EXPECT !media-left-margin-supported
-	# EXPECT !media-ready
-	# EXPECT !media-right-margin-supported
-	# EXPECT !media-size-supported
-	# EXPECT !media-source-supported
-	# EXPECT !media-supported
-	# EXPECT !media-top-margin-supported
-	# EXPECT !media-type-supported
-	# EXPECT !orientation-requested-default
-	# EXPECT !orientation-requested-supported
-	# EXPECT !output-bin-default
-	# EXPECT !output-bin-supported
-	# EXPECT !overrides-supported
-	# EXPECT !page-ranges-supported
-	# EXPECT !print-color-mode-default
-	# EXPECT !print-color-mode-supported
-	# EXPECT !print-content-optimize-default
-	# EXPECT !print-content-optimize-supported
-	# EXPECT !print-quality-default
-	# EXPECT !print-quality-supported
-	# EXPECT !print-rendering-intent-default
-	# EXPECT !print-rendering-intent-supported
-	# EXPECT !printer-resolution-default
-	# EXPECT !printer-resolution-supported
-	# EXPECT !sides-default IF-DEFINED HAVE_DUPLEX
-	# EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX
+	EXPECT !copies-default IF-DEFINED STRICT
+	EXPECT !copies-supported IF-DEFINED STRICT
+	EXPECT !finishings-default IF-DEFINED STRICT
+	EXPECT !finishings-supported IF-DEFINED STRICT
+	EXPECT !media-bottom-margin-supported IF-DEFINED STRICT
+	EXPECT !media-col-default IF-DEFINED STRICT
+	EXPECT !media-col-ready IF-DEFINED STRICT
+	EXPECT !media-col-supported IF-DEFINED STRICT
+	EXPECT !media-default IF-DEFINED STRICT
+	EXPECT !media-left-margin-supported IF-DEFINED STRICT
+	EXPECT !media-ready IF-DEFINED STRICT
+	EXPECT !media-right-margin-supported IF-DEFINED STRICT
+	EXPECT !media-size-supported IF-DEFINED STRICT
+	EXPECT !media-source-supported IF-DEFINED STRICT
+	EXPECT !media-supported IF-DEFINED STRICT
+	EXPECT !media-top-margin-supported IF-DEFINED STRICT
+	EXPECT !media-type-supported IF-DEFINED STRICT
+	EXPECT !orientation-requested-default IF-DEFINED STRICT
+	EXPECT !orientation-requested-supported IF-DEFINED STRICT
+	EXPECT !output-bin-default IF-DEFINED STRICT
+	EXPECT !output-bin-supported IF-DEFINED STRICT
+	EXPECT !overrides-supported IF-DEFINED STRICT
+	EXPECT !page-ranges-supported IF-DEFINED STRICT
+	EXPECT !print-color-mode-default IF-DEFINED STRICT
+	EXPECT !print-color-mode-supported IF-DEFINED STRICT
+	EXPECT !print-content-optimize-default IF-DEFINED STRICT
+	EXPECT !print-content-optimize-supported IF-DEFINED STRICT
+	EXPECT !print-quality-default IF-DEFINED STRICT
+	EXPECT !print-quality-supported IF-DEFINED STRICT
+	EXPECT !print-rendering-intent-default IF-DEFINED STRICT
+	EXPECT !print-rendering-intent-supported IF-DEFINED STRICT
+	EXPECT !printer-resolution-default IF-DEFINED STRICT
+	EXPECT !printer-resolution-supported IF-DEFINED STRICT
+	EXPECT !sides-default IF-DEFINED HAVE_DUPLEX IF-DEFINED STRICT
+	EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX IF-DEFINED STRICT
 }
 
 {
@@ -1122,67 +1124,67 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	## Issue #50: Relax Get-Printer-Attributes tests
 	# 'printer-description' attributes
-	# EXPECT !charset-configured
-	# EXPECT !charset-supported
-	# EXPECT !color-supported
-	# EXPECT !compression-supported
-	# EXPECT !document-format-default
-	# EXPECT !document-format-supported
-	# EXPECT !generated-natural-language-supported
-	# EXPECT !identify-actions-default
-	# EXPECT !identify-actions-supported
-	# EXPECT !ipp-features-supported
-	# EXPECT !ipp-versions-supported
-	# EXPECT !job-constraints-supported
-	# EXPECT !job-creation-attributes-supported
-	# EXPECT !job-ids-supported
-	# EXPECT !job-password-supported
-	# EXPECT !job-password-encryption-supported
-	# EXPECT !job-resolvers-supported
-	# EXPECT !multiple-document-jobs-supported
-	# EXPECT !multiple-operation-time-out
-	# EXPECT !multiple-operation-time-out-action
-	# EXPECT !natural-language-configured
-	# EXPECT !operations-supported
-	# EXPECT !pages-per-minute
-	# EXPECT !pages-per-minute-color
-	# EXPECT !!pages-per-minute-color
-	# EXPECT !pdl-override-supported
-	# EXPECT !preferred-attributes-supported
-	# EXPECT !printer-charge-info-uri
-	# EXPECT !printer-config-change-date-time
-	# EXPECT !printer-config-change-time
-	# EXPECT !printer-current-time
-	# EXPECT !printer-geo-location
-	# EXPECT !printer-get-attributes-supported
-	# EXPECT !printer-icc-profiles-supported
-	# EXPECT !printer-icons
-	# EXPECT !printer-info
-	# EXPECT !printer-is-accepting-jobs
-	# EXPECT !printer-location
-	# EXPECT !printer-make-and-model
-	# EXPECT !printer-more-info
-	# EXPECT !printer-name
-	# EXPECT !printer-organization
-	# EXPECT !printer-organizational-unit
-	# EXPECT !printer-state
-	# EXPECT !printer-state-change-date-time
-	# EXPECT !printer-state-change-time
-	# EXPECT !printer-state-message
-	# EXPECT !printer-state-reasons
-	# EXPECT !printer-supply
-	# EXPECT !printer-supply-description
-	# EXPECT !printer-supply-info-uri
-	# EXPECT !printer-up-time
-	# EXPECT !printer-uri-supported
-	# EXPECT !printer-uuid
-	# EXPECT !pwg-raster-document-resolution-supported
-	# EXPECT !pwg-raster-document-sheet-back
-	# EXPECT !pwg-raster-document-type-supported
-	# EXPECT !queued-job-count
-	# EXPECT !uri-authentication-supported
-	# EXPECT !uri-security-supported
-	# EXPECT !which-jobs-supported
+	EXPECT !charset-configured IF-DEFINED STRICT
+	EXPECT !charset-supported IF-DEFINED STRICT
+	EXPECT !color-supported IF-DEFINED STRICT
+	EXPECT !compression-supported IF-DEFINED STRICT
+	EXPECT !document-format-default IF-DEFINED STRICT
+	EXPECT !document-format-supported IF-DEFINED STRICT
+	EXPECT !generated-natural-language-supported IF-DEFINED STRICT
+	EXPECT !identify-actions-default IF-DEFINED STRICT
+	EXPECT !identify-actions-supported IF-DEFINED STRICT
+	EXPECT !ipp-features-supported IF-DEFINED STRICT
+	EXPECT !ipp-versions-supported IF-DEFINED STRICT
+	EXPECT !job-constraints-supported IF-DEFINED STRICT
+	EXPECT !job-creation-attributes-supported IF-DEFINED STRICT
+	EXPECT !job-ids-supported IF-DEFINED STRICT
+	EXPECT !job-password-supported IF-DEFINED STRICT
+	EXPECT !job-password-encryption-supported IF-DEFINED STRICT
+	EXPECT !job-resolvers-supported IF-DEFINED STRICT
+	EXPECT !multiple-document-jobs-supported IF-DEFINED STRICT
+	EXPECT !multiple-operation-time-out IF-DEFINED STRICT
+	EXPECT !multiple-operation-time-out-action IF-DEFINED STRICT
+	EXPECT !natural-language-configured IF-DEFINED STRICT
+	EXPECT !operations-supported IF-DEFINED STRICT
+	EXPECT !pages-per-minute IF-DEFINED STRICT
+	EXPECT !pages-per-minute-color IF-DEFINED STRICT
+	EXPECT !!pages-per-minute-color IF-DEFINED STRICT
+	EXPECT !pdl-override-supported IF-DEFINED STRICT
+	EXPECT !preferred-attributes-supported IF-DEFINED STRICT
+	EXPECT !printer-charge-info-uri IF-DEFINED STRICT
+	EXPECT !printer-config-change-date-time IF-DEFINED STRICT
+	EXPECT !printer-config-change-time IF-DEFINED STRICT
+	EXPECT !printer-current-time IF-DEFINED STRICT
+	EXPECT !printer-geo-location IF-DEFINED STRICT
+	EXPECT !printer-get-attributes-supported IF-DEFINED STRICT
+	EXPECT !printer-icc-profiles-supported IF-DEFINED STRICT
+	EXPECT !printer-icons IF-DEFINED STRICT
+	EXPECT !printer-info IF-DEFINED STRICT
+	EXPECT !printer-is-accepting-jobs IF-DEFINED STRICT
+	EXPECT !printer-location IF-DEFINED STRICT
+	EXPECT !printer-make-and-model IF-DEFINED STRICT
+	EXPECT !printer-more-info IF-DEFINED STRICT
+	EXPECT !printer-name IF-DEFINED STRICT
+	EXPECT !printer-organization IF-DEFINED STRICT
+	EXPECT !printer-organizational-unit IF-DEFINED STRICT
+	EXPECT !printer-state IF-DEFINED STRICT
+	EXPECT !printer-state-change-date-time IF-DEFINED STRICT
+	EXPECT !printer-state-change-time IF-DEFINED STRICT
+	EXPECT !printer-state-message IF-DEFINED STRICT
+	EXPECT !printer-state-reasons IF-DEFINED STRICT
+	EXPECT !printer-supply IF-DEFINED STRICT
+	EXPECT !printer-supply-description IF-DEFINED STRICT
+	EXPECT !printer-supply-info-uri IF-DEFINED STRICT
+	EXPECT !printer-up-time IF-DEFINED STRICT
+	EXPECT !printer-uri-supported IF-DEFINED STRICT
+	EXPECT !printer-uuid IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-resolution-supported IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-sheet-back IF-DEFINED STRICT
+	EXPECT !pwg-raster-document-type-supported IF-DEFINED STRICT
+	EXPECT !queued-job-count IF-DEFINED STRICT
+	EXPECT !uri-authentication-supported IF-DEFINED STRICT
+	EXPECT !uri-security-supported IF-DEFINED STRICT
+	EXPECT !which-jobs-supported IF-DEFINED STRICT
 
 	# 'job-template' attributes
 	EXPECT copies-default
@@ -1249,10 +1251,10 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
 
 	## Issue #50: Relax Get-Printer-Attributes tests
-	# EXPECT !printer-name
-	# EXPECT !printer-state
-	# EXPECT !printer-state-message
-	# EXPECT !printer-state-reasons
+	EXPECT !printer-name IF-DEFINED STRICT
+	EXPECT !printer-state IF-DEFINED STRICT
+	EXPECT !printer-state-message IF-DEFINED STRICT
+	EXPECT !printer-state-reasons IF-DEFINED STRICT
 }
 
 
@@ -2460,5 +2462,5 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24
 
 	## Issue #50: Relax Get-Printer-Attributes tests
-	# EXPECT !printer-state
+	EXPECT !printer-state IF-DEFINED STRICT
 }
