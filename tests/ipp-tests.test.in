@@ -123,6 +123,8 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 
 	STATUS successful-ok
 	EXPECT printer-uri-supported OF-TYPE uri WITH-ALL-VALUES "$IPP_URI_SCHEME"
+	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+		DEFINE-MATCH HAVE_IDENTIFY_PRINTER
 }
 
 
@@ -207,7 +209,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,1
 	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
 	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
 	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
-		IF-NOT-DEFINED IPP_EVERYWHERE_SERVER DEFINE-MATCH HAVE_IDENTIFY_PRINTER
+		IF-NOT-DEFINED IPP_EVERYWHERE_SERVER
 
 	# Default Get-Printer-Attributes MUST NOT return media-col-database, per PWG 5100.7 (JOBEXT)
 	EXPECT !media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
