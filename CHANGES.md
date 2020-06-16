@@ -1,5 +1,11 @@
 # Changes
 
+## v1.0 Update 5 (June ??, 2020)
+
+- Fixed support for the `-m` option of the `ippevesubmit` command.
+- Made output JSON from the `ippevesubmit` command pass as standalone JSON.
+
+
 ## v1.0 Update 4 (April 8, 2020)
 
 - Issue #41: Windows IPP Everywhere Self Cert 1.0 Update 3: ipptool fails to
