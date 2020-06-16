@@ -615,6 +615,11 @@ json_write_plist(FILE	 *fp,		/* I - File to write to */
 		*next;			/* Next node */
 
 
+  putc('[', fp);
+
+  if (plist->type == PLIST_TYPE_DICT)
+    putc('{', fp);
+
   for (current = plist->first_child; current; current = next)
   {
     if (current->prev_sibling && current->parent->type == PLIST_TYPE_ARRAY)
@@ -676,6 +681,9 @@ json_write_plist(FILE	 *fp,		/* I - File to write to */
       }
     }
   }
+
+  if (plist->type == PLIST_TYPE_DICT)
+    putc(']', fp);
 
   putc('\n', fp);
 }
@@ -1204,8 +1212,12 @@ read_string(const char *prompt,		/* I - Prompt (if interactive) */
     */
 
     for (bufptr = buffer + strlen(buffer) - 1; bufptr >= buffer; bufptr --)
+    {
       if (isspace(*bufptr & 255))
 	*bufptr = '\0';
+      else
+        break;
+    }
 
    /*
     * If there is anything left, return it...
