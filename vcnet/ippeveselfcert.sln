@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcups2", "libcups2.vcxproj", "{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}"
 EndProject
@@ -20,7 +20,10 @@ EndProject
 Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "sw-ippeveselfcert", "sw-ippeveselfcert.aiproj", "{51C47D39-F1FE-4F8E-98BC-0A7461C2A175}"
 	ProjectSection(ProjectDependencies) = postProject
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E} = {18950A1B-D37A-40C7-B2DF-C12986C0526E}
+		{769507B7-0960-498E-80CE-1085D63DB835} = {769507B7-0960-498E-80CE-1085D63DB835}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ippevesubmit", "ippevesubmit.vcxproj", "{769507B7-0960-498E-80CE-1085D63DB835}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +74,12 @@ Global
 		{51C47D39-F1FE-4F8E-98BC-0A7461C2A175}.Debug|x64.Build.0 = DefaultBuild
 		{51C47D39-F1FE-4F8E-98BC-0A7461C2A175}.Release|x64.ActiveCfg = DefaultBuild
 		{51C47D39-F1FE-4F8E-98BC-0A7461C2A175}.Release|x64.Build.0 = DefaultBuild
+		{769507B7-0960-498E-80CE-1085D63DB835}.All|x64.ActiveCfg = Release|x64
+		{769507B7-0960-498E-80CE-1085D63DB835}.All|x64.Build.0 = Release|x64
+		{769507B7-0960-498E-80CE-1085D63DB835}.Debug|x64.ActiveCfg = Debug|x64
+		{769507B7-0960-498E-80CE-1085D63DB835}.Debug|x64.Build.0 = Debug|x64
+		{769507B7-0960-498E-80CE-1085D63DB835}.Release|x64.ActiveCfg = Release|x64
+		{769507B7-0960-498E-80CE-1085D63DB835}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
