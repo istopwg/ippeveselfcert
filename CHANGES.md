@@ -1,6 +1,6 @@
 # Changes
 
-## v1.0 Update 5 (June ??, 2020)
+## v1.0 Update 5 (June 17, 2020)
 
 - Fixed support for the `-m` option of the `ippevesubmit` command.
 - Made output JSON from the `ippevesubmit` command pass as standalone JSON.
