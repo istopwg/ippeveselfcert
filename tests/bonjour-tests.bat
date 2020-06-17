@@ -43,7 +43,7 @@ echo ^<dict^>^<key^>Name^</key^>^<string^>B-1. IPP Browse test^</string^> >>"%PL
 echo ^<key^>FileId^</key^>^<string^>org.pwg.ippeveselfcert10.bonjour^</string^> >>"%PLIST%"
 
 set result=FAIL
-ippfind _ipp._tcp,_print.local. --literal-name "%name%" --quiet && set result=PASS
+ippfind _ipp._tcp,_print.local. -T 5 --literal-name "%name%" --quiet && set result=PASS
 if "%result%" == "PASS" (
 	set /a pass+=1
 ) else (
@@ -219,7 +219,7 @@ echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</st
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
-	ippfind _ipps._tcp,_print.local. --literal-name "%name%" --quiet && set result=PASS
+	ippfind _ipps._tcp,_print.local. -T 5 --literal-name "%name%" --quiet && set result=PASS
 	if "%result%" == "PASS" (
 		set /a pass+=1
 	) else (

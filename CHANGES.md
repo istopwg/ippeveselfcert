@@ -5,6 +5,7 @@
 - Fixed support for the `-m` option of the `ippevesubmit` command.
 - Made output JSON from the `ippevesubmit` command pass as standalone JSON.
 - Fixed Windows TLS client support.
+- Increased the timeout for the browse tests to 5 seconds.
 
 
 ## v1.0 Update 4 (April 8, 2020)

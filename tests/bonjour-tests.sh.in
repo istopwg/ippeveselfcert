@@ -181,7 +181,7 @@ end_test() {
 
 # B-1. IPP Browse test: Printers appear in a search for "_ipp._tcp,_print" services?
 start_test "B-1. IPP Browse test"
-$IPPFIND --literal-name "${TARGET}" "_ipp._tcp,_print.local." --quiet
+$IPPFIND --literal-name "${TARGET}" "_ipp._tcp,_print.local." --quiet -T 5
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
@@ -261,7 +261,7 @@ fi
 # B-5.2 IPPS Browse test: Printer appears in a search for "_ipps._tcp,_print" services.
 start_test "B-5.2 IPPS Browse test"
 if test $HAVE_TLS = 1; then
-	$IPPFIND --literal-name "${TARGET}" "_ipps._tcp,_print.local." --quiet
+	$IPPFIND --literal-name "${TARGET}" "_ipps._tcp,_print.local." --quiet -T 5
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
