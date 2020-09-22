@@ -2,9 +2,10 @@
 
 ## v1.1 Update 2 (???, 2020)
 
-- Allow empty "printer-alert" values since PWG 5100.9 is ambiguous about how to
-  report the absence of alerts (Issue #61)
-
+- Now allow the I-10.3 test to return the
+  'successful-ok-ignored-or-substituted-attributes' status code (Issue #60)
+- Now allow empty "printer-alert" values since PWG 5100.9 is ambiguous about
+  how to report the absence of alerts (Issue #61)
 
 ## v1.1 Update 1 (June 17, 2020)
 
