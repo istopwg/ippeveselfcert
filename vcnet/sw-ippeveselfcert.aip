@@ -29,7 +29,7 @@
     <ROW Property="ProductCode" Value="1033:{C50005AC-A820-45BB-8D9F-648AAC7E690E} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="IPP Everywhere v1.1 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="11.1.4" Type="32"/>
+    <ROW Property="ProductVersion" Value="11.1.5" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
@@ -223,7 +223,7 @@
     <ROW XmlAttribute="Square44x44Logo_1" XmlElement="VisualElements_1" Name="Square44x44Logo" Flags="0" Order="0" FileId="ippeveprinterSquare44x44Logo.scale100.png"/>
     <ROW XmlAttribute="Square44x44Logo_2" XmlElement="VisualElements_2" Name="Square44x44Logo" Flags="0" Order="0" FileId="ippfindSquare44x44Logo.scale100.png"/>
     <ROW XmlAttribute="Square44x44Logo_3" XmlElement="VisualElements_3" Name="Square44x44Logo" Flags="0" Order="0" FileId="ippevesubmitSquare44x44Logo.scale100.png"/>
-    <ROW XmlAttribute="Version" XmlElement="Identity" Name="Version" Flags="0" Order="0" Value="11.1.4.0"/>
+    <ROW XmlAttribute="Version" XmlElement="Identity" Name="Version" Flags="0" Order="0" Value="11.1.5.0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlElementComponent">
     <ROW XmlElement="Application" ParentElement="Applications" Name="Application" Order="1" Flags="0" Type="4"/>

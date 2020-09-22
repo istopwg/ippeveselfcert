@@ -43,6 +43,97 @@ Documentation:
 - "README.md": This README file
 
 
+Running the Self-Certification Tools on Windows® 7 and Higher
+-------------------------------------------------------------
+
+In addition to this software, you also need to install the Bonjour for Windows
+software from Apple: <http://support.apple.com/kb/DL999>
+
+Extract the PWG Raster files to your Desktop directory, then open a command
+prompt or power shell and run the following commands with "Printer Name"
+replaced by the DNS-SD service name of your printer:
+
+    cd "C:\Program Files\IPP Everywhere Printer Self-Certification Tools"
+    .\dnssd-tests.bat "Printer Name"
+    .\ipp-tests.bat "Printer Name"
+    .\document-tests.bat "Printer Name"
+
+Assuming all of the tests passed, you can then run the following command to
+generate a JSON file containing your submission:
+
+    .\ippevesubmit "Printer Name<"
+
+You can then submit the JSON file to the "ippeveselfcert@pwg.org" mailing list
+or the Github issue tracker at:
+<https://github.com/istopwg/ippeveselfcert/issues/new>
+
+
+Running the Self-Certification Tools on macOS® 10.10 and Higher
+---------------------------------------------------------------
+
+Extract the PWG Raster files to the tools directory, then open a Terminal
+window and run the following commands with "Printer Name" replaced by the
+DNS-SD service name of your printer:
+
+    cd /path/to/tools
+    ./dnssd-tests.sh "Printer Name"
+    ./ipp-tests.sh "Printer Name"
+    ./document-tests.sh "Printer Name"
+
+Assuming all of the tests passed, you can then run the following command to
+generate a JSON file containing your submission:
+
+    ./ippevesubmit "Printer Name"
+
+You can then submit the JSON file to the "ippeveselfcert@pwg.org" mailing list
+or the Github issue tracker at:
+<https://github.com/istopwg/ippeveselfcert/issues/new>
+
+
+Running the Self-Certification Tools on Red Hat Enterprise Linux 7 and Higher
+-----------------------------------------------------------------------------
+
+Extract the PWG Raster files to the tools directory, then open a Terminal
+window and run the following commands with "Printer Name" replaced by the
+DNS-SD service name of your printer:
+
+    cd /path/to/tools
+    ./dnssd-tests.sh "Printer Name"
+    ./ipp-tests.sh "Printer Name"
+    ./document-tests.sh "Printer Name"
+
+Assuming all of the tests passed, you can then run the following command to
+generate a JSON file containing your submission:
+
+    ./ippevesubmit "Printer Name"
+
+You can then submit the JSON file to the "ippeveselfcert@pwg.org" mailing list
+or the Github issue tracker at:
+<https://github.com/istopwg/ippeveselfcert/issues/new>
+
+
+Running the Self-Certification Tools on Ubuntu 18.04 and higher
+---------------------------------------------------------------
+
+Extract the PWG Raster files to the tools directory, then open a Terminal
+window and run the following commands with "Printer Name" replaced by the
+DNS-SD service name of your printer:
+
+    cd /path/to/tools
+    ./dnssd-tests.sh "Printer Name"
+    ./ipp-tests.sh "Printer Name"
+    ./document-tests.sh "Printer Name"
+
+Assuming all of the tests passed, you can then run the following command to
+generate a JSON file containing your submission:
+
+    ./ippevesubmit "Printer Name"
+
+You can then submit the JSON file to the "ippeveselfcert@pwg.org" mailing list
+or the Github issue tracker at:
+<https://github.com/istopwg/ippeveselfcert/issues/new>
+
+
 Getting Support and Other Resources
 -----------------------------------
 
@@ -52,6 +143,9 @@ IPP Eveywhere: <https://www.pwg.org/ipp/everywhere.html>
 The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere
 Printer Self-Certification.  You can subscribe from the following page:
 <https://www.pwg.org/mailman/listinfo/ippeveselfcert>
+
+Issues found in the tools should be reported using the Github issues page:
+<https://github.com/istopwg/ippeveselfcert/issues>
 
 
 Legal Stuff
