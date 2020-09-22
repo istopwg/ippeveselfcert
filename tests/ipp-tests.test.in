@@ -761,110 +761,111 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	ATTR keyword requested-attributes 'none'
 
 	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes DEFINE-MATCH HAVE_IGNORED
 
 	# 'media-col-database' attribute should never be returned unless
 	# explicitly requested...
 	EXPECT !media-col-database
 
 	# 'printer-description' attributes
-	EXPECT !charset-configured
-	EXPECT !charset-supported
-	EXPECT !color-supported
-	EXPECT !compression-supported
-	EXPECT !document-format-default
-	EXPECT !document-format-supported
-	EXPECT !generated-natural-language-supported
-	EXPECT !identify-actions-default
-	EXPECT !identify-actions-supported
-	EXPECT !ipp-features-supported
-	EXPECT !ipp-versions-supported
-	EXPECT !job-constraints-supported
-	EXPECT !job-creation-attributes-supported
-	EXPECT !job-ids-supported
-	EXPECT !job-password-supported
-	EXPECT !job-password-encryption-supported
-	EXPECT !job-resolvers-supported
-	EXPECT !multiple-document-jobs-supported
-	EXPECT !multiple-operation-time-out
-	EXPECT !multiple-operation-time-out-action
-	EXPECT !natural-language-configured
-        EXPECT !operations-supported
-        EXPECT !pages-per-minute
-        EXPECT !pages-per-minute-color
-        EXPECT !!pages-per-minute-color
-	EXPECT !pdl-override-supported
-        EXPECT !preferred-attributes-supported
-	EXPECT !printer-charge-info-uri
-	EXPECT !printer-config-change-date-time
-	EXPECT !printer-config-change-time
-	EXPECT !printer-current-time
-	EXPECT !printer-geo-location
-	EXPECT !printer-get-attributes-supported
-	EXPECT !printer-icc-profiles-supported
-	EXPECT !printer-icons
-	EXPECT !printer-info
-	EXPECT !printer-is-accepting-jobs
-	EXPECT !printer-location
-	EXPECT !printer-make-and-model
-	EXPECT !printer-more-info
-	EXPECT !printer-name
-	EXPECT !printer-organization
-	EXPECT !printer-organizational-unit
-	EXPECT !printer-state
-	EXPECT !printer-state-change-date-time
-	EXPECT !printer-state-change-time
-	EXPECT !printer-state-message
-	EXPECT !printer-state-reasons
-	EXPECT !printer-supply
-	EXPECT !printer-supply-description
-	EXPECT !printer-supply-info-uri
-	EXPECT !printer-up-time
-	EXPECT !printer-uri-supported
-	EXPECT !printer-uuid
-	EXPECT !pwg-raster-document-resolution-supported
-	EXPECT !pwg-raster-document-sheet-back
-	EXPECT !pwg-raster-document-type-supported
-	EXPECT !queued-job-count
-	EXPECT !uri-authentication-supported
-	EXPECT !uri-security-supported
-	EXPECT !which-jobs-supported
+	EXPECT !charset-configured IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !charset-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !color-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !compression-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !document-format-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !document-format-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !generated-natural-language-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !identify-actions-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !identify-actions-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !ipp-features-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !ipp-versions-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-constraints-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-creation-attributes-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-ids-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-password-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-password-encryption-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !job-resolvers-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !multiple-document-jobs-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !multiple-operation-time-out IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !multiple-operation-time-out-action IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !natural-language-configured IF-NOT-DEFINED HAVE_IGNORED
+        EXPECT !operations-supported IF-NOT-DEFINED HAVE_IGNORED
+        EXPECT !pages-per-minute IF-NOT-DEFINED HAVE_IGNORED
+        EXPECT !pages-per-minute-color IF-NOT-DEFINED HAVE_IGNORED
+        EXPECT !!pages-per-minute-color IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !pdl-override-supported IF-NOT-DEFINED HAVE_IGNORED
+        EXPECT !preferred-attributes-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-charge-info-uri IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-config-change-date-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-config-change-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-current-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-geo-location IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-get-attributes-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-icc-profiles-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-icons IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-info IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-is-accepting-jobs IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-location IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-make-and-model IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-more-info IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-name IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-organization IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-organizational-unit IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-state IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-state-change-date-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-state-change-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-state-message IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-state-reasons IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-supply IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-supply-description IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-supply-info-uri IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-up-time IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-uri-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-uuid IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !pwg-raster-document-resolution-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !pwg-raster-document-sheet-back IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !pwg-raster-document-type-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !queued-job-count IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !uri-authentication-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !uri-security-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !which-jobs-supported IF-NOT-DEFINED HAVE_IGNORED
 
 	# 'job-template' attributes
-	EXPECT !copies-default
-	EXPECT !copies-supported
-	EXPECT !finishings-default
-	EXPECT !finishings-supported
-	EXPECT !media-bottom-margin-supported
-	EXPECT !media-col-default
-	EXPECT !media-col-ready
-	EXPECT !media-col-supported
-	EXPECT !media-default
-	EXPECT !media-left-margin-supported
-	EXPECT !media-ready
-	EXPECT !media-right-margin-supported
-	EXPECT !media-size-supported
-	EXPECT !media-source-supported
-	EXPECT !media-supported
-	EXPECT !media-top-margin-supported
-	EXPECT !media-type-supported
-	EXPECT !orientation-requested-default
-	EXPECT !orientation-requested-supported
-	EXPECT !output-bin-default
-	EXPECT !output-bin-supported
-	EXPECT !overrides-supported
-	EXPECT !page-ranges-supported
-	EXPECT !print-color-mode-default
-	EXPECT !print-color-mode-supported
-	EXPECT !print-content-optimize-default
-	EXPECT !print-content-optimize-supported
-	EXPECT !print-quality-default
-	EXPECT !print-quality-supported
-	EXPECT !print-rendering-intent-default
-	EXPECT !print-rendering-intent-supported
-	EXPECT !printer-resolution-default
-	EXPECT !printer-resolution-supported
-	EXPECT !sides-default IF-DEFINED HAVE_DUPLEX
-	EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX
+	EXPECT !copies-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !copies-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !finishings-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !finishings-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-bottom-margin-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-col-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-col-ready IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-col-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-left-margin-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-ready IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-right-margin-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-size-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-source-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-top-margin-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !media-type-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !orientation-requested-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !orientation-requested-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !output-bin-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !output-bin-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !overrides-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !page-ranges-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-color-mode-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-color-mode-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-content-optimize-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-content-optimize-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-quality-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-quality-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-rendering-intent-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !print-rendering-intent-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-resolution-default IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !printer-resolution-supported IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !sides-default IF-DEFINED HAVE_DUPLEX IF-NOT-DEFINED HAVE_IGNORED
+	EXPECT !sides-supported IF-DEFINED HAVE_DUPLEX IF-NOT-DEFINED HAVE_IGNORED
 }
 
 {
