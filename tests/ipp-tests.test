@@ -406,7 +406,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE >3 DEFINE-MATCH HAVE_FINISHINGS
 
-	EXPECT finishing-template-supported OF-TYPE keyword IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishing-template-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
 	EXPECT finishing-template-supported WITH-VALUE "none" IF-DEFINED HAVE_FINISHINGS
 
 	EXPECT finishings-col-database OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
