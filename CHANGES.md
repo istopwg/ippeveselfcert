@@ -10,6 +10,9 @@
   'successful-ok-ignored-or-substituted-attributes' status code (Issue #60)
 - Now allow empty "printer-alert" values since PWG 5100.9 is ambiguous about
   how to report the absence of alerts (Issue #61)
+- The "dnssd-tests.sh" script did not correctly report errors on monochrome
+  printers.
+
 
 ## v1.1 Update 1 (June 17, 2020)
 

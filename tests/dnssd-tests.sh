@@ -56,7 +56,7 @@ else
 fi
 
 # Special case "_failN" name to show bad/missing TXT keys
-if test "$2" = _fail2 -o "$2" = _fail4 -o "$2" = _fail5.3 -o "$2" = _fail5.5; then
+if test "$2" = _fail2 -o "$2" = _fail4 -o "$2" = _fail4.1 -o "$2" = _fail5.3 -o "$2" = _fail5.5 -o "$2" = _fail5.5.1; then
 	echo "FAIL"
 	echo "<key>Errors</key><array>" >>"$PLIST"
 	if test "${IPPFIND_TXT_ADMINURL:-NOTSET}" = NOTSET; then
