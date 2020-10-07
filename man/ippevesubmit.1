@@ -7,7 +7,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ippevesubmit 1 "IPP Everywhere Tools" "2020-06-16" "ISTO-PWG"
+.TH ippevesubmit 1 "IPP Everywhere Tools" "2020-10-07" "ISTO-PWG"
 .SH NAME
 ippevesubmit \- prepare a submission for self-certification results.
 .SH SYNOPSIS
@@ -26,6 +26,9 @@ ippevesubmit \- prepare a submission for self-certification results.
 ] [
 .B \-p
 .I "product family"
+] [
+.B \-r
+.I {dnssd|document|ipp}
 ] [
 .B \-s
 ] [
@@ -59,6 +62,9 @@ Specifies the product family for the models being submitted.
 If not specified,
 .B ippevesubmit
 will ask for the family name.
+.TP 5
+\fB\-r \fI{dnssd|document|ipp}\fR
+Replays the specified tests from the corresponding plist file.
 .TP 5
 .B \-t printer
 Specifies that the submission is for a standalone printer.

@@ -13,17 +13,19 @@
  *
  * Options:
  *
- *    --help		   Show help.
- *    --override           Override test results for granted exception.
- *    -f standard          The standard firmware includes IPP Everywhere support.
- *    -f update            A firmware update may be needed.
- *    -m models.txt	   Specify list of models, one per line.
- *    -o filename.json	   Specify the JSON output file, otherwise JSON is sent
- *			   to 'printer name.json'.
- *    -p "product family"  Specify the product family.
- *    -t {printer|server}  Submit for a printer or print server.
- *    -u URL		   Specify the product family web page.
- *    -y		   Answer yes to the checklist questions.
+ *    --help		       Show help.
+ *    --override               Override test results for granted exception.
+ *    -f standard              The standard firmware includes IPP Everywhere
+ *                             support.
+ *    -f update                A firmware update may be needed.
+ *    -m models.txt	       Specify list of models, one per line.
+ *    -o filename.json	       Specify the JSON output file, otherwise JSON is
+ *			       sent to 'printer name.json'.
+ *    -p "product family"      Specify the product family.
+ *    -r {dnssd|document|ipp}  Replay the results of the specified tests.
+ *    -t {printer|server}      Submit for a printer or print server.
+ *    -u URL		       Specify the product family web page.
+ *    -y		       Answer yes to the checklist questions.
  */
 
 
@@ -93,6 +95,7 @@ static plist_t	*plist_find(plist_t *parent, const char *path);
 static plist_t	*plist_read(const char *filename);
 static int	read_boolean(const char *prompt);
 static char	*read_string(const char *prompt, FILE *fp, char *buffer, size_t bufsize);
+static void	replay_results(const char *filename, plist_t *results);
 static void	usage(void);
 static int	validate_dnssd_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
 static int	validate_document_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
@@ -115,6 +118,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*json = NULL,		/* JSON output file */
 		*models = NULL,		/* File containing a list of models */
 		*printer = NULL,	/* Printer being tested */
+		*replay = NULL,		/* Replay results */
 		*webpage = NULL;	/* Product family web page */
   int		override_tests = 0,	/* Test results were overridden */
 		print_server = -1,	/* Product is a print server */
@@ -255,6 +259,18 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      family = argv[i];
 	      break;
 
+          case 'r' : /* -r {dnssd|ipp|document} */
+              i ++;
+              if (i >= argc || (strcmp(argv[i], "dnssd") && strcmp(argv[i], "document") && strcmp(argv[i], "ipp")))
+              {
+                puts("ippevesubmit: Expected 'dnssd', 'document', or 'ipp' after '-r'.");
+                usage();
+                return (1);
+              }
+
+              replay = argv[i];
+              break;
+
 	  case 't' : /* -t {printer|server} */
 	      i ++;
 	      if (i >= argc || (strcmp(argv[i], "printer") && strcmp(argv[i], "server")))
@@ -306,6 +322,26 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     usage();
     return (1);
+  }
+
+ /* 
+  * Replay results if requested...
+  */
+
+  if (replay)
+  {
+    plist_t	*results;		/* Results to replay */
+
+    if (!strcmp(replay, "dnssd"))
+      snprintf(filename, sizeof(filename), "%s DNS-SD Results.plist", printer);
+    else if (!strcmp(replay, "document"))
+      snprintf(filename, sizeof(filename), "%s Document Results.plist", printer);
+    else
+      snprintf(filename, sizeof(filename), "%s IPP Results.plist", printer);
+
+    results = plist_read(filename);
+    replay_results(filename, results);
+    return (0);
   }
 
  /*
@@ -1232,6 +1268,78 @@ read_string(const char *prompt,		/* I - Prompt (if interactive) */
 
 
 /*
+ * 'replay_results()' - Replay the results from a test.
+ */
+
+static void
+replay_results(const char *filename,	/* I - Filename */
+               plist_t    *results)	/* I - Results */
+{
+  plist_t	*tests,			/* Tests array */
+		*test,			/* Current test dictionary */
+		*name,			/* Test name ("Name" string) */
+		*successful,		/* Test status ("Successful" boolean) */
+		*skipped,		/* Test skipped? ("Skipped" boolean) */
+		*errors;		/* Test errors, if any ("Errors" array) */
+  const char	*status;		/* Status to display */
+  int		total = 0,		/* Test counts */
+		pass = 0,
+		skip = 0,
+		fail = 0;
+
+
+  printf("\"%s\":\n", filename);
+  if ((tests = plist_find(results, "Tests")) == NULL)
+  {
+    puts("    No tests found in results.");
+    return;
+  }
+
+  for (test = tests->first_child; test; test = test->next_sibling)
+  {
+    name       = plist_find(test, "Name");
+    successful = plist_find(test, "Successful");
+    skipped    = plist_find(test, "Skipped");
+    errors     = plist_find(test, "Errors");
+
+    if (!name || name->type != PLIST_TYPE_STRING || !successful)
+      continue;
+
+    total ++;
+
+    if (skipped && skipped->type == PLIST_TYPE_TRUE)
+    {
+      status = "SKIP";
+      skip ++;
+    }
+    else if (successful->type == PLIST_TYPE_TRUE)
+    {
+      status = "PASS";
+      pass ++;
+    }
+    else
+    {
+      status = "FAIL";
+      fail ++;
+    }
+
+    printf("    %-68.68s [%s]\n", name->value, status);
+
+    if (errors && errors->type == PLIST_TYPE_ARRAY)
+    {
+      plist_t	*error;			/* Current error */
+
+      for (error = errors->first_child; error; error = error->next_sibling)
+        printf("        %s\n", error->value);
+    }
+  }
+
+  printf("\nSummary: %d tests, %d passed, %d failed, %d skipped\n", total, pass, fail, skip);
+  printf("Score: %d%%\n", 100 * (pass + skip) / total);
+}
+
+
+/*
  * 'usage()' - Show program usage.
  */
 
@@ -1241,16 +1349,17 @@ usage(void)
   puts("Usage: ippevesubmit [options] \"Printer Name\"");
   puts("");
   puts("Options:");
-  puts("  --help	       Show help.");
-  puts("  -f standard          The standard firmware supports IPP Everywhere.");
-  puts("  -f update            The firmware may need to be updated.");
-  puts("  -m models.txt	       Specify a list of models, one per line.");
-  puts("  -o filename.json     Specify the JSON output file, otherwise JSON is sent");
-  puts("		       to 'printer name.json'.");
-  puts("  -p \"product family\"  Specify the product family.");
-  puts("  -t {printer|server}  Submit for a printer or print server.");
-  puts("  -u URL	       Specify the product family web page.");
-  puts("  -y		       Answer yes to the checklist questions.");
+  puts("  --help	           Show help.");
+  puts("  -f standard              The standard firmware supports IPP Everywhere.");
+  puts("  -f update                The firmware may need to be updated.");
+  puts("  -m models.txt	           Specify a list of models, one per line.");
+  puts("  -o filename.json         Specify the JSON output file, otherwise JSON is");
+  puts("		           sent to 'printer name.json'.");
+  puts("  -p \"product family\"      Specify the product family.");
+  puts("  -r {dnssd|document|ipp}  Replay the results for the specified tests");
+  puts("  -t {printer|server}      Submit for a printer or print server.");
+  puts("  -u URL	           Specify the product family web page.");
+  puts("  -y		           Answer yes to the checklist questions.");
 }
 
 

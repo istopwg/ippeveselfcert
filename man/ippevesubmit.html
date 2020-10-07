@@ -26,6 +26,9 @@ ippevesubmit - prepare a submission for self-certification results.
 <b>-p</b>
 <i>"product family"</i>
 ] [
+<b>-r</b>
+<i>{dnssd|document|ipp}</i>
+] [
 <b>-s</b>
 ] [
 <b>-t</b>
@@ -55,6 +58,8 @@ If not specified, the JSON file is sent to a file named 'printer name.json'.
 If not specified,
 <b>ippevesubmit</b>
 will ask for the family name.
+<dt><b>-r </b><i>{dnssd|document|ipp}</i>
+<dd style="margin-left: 5.0em">Replays the specified tests from the corresponding plist file.
 <dt><b>-t</b><b>printer</b>
 <dd style="margin-left: 5.0em">Specifies that the submission is for a standalone printer.
 <dt><b>-t</b><b>server</b>
