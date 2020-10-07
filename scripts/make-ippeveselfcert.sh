@@ -76,8 +76,9 @@ done
 if test x$platform = xmacos; then
 	# Sign executables...
 	if test "x$CODESIGN_IDENTITY" = x; then
-#		CODESIGN_IDENTITY="IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION"
-		CODESIGN_IDENTITY="Developer ID Application"
+		echo "Set the CODESIGN_IDENTITY environment variable to your Apple Developer ID"
+		echo "Application certificate."
+		exit 1
 	fi
 
 	for tool in $TOOLS; do
@@ -95,8 +96,8 @@ if test x$platform = xmacos; then
 
 	# Notarize package...
 	if test "x$TEAMID" = x; then
-		echo "Set the TEAMID environment variable to your Apple Developer Team ID (from your"
-		echo "Developer ID Application certificate)"
+		echo "Set the TEAMID environment variable to your Apple Developer Team ID, from your"
+		echo "Developer ID Application certificate."
 		exit 1
 	fi
 
