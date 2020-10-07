@@ -1,6 +1,6 @@
 # Changes
 
-## v1.1 Update 2 (???, 2020)
+## v1.1 Update 2 (October 7, 2020)
 
 - Documentation updates (Issue #55)
 - The "printer-alert" test did not allow an index value of -1 (Issue #58)
