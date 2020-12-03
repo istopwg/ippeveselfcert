@@ -4,4 +4,5 @@ queries:
   - exclude: cpp/short-global-name
   - exclude: cpp/uncontrolled-allocation-size
   - exclude: cpp/tainted-format-string
+  - exclude: cpp/tainted-format-string-through-global
 
