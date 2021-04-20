@@ -1640,6 +1640,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "document-format-default",
     "document-format-details-default",
     "document-format-details-supported",
+    "document-format-preferred",	/* AirPrint extension */
     "document-format-supported",
     "document-format-varying-attributes",
     "document-format-version-default",
@@ -1692,6 +1693,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "marker-types",			/* CUPS extension */
     "member-names",			/* CUPS extension */
     "member-uris",			/* CUPS extension */
+    "mopria-certified",			/* Mopria extension */
     "multiple-destination-uris-supported",/* IPP FaxOut */
     "multiple-document-jobs-supported",
     "multiple-operation-time-out",
@@ -1769,6 +1771,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-up-time",
     "printer-uri-supported",
     "printer-uuid",
+    "printer-wifi-ssid",		/* AirPrint extension */
+    "printer-wifi-state",		/* AirPrint extension */
     "printer-xri-supported",
     "pwg-raster-document-resolution-supported",
     "pwg-raster-document-sheet-back",
@@ -2262,7 +2266,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * No, build an "0xxxxx" error string...
   */
 
-  sprintf(cg->ipp_unknown, "0x%04x", error);
+  snprintf(cg->ipp_unknown, sizeof(cg->ipp_unknown), "0x%04x", error);
 
   return (cg->ipp_unknown);
 }
@@ -2339,7 +2343,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * No, build an "0xxxxx" operation string...
   */
 
-  sprintf(cg->ipp_unknown, "0x%04x", op);
+  snprintf(cg->ipp_unknown, sizeof(cg->ipp_unknown), "0x%04x", op);
 
   return (cg->ipp_unknown);
 }
