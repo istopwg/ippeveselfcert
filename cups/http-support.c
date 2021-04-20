@@ -1,8 +1,9 @@
 /*
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2019 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2020-2021 by OpenPrinting
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -14,7 +15,7 @@
 
 #include "cups-private.h"
 #include "debug-internal.h"
-#ifdef HAVE_DNSSD
+#ifdef HAVE_MDNSRESPONDER
 #  include <dns_sd.h>
 #  ifdef _WIN32
 #    include <io.h>
@@ -26,8 +27,9 @@
 #elif defined(HAVE_AVAHI)
 #  include <avahi-client/client.h>
 #  include <avahi-client/lookup.h>
+#  include <avahi-common/malloc.h>
 #  include <avahi-common/simple-watch.h>
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_MDNSRESPONDER */
 
 
 /*
@@ -108,7 +110,7 @@ static const char	*http_copy_decode(char *dst, const char *src,
 static char		*http_copy_encode(char *dst, const char *src,
 			                  char *dstend, const char *reserved,
 					  const char *term, int encode);
-#ifdef HAVE_DNSSD
+#ifdef HAVE_MDNSRESPONDER
 static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
 					DNSServiceFlags flags,
 					uint32_t interfaceIndex,
@@ -118,7 +120,7 @@ static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
 					uint16_t port, uint16_t txtLen,
 					const unsigned char *txtRecord,
 					void *context);
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_MDNSRESPONDER */
 
 #ifdef HAVE_AVAHI
 static void	http_client_cb(AvahiClient *client,
@@ -839,6 +841,13 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
 
   DEBUG_printf(("4httpGetDateTime: day=%d, mon=\"%s\", year=%d, hour=%d, "
                 "min=%d, sec=%d", day, mon, year, hour, min, sec));
+
+ /*
+  * Check for invalid year (RFC 7231 says it's 4DIGIT)
+  */
+
+  if (year > 9999)
+    return (0);
 
  /*
   * Convert the month name to a number from 0 to 11.
@@ -1761,14 +1770,14 @@ _httpResolveURI(
 
   if (strstr(hostname, "._tcp"))
   {
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+#ifdef HAVE_DNSSD
     char		*regtype,	/* Pointer to type in hostname */
 			*domain,	/* Pointer to domain in hostname */
 			*uuid,		/* Pointer to UUID in URI */
 			*uuidend;	/* Pointer to end of UUID in URI */
     _http_uribuf_t	uribuf;		/* URI buffer */
     int			offline = 0;	/* offline-report state set? */
-#  ifdef HAVE_DNSSD
+#  ifdef HAVE_MDNSRESPONDER
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref = NULL,/* DNS-SD service reference for domain */
 			ippref = NULL,	/* DNS-SD service reference for network IPP */
@@ -1784,7 +1793,7 @@ _httpResolveURI(
 #  elif defined(HAVE_AVAHI)
     AvahiClient		*client;	/* Client information */
     int			error;		/* Status */
-#  endif /* HAVE_DNSSD */
+#  endif /* HAVE_MDNSRESPONDER */
 
     if (options & _HTTP_RESOLVE_STDERR)
       fprintf(stderr, "DEBUG: Resolving \"%s\"...\n", hostname);
@@ -1848,7 +1857,7 @@ _httpResolveURI(
 
     uri = NULL;
 
-#  ifdef HAVE_DNSSD
+#  ifdef HAVE_MDNSRESPONDER
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
       uint32_t myinterface = kDNSServiceInterfaceIndexAny;
@@ -2071,7 +2080,7 @@ _httpResolveURI(
 
       avahi_simple_poll_free(uribuf.poll);
     }
-#  endif /* HAVE_DNSSD */
+#  endif /* HAVE_MDNSRESPONDER */
 
     if (options & _HTTP_RESOLVE_STDERR)
     {
@@ -2087,13 +2096,13 @@ _httpResolveURI(
       }
     }
 
-#else /* HAVE_DNSSD || HAVE_AVAHI */
+#else /* !HAVE_DNSSD */
    /*
     * No DNS-SD support...
     */
 
     uri = NULL;
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
+#endif /* HAVE_DNSSD */
 
     if ((options & _HTTP_RESOLVE_STDERR) && !uri)
       _cupsLangPrintFilter(stderr, "INFO", _("Unable to find printer."));
@@ -2265,7 +2274,7 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 }
 
 
-#ifdef HAVE_DNSSD
+#ifdef HAVE_MDNSRESPONDER
 /*
  * 'http_resolve_cb()' - Build a device URI for the given service name.
  */
@@ -2483,7 +2492,7 @@ http_poll_cb(
 static void
 http_resolve_cb(
     AvahiServiceResolver   *resolver,	/* I - Resolver (unused) */
-    AvahiIfIndex           interface,	/* I - Interface index (unused) */
+    AvahiIfIndex           interface,	/* I - Interface index */
     AvahiProtocol          protocol,	/* I - Network protocol (unused) */
     AvahiResolverEvent     event,	/* I - Event (found, etc.) */
     const char             *name,	/* I - Service name */
@@ -2504,6 +2513,8 @@ http_resolve_cb(
 			*resdefault;	/* Default path */
   char			resource[257],	/* Remote path */
 			fqdn[256];	/* FQDN of the .local name */
+  char			ifname[IF_NAMESIZE];
+					/* Interface name */
   AvahiStringList	*pair;		/* Current TXT record key/value pair */
   char			*value;		/* Value for "rp" key */
   size_t		valueLen = 0;	/* Length of "rp" key */
@@ -2535,6 +2546,8 @@ http_resolve_cb(
 
     memcpy(uuid, value, valueLen);
     uuid[valueLen] = '\0';
+
+    avahi_free(value);
 
     if (_cups_strcasecmp(uuid, uribuf->uuid))
     {
@@ -2620,6 +2633,8 @@ http_resolve_cb(
       memcpy(resource + 1, value, valueLen);
       resource[valueLen + 1] = '\0';
     }
+
+    avahi_free(value);
   }
   else
   {
@@ -2631,12 +2646,32 @@ http_resolve_cb(
   }
 
  /*
-  * Lookup the FQDN if needed...
+  * Get the name of the interface this is coming from...
   */
 
-  if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
-      (hostptr = hostTarget + strlen(hostTarget) - 6) > hostTarget &&
-      !_cups_strcasecmp(hostptr, ".local"))
+  if (!if_indextoname((unsigned int)interface, ifname))
+  {
+    if (uribuf->options & _HTTP_RESOLVE_STDERR)
+      fprintf(stderr, "DEBUG: Unable to find interface name for interface %d: %s\n", interface, strerror(errno));
+    DEBUG_printf(("Unable to find interface name for interface %d: %s\n", interface, strerror(errno)));
+    ifname[0] = '\0';
+  }
+
+  if (!strcmp(ifname, "lo"))
+  {
+   /*
+    * If this service is registered on loopback interface ("lo"), force the host
+    * name to "localhost"...
+    */
+
+    if (uribuf->options & _HTTP_RESOLVE_STDERR)
+      fputs("DEBUG: Service comes from loopback interface \"lo\", setting \"localhost\" as host name.\n", stderr);
+    DEBUG_puts("Service comes from loopback interface \"lo\", setting \"localhost\" as host name.");
+    hostTarget = "localhost";
+  }
+  else if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
+	   (hostptr = hostTarget + strlen(hostTarget) - 6) > hostTarget &&
+	   !_cups_strcasecmp(hostptr, ".local"))
   {
    /*
     * OK, we got a .local name but the caller needs a real domain.  Start by
@@ -2682,10 +2717,9 @@ http_resolve_cb(
   * Assemble the final device URI using the resolved hostname...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme,
-                  NULL, hostTarget, port, resource);
+  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, port, resource);
   DEBUG_printf(("5http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
 }
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_MDNSRESPONDER */
