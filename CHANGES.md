@@ -1,6 +1,16 @@
-# Changes
+Changes
+=======
 
-## v1.1 Update 2 (October 7, 2020)
+v1.1 Update 3 (PENDING)
+-----------------------
+
+- Finishing options were not reported correctly by `ippevesubmit` in the JSON
+  file (Issue #67)
+- The `media-needed` test did not work on streaming printers (Issue #68)
+
+
+v1.1 Update 2 (October 7, 2020)
+-------------------------------
 
 - Documentation updates (Issue #55)
 - The "printer-alert" test did not allow an index value of -1 (Issue #58)
@@ -16,7 +26,8 @@
   printers.
 
 
-## v1.1 Update 1 (June 17, 2020)
+v1.1 Update 1 (June 17, 2020)
+-----------------------------
 
 - Fixed support for the `-m` option of the `ippevesubmit` command.
 - Made output JSON from the `ippevesubmit` command pass as standalone JSON.
@@ -24,6 +35,7 @@
 - Increased the timeout for the browse tests to 5 seconds.
 
 
-## v1.1 (May 21, 2020)
+v1.1 (May 21, 2020)
+-------------------
 
 Initial release.
