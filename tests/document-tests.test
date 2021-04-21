@@ -1,7 +1,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.1: Section 7: Document Data Tests.
 #
-# Copyright 2014-2020 by the IEEE-ISTO Printer Working Group.
+# Copyright 2014-2021 by the IEEE-ISTO Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -65,6 +65,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8"
 	OPERATION Print-Job
@@ -78,6 +91,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
@@ -95,6 +121,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	NAME "D-1.1 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8"
 	OPERATION Print-Job
@@ -108,6 +147,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### 1.2 DEFLATE COMPRESSION ####
@@ -130,6 +182,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
 	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, deflate"
@@ -146,6 +212,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
@@ -166,6 +246,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
 	NAME "D-1.2 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, deflate"
@@ -182,6 +276,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### 1.3 GZIP COMPRESSION ####
@@ -204,6 +312,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
 	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, sgray_8, gzip"
@@ -220,6 +342,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/color-4x6-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
@@ -240,6 +376,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
 	NAME "D-1.3 Print color-4x6.pwg @ $RASTER_RESOLUTION, cmyk_8, gzip"
@@ -256,6 +406,20 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/color-4x6-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### 1.4 A4 TESTS ####
@@ -275,6 +439,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, sgray_8"
 	OPERATION Print-Job
@@ -288,6 +465,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/document-a4-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
@@ -305,6 +495,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, cmyk_8"
 	OPERATION Print-Job
@@ -318,6 +521,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/document-a4-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### 1.5 US Letter TESTS ####
@@ -337,6 +553,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, sgray_8"
 	OPERATION Print-Job
@@ -350,6 +579,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/sgray-8/document-letter-sgray-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
@@ -367,6 +609,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, cmyk_8"
 	OPERATION Print-Job
@@ -380,6 +635,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 	FILE "pwg-raster-samples-${RASTER_RESOLUTION}/cmyk-8/document-letter-cmyk-8-${RASTER_RESOLUTION}.pwg"
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### JPEG Tests
@@ -416,6 +684,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_COLOR
+	NAME "D-2.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.2 Print color.jpg with copies=2"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -434,6 +715,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_COLOR
+	NAME "D-2.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.3 Print color.jpg with print-color-mode=monochrome"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -449,6 +743,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
+	NAME "D-2.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_COLOR
@@ -471,6 +778,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_COLOR
+	NAME "D-2.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
 	NAME "D-2.5 Print color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -487,6 +807,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_COLOR
+	NAME "D-2.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 
 #### PDF Tests
@@ -522,6 +855,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.1 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
 	NAME "D-3.2 Print document-letter.pdf with copies=2"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -537,6 +883,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.2 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
@@ -559,6 +918,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.3 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
 	SKIP-IF-NOT-DEFINED HAVE_DUPLEX
 	NAME "D-3.4 Print document-letter.pdf with sides=two-sided-long-edge"
 	OPERATION Print-Job
@@ -575,6 +947,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.4 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
@@ -597,6 +982,19 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.5 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
 	NAME "D-3.6 Print document-a4.pdf with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
@@ -613,4 +1011,17 @@ FILE-ID "org.pwg.ippeveselfcert11.document"
 
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.6 Wait for job to complete..."
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	STATUS successful-ok
+	EXPECT job-state WITH-VALUE >6 REPEAT-NO-MATCH
 }
