@@ -1,7 +1,7 @@
 /*
  * IPP Everywhere Printer Self-Certification submission tool
  *
- * Copyright © 2019-2020 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2019-2021 by the IEEE-ISTO Printer Working Group.
  * Copyright © 2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.	See the file "LICENSE" for more
@@ -432,7 +432,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Supported values from the IPP results...
   */
 
-  supported	       = plist_find(ipp_results, "Tests/8/ResponseAttributes/1");
+  supported	       = plist_find(ipp_results, "Tests/9/ResponseAttributes/1");
   color_supported      = plist_find(supported, "color-supported");
   finishings_supported = plist_find(supported, "finishings-supported");
   media_supported      = plist_find(supported, "media-supported");
