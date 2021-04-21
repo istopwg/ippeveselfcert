@@ -1,7 +1,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.1: Section 6: IPP Tests.
 #
-# Copyright 2014-2020 by the IEEE-ISTO Printer Working Group.
+# Copyright 2014-2021 by the IEEE-ISTO Printer Working Group.
 # Copyright 2007-2019 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -2339,6 +2339,10 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
 
+        MONITOR-PRINTER-STATE $uri {
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+        }
+
 	STATUS successful-ok
 	STATUS server-error-job-canceled
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
@@ -2384,6 +2388,10 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
 
+        MONITOR-PRINTER-STATE $uri {
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+        }
+
 	STATUS successful-ok
 	STATUS server-error-job-canceled
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
@@ -2428,6 +2436,10 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
+        MONITOR-PRINTER-STATE $uri {
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+        }
+
 	STATUS successful-ok
 	STATUS server-error-job-canceled
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
@@ -2448,6 +2460,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 # Test 'media-needed' reason
 {
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
+        PASS-IF-DEFINED HAVE_MEDIA_NEEDED
 
 	DELAY 5
 
