@@ -4,6 +4,8 @@ Changes
 v1.1 Update 3 (PENDING)
 -----------------------
 
+- The DNS-SD tests now look for a TLS key whose value contains a TLS version
+  number (Issue #64)
 - The document tests now wait for each job to complete before proceeding to the
   next job (Issue #66)
 - Finishing options were not reported correctly by `ippevesubmit` in the JSON
