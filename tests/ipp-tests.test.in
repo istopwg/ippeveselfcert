@@ -2345,7 +2345,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	SKIP-IF-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	PAUSE "Remove media from printer until this test run is complete."
+	PAUSE "======== Remove media from printer until instructed. ========"
 
 	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
@@ -2370,7 +2370,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/black-1/onepage-letter-black-1-$RASTER_RESOLUTION.pwg"
 
         MONITOR-PRINTER-STATE $uri {
-            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED DISPLAY-MATCH "======== Insert paper. ========"
         }
 
 	STATUS successful-ok
@@ -2394,7 +2394,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
 
-	PAUSE "Remove media from printer until this test run is complete."
+	PAUSE "======== Remove media from printer until instructed. ========"
 
 	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
@@ -2419,7 +2419,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/sgray-8/onepage-letter-sgray-8-$RASTER_RESOLUTION.pwg"
 
         MONITOR-PRINTER-STATE $uri {
-            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED DISPLAY-MATCH "======== Insert paper. ========"
         }
 
 	STATUS successful-ok
@@ -2442,7 +2442,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
-	PAUSE "Remove media from printer until this test run is complete."
+	PAUSE "======== Remove media from printer until instructed. ========"
 
 	NAME "I-20. media-needed (Print-Job onepage-letter.pwg)"
 	OPERATION Print-Job
@@ -2467,7 +2467,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	FILE "pwg-raster-samples-$RASTER_RESOLUTION/srgb-8/onepage-letter-srgb-8-$RASTER_RESOLUTION.pwg"
 
         MONITOR-PRINTER-STATE $uri {
-            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED DISPLAY-MATCH "======== Insert paper. ========"
         }
 
 	STATUS successful-ok
@@ -2505,7 +2505,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	STATUS successful-ok
 
-	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24 DISPLAY-MATCH "======== Insert paper. ========"
 
 	## Issue #50: Relax Get-Printer-Attributes tests
 	EXPECT !printer-state IF-DEFINED STRICT
