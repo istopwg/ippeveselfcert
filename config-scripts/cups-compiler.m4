@@ -1,6 +1,7 @@
 dnl
 dnl Compiler tests for CUPS.
 dnl
+dnl Copyright © 2021 by the ISTO Printer Working Group.
 dnl Copyright © 2021 by OpenPrinting.
 dnl Copyright © 2007-2018 by Apple Inc.
 dnl Copyright © 1997-2007 by Easy Software Products, all rights reserved.
@@ -23,7 +24,7 @@ AC_SUBST([OPTIM])
 
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [build with debugging symbols]))
 AC_ARG_ENABLE([debug_guards], AS_HELP_STRING([--enable-debug-guards], [build with memory allocation guards]))
-AC_ARG_ENABLE([debug_printfs], AS_HELP_STRING([--enable-debug-printfs], [build with CUPS_DEBUG_LOG support]))
+AC_ARG_ENABLE([debug_printfs], AS_HELP_STRING([--disable-debug-printfs], [build without CUPS_DEBUG_LOG support]))
 AC_ARG_ENABLE([maintainer], AS_HELP_STRING([--enable-maintainer], [turn on maintainer mode (warnings as errors)]))
 AC_ARG_ENABLE([unit_tests], AS_HELP_STRING([--enable-unit-tests], [build and run unit tests]))
 
@@ -34,8 +35,8 @@ AS_IF([test x$enable_debug = xyes -a "x$OPTIM" = x], [
     INSTALL_STRIP="-s"
 ])
 
-dnl Debug printfs can slow things down, so provide a separate option for that
-AS_IF([test x$enable_debug_printfs = xyes], [
+dnl Debug printfs are enabled by default for ippeveselfcert
+AS_IF([test x$enable_debug_printfs != xno], [
     CFLAGS="$CFLAGS -DDEBUG"
     CXXFLAGS="$CXXFLAGS -DDEBUG"
 ])
