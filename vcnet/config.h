@@ -2,7 +2,7 @@
  * Configuration file for the IPP Everywhere Printer Self-Certification tools
  * on Windows.
  *
- * Copyright © 2014-2020 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2014-2021 by the IEEE-ISTO Printer Working Group.
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
@@ -99,8 +99,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "IPPEVESELFCERT11 v20201007"
-#define CUPS_MINIMAL "IPPEVESELFCERT11/20201007"
+#define CUPS_SVERSION "IPPEVESELFCERT11 v20210517"
+#define CUPS_MINIMAL "IPPEVESELFCERT11/20210517"
 
 
 /*
@@ -155,15 +155,6 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Use <string.h>, <strings.h>, and/or <bstring.h>?
- */
-
-#define HAVE_STRING_H 1
-/* #undef HAVE_STRINGS_H */
-/* #undef HAVE_BSTRING_H */
-
-
-/*
  * Do we have the long long type?
  */
 
@@ -202,9 +193,8 @@ typedef unsigned long useconds_t;
  * Do we have the (v)snprintf() functions?
  */
 
-/* Windows snprintf/vsnprintf are non-conforming */
-/* #def HAVE_SNPRINTF */
-/* #undef HAVE_VSNPRINTF */
+#define HAVE_SNPRINTF 1
+#define HAVE_VSNPRINTF 1
 
 
 /*
@@ -234,10 +224,10 @@ typedef unsigned long useconds_t;
  * Which encryption libraries do we have?
  */
 
+#define HAVE_TLS 1
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
 #define HAVE_SSPISSL 1
-#define HAVE_SSL 1
 
 
 /*
@@ -258,7 +248,6 @@ typedef unsigned long useconds_t;
  * What Security framework headers do we have?
  */
 
-/* #undef HAVE_AUTHORIZATION_H */
 /* #undef HAVE_SECCERTIFICATE_H */
 /* #undef HAVE_SECITEM_H */
 /* #undef HAVE_SECPOLICY_H */
@@ -272,28 +261,21 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have the SecKeychainOpen function?
- */
-
-/* #undef HAVE_SECKEYCHAINOPEN */
-
-
-/*
- * Do we have (a working) SSLSetEnabledCiphers function?
- */
-
-/* #undef HAVE_SSLSETENABLEDCIPHERS */
-
-
-/*
- * Do we have mDNSResponder for DNS Service Discovery (aka Bonjour)?
+ * Do we have DNS Service Discovery (aka Bonjour) support?
  */
 
 #define HAVE_DNSSD 1
 
 
 /*
- * Do we have Avahi for DNS Service Discovery (aka Bonjour)?
+ * Do we have mDNSResponder for DNS-SD?
+ */
+
+#define HAVE_MDNSRESPONDER 1
+
+
+/*
+ * Do we have Avahi for DNS-SD?
  */
 
 /* #undef HAVE_AVAHI */
@@ -374,13 +356,6 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_COREFOUNDATION_H */
-
-
-/*
- * Do we have ApplicationServices public headers?
- */
-
-/* #undef HAVE_APPLICATIONSERVICES_H */
 
 
 /*
