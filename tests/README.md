@@ -68,7 +68,7 @@ or the Github issue tracker at:
 <https://github.com/istopwg/ippeveselfcert/issues/new>
 
 
-Running the Self-Certification Tools on macOS® 10.10 and Higher
+Running the Self-Certification Tools on macOS® 10.13 and Higher
 ---------------------------------------------------------------
 
 Extract the PWG Raster files to the tools directory, then open a Terminal
@@ -151,7 +151,7 @@ Issues found in the tools should be reported using the Github issues page:
 Legal Stuff
 -----------
 
-Copyright © 2014-2020 by the IEEE-ISTO Printer Working Group.
+Copyright © 2014-2021 by the IEEE-ISTO Printer Working Group.
 Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 

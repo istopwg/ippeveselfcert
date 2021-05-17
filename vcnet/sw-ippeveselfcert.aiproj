@@ -5,7 +5,7 @@
     <ProjectGuid>51c47d39-f1fe-4f8e-98bc-0a7461c2a175</ProjectGuid>
     <OutputType>msi</OutputType>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>sw-ippeveselfcert10.aip</StartupFile>
+    <StartupFile>sw-ippeveselfcert11.aip</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
