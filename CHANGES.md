@@ -1,8 +1,8 @@
 Changes
 =======
 
-v1.1 Update 3 (PENDING)
------------------------
+v1.1 Update 3 (May 17, 2021)
+----------------------------
 
 - The DNS-SD tests now look for a TLS key whose value contains a TLS version
   number (Issue #64)
