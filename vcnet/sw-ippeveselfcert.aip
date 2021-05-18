@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<<<<<<< HEAD
 <DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="17.1.1" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
-=======
-<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="18.2" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
->>>>>>> upstream/master
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="MigrationUninstallCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-<<<<<<< HEAD
-=======
-    <ROW Property="AI_CURRENT_YEAR" Value="2021" ValueLocId="-"/>
->>>>>>> upstream/master
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Release"/>
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippevesubmit.exe" Value="x64\Release"/>
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Release"/>
@@ -127,11 +119,7 @@
     <ROW Name="AI_APPPATH_PERBUILD_regex.dll" Path="[|AI_PROPPATH_DIR_PERBUILD_regex.dll]\[|AI_PROPPATH_FILENAME_PERBUILD_regex.dll]" Type="2" Content="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AppXCfgComponent">
-<<<<<<< HEAD
     <ROW ID="Configuration" Order="1" ManifestFile="AppxManifest.xml" TargetOs="4"/>
-=======
-    <ROW ID="Configuration" Order="1" ManifestFile="AppxManifest.xml" TargetOs="4" AutoUpdatesFrequency="0" AutoUpdatesOptions="0" ManifestBundleFile="AppxBundleManifest.xml"/>
->>>>>>> upstream/master
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -139,11 +127,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="Build_MSIX_APPX" BuildName="Build_MSIX_APPX" BuildOrder="2" BuildType="7" PackageFolder="Build_MSIX_APPXSetupFiles" Languages="en" UwpTargetDesktop="TargetDeviceFamily"/>
     <ROW BuildKey="Build_MSIX_APPXSubBuild" BuildName="x64" BuildOrder="3" BuildType="8" ParentBuild="Build_MSIX_APPX"/>
-<<<<<<< HEAD
     <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder=".." PackageFileName="sw-ippeveselfcert11-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
-=======
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="sw-ippeveselfcert11-YYYYMMDD-windows" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
->>>>>>> upstream/master
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.CacheComponent">
     <ATTRIBUTE name="Enable" value="false"/>
@@ -247,10 +231,6 @@
     <ROW XmlElement="Application_2" ParentElement="Applications" Name="Application" Order="3" Flags="0" Type="4"/>
     <ROW XmlElement="Application_3" ParentElement="Applications" Name="Application" Order="0" Flags="0" Type="4"/>
     <ROW XmlElement="Applications" ParentElement="Package" Name="Applications" Order="4" Flags="0" Type="3"/>
-<<<<<<< HEAD
-=======
-    <ROW XmlElement="Bundle" Name="Bundle" Order="0" Flags="0" Type="0"/>
->>>>>>> upstream/master
     <ROW XmlElement="Capabilities" ParentElement="Package" Name="Capabilities" Order="5" Flags="0" Type="0"/>
     <ROW XmlElement="Capability" ParentElement="Capabilities" Name="Capability" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="Dependencies" ParentElement="Package" Name="Dependencies" Order="1" Flags="0" Type="0"/>
@@ -302,10 +282,6 @@
     <ROW XmlElement="VisualElements_3" ParentElement="Application_3" Name="VisualElements" Order="0" Flags="0" Type="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlFileComponent">
-<<<<<<< HEAD
-=======
-    <ROW XmlFile="AppxBundleManifest.xml" FileName="AppxBundleManifest.xml" RootElement="Bundle" Flags="89" Version="1.0" Encoding="UTF-8" IndentUnits="2"/>
->>>>>>> upstream/master
     <ROW XmlFile="AppxManifest.xml" FileName="AppxManifest.xml" RootElement="Package" Flags="89" Version="1.0" Encoding="UTF-8" IndentUnits="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
