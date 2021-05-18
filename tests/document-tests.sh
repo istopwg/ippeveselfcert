@@ -12,8 +12,17 @@
 #   ./document-tests.sh "Printer NamePrinter DNS-SD Service Instance Name"
 #
 
+NON_INTERACTIVE=0
+
+if test $# -eq 2; then
+    if test $1 = "--non-interactive"; then
+        NON_INTERACTIVE=1
+        shift
+    fi
+fi
+
 if test $# -ne 1; then
-    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo "Usage: ${0} [--non-interactive] \"Printer DNS-SD Service Instance Name\""
     echo ""
     exit 1
 else
@@ -45,7 +54,7 @@ done
 if test "`ls -d pwg-raster-samples-*dpi 2>/dev/null`" = ""; then
 	echo "You must first download and extract the PWG Raster Format sample files from:"
 	echo ""
-	echo "    http://ftp.pwg.org/pub/pwg/ipp/examples/"
+	echo "    https://ftp.pwg.org/pub/pwg/ipp/examples/"
 	echo ""
 	echo "Before you can run this script."
 	exit 1
@@ -54,7 +63,18 @@ fi
 
 PLIST="${TARGET} Document Results.plist"
 
-$IPPFIND --literal-name "${TARGET}" -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
+echo "TARGET=${TARGET}"
+echo "IPPFIND=${IPPFIND}"
+echo "IPPTOOL=${IPPTOOL}"
+echo "PLIST=${PLIST}"
+echo "TARGET=${TARGET}"
+
+if test $NON_INTERACTIVE -eq 1; then
+    echo "Non-interactive mode"
+    "${IPPFIND}" --literal-name "${TARGET}" -x "${IPPTOOL}" -P "${PLIST}" -d NON_INTERACTIVE=1 -I '{}' document-tests.test \;
+else
+    "${IPPFIND}" --literal-name "${TARGET}" -x "${IPPTOOL}" -P "$PLIST"                        -I '{}' document-tests.test \;
+fi
 
 # confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
 test `which plutil` && plutil -lint -s "${PLIST}"

@@ -12,8 +12,18 @@
 #   ./dnssd-tests.sh "Printer DNS-SD Service Instance Name"
 #
 
+# Currently unused
+NON_INTERACTIVE=0
+
+if test $# -eq 2; then
+    if test $1 = "--non-interactive"; then
+        NON_INTERACTIVE=1 # Currently unused
+        shift
+    fi
+fi
+
 if test $# -lt 1; then
-    echo "Usage: ${0} \"Printer DNS-SD Service Instance Name\""
+    echo "Usage: ${0} [--non-interactive] \"Printer DNS-SD Service Instance Name\""
     echo ""
     exit 1
 else

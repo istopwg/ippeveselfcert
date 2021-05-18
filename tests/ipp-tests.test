@@ -166,6 +166,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 #
 # Check for Identify-Printer support
 #
+# Required by: PWG 5100.14 Section 5.x
 {
 	NAME "I-9.1 Get-Printer-Attributes (check for Identify-Printer support)"
 
@@ -175,21 +176,16 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR keyword requested-attributes "operations-supported","identify-actions-supported","identify-actions-default"
+	ATTR keyword requested-attributes 'operations-supported','identify-actions-supported','identify-actions-default'
 
 	STATUS successful-ok
 
-	# 'media-col-database' attribute should never be returned unless
-	# explicitly requested...
-	EXPECT !media-col-database
 	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
 		IF-NOT-DEFINED IPP_EVERYWHERE_SERVER DEFINE-MATCH HAVE_IDENTIFY_PRINTER
         
 	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/" IF-DEFINED HAVE_IDENTIFY_PRINTER
 	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE-FROM identify-actions-supported IF-DEFINED HAVE_IDENTIFY_PRINTER
 	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag DEFINE-VALUE IDENTIFY_ACTION_DEFAULT IF-DEFINED HAVE_IDENTIFY_PRINTER
-
-
 }
 
 
@@ -2344,6 +2340,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 #
 # Required by: RFC 8011 section 4.2.1
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-DEFINED HAVE_SGRAY
@@ -2394,6 +2391,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
@@ -2443,6 +2441,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
@@ -2493,6 +2492,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 # Test 'media-needed' reason
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
         PASS-IF-DEFINED HAVE_MEDIA_NEEDED
 

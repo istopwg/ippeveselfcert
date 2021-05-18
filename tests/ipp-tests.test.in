@@ -2340,6 +2340,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 #
 # Required by: RFC 8011 section 4.2.1
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-DEFINED HAVE_SGRAY
@@ -2390,6 +2391,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-DEFINED HAVE_SRGB
@@ -2439,6 +2441,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 }
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 
@@ -2489,6 +2492,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 # Test 'media-needed' reason
 {
+	SKIP-IF-DEFINED NON_INTERACTIVE
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
         PASS-IF-DEFINED HAVE_MEDIA_NEEDED
 

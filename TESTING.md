@@ -18,7 +18,7 @@ software on your system.
 Getting PWG Raster Sample Files
 -------------------------------
 
-The [IPP Everywhere™ home page](http://www.pwg.org/ipp/everywhere.html) provides
+The [IPP Everywhere™ home page](https://www.pwg.org/ipp/everywhere.html) provides
 access to all information relevant to IPP Everywhere™. Sample PWG Raster files
 (needed for the document tests) can be downloaded from the PWG FTP server at
 <https://ftp.pwg.org/pub/pwg/ipp/examples> - only the files dated on or after
@@ -31,7 +31,8 @@ PWG Raster files.
 Testing on Linux and macOS
 --------------------------
 
-The "runtests.sh" script can be used to run any of the test scripts using the locally-built tools. For example:
+The "runtests.sh" script can be used to run any of the test scripts using the 
+locally-built tools. For example:
 
     ./runtests.sh bonjour-tests.sh "Example Test Printer"
     ./runtests.sh ipp-tests.sh "Example Test Printer"
@@ -41,7 +42,9 @@ The "runtests.sh" script can be used to run any of the test scripts using the lo
 Testing on Windows
 ------------------
 
-You'll need to manually copy the DLL and EXE files from the "vcnet" directory to the "tests" directory. Then run the corresponding test from that directory, for example:
+You'll need to manually copy the DLL and EXE files from the "vcnet" directory to
+the "tests" directory. Then run the corresponding test from that directory, for 
+example:
 
     cd tests
     bonjour-tests.bat "Example Test Printer"
@@ -63,3 +66,14 @@ logging:
   the messages to stderr.  Prefix a filename with "+" to append to an existing
   file.  You can include a single "%d" in the filename to embed the current
   process ID.
+
+
+Non-Interactive Testing
+-----------------------
+
+Running a subset of the tests that don't require a human interactive monitor can
+be useful in cases such as incorporating the tests into a continuous integration
+automated build system. The scripts can be run in non-interactive mode by 
+supplying the "--non-interactive" argument to any of the "dnssd-tests.sh", 
+"ipp-tests.sh" and/or "document-tests.sh" scripts.
+

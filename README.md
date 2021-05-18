@@ -33,6 +33,11 @@ Please see the file "BUILD.md" for instructions on compiling the software.
 > MUST be generated using the tools provides on the PWG web site.
 
 
+Testing
+-----------
+Please see the file "TESTING.md" for instructions on running the tests.
+
+
 Legal Stuff
 -----------
 
