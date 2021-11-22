@@ -379,8 +379,9 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT finishings-col-database OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
 	EXPECT finishings-col-database/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
 
-	EXPECT finishings-col-default OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
-	EXPECT finishings-col-default/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-col-default OF-TYPE collection|no-value IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+	EXPECT finishings-col-default OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_COL_IN_FINISHINGS_COL_DEFAULT
+	EXPECT finishings-col-default/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_COL_IN_FINISHINGS_COL_DEFAULT
 
 	EXPECT finishings-col-ready OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
 	EXPECT finishings-col-ready/finishing-template OF-TYPE keyword|name IF-DEFINED HAVE_FINISHINGS
