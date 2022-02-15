@@ -1,7 +1,7 @@
 /*
  * IPP Everywhere Printer Self-Certification submission tool
  *
- * Copyright © 2019-2021 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2019-2022 by the IEEE-ISTO Printer Working Group.
  * Copyright © 2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.	See the file "LICENSE" for more
@@ -42,6 +42,7 @@
 #ifndef _WIN32
 #  include <unistd.h>
 #endif /* !_WIN32 */
+#include <sys/stat.h>
 #include <cups/cups.h>
 
 
@@ -148,6 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		finishings_punch = 0,	/* Punching? */
 		finishings_staple = 0,	/* Stapling? */
 		finishings_trim = 0;	/* Trimming/cutting? */
+  struct stat	fileinfo;		/* PLIST file information */
   time_t	submission_time;	/* Date/time of submission (seconds) */
   struct tm	submission_tm;		/* Date/time of submission (tm data) */
   char		submission_date[32],	/* Date/time of submission (string) */
@@ -324,7 +326,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
 
- /* 
+ /*
   * Replay results if requested...
   */
 
@@ -348,17 +350,25 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Load test results and validate...
   */
 
+  submission_time = 0;
+
   snprintf(filename, sizeof(filename), "%s DNS-SD Results.plist", printer);
+  if (!stat(filename, &fileinfo) && fileinfo.st_mtime > submission_time)
+    submission_time = fileinfo.st_mtime;
   dnssd_results = plist_read(filename);
   if (!validate_dnssd_results(filename, dnssd_results, print_server, dnssd_errors, sizeof(dnssd_errors)))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s IPP Results.plist", printer);
+  if (!stat(filename, &fileinfo) && fileinfo.st_mtime > submission_time)
+    submission_time = fileinfo.st_mtime;
   ipp_results = plist_read(filename);
   if (!validate_ipp_results(filename, ipp_results, print_server, ipp_errors, sizeof(ipp_errors)))
     ok = 0;
 
   snprintf(filename, sizeof(filename), "%s Document Results.plist", printer);
+  if (!stat(filename, &fileinfo) && fileinfo.st_mtime > submission_time)
+    submission_time = fileinfo.st_mtime;
   document_results = plist_read(filename);
   if (!validate_document_results(filename, document_results, print_server, document_errors, sizeof(document_errors)))
     ok = 0;
@@ -485,7 +495,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   submission = plist_add(NULL, PLIST_TYPE_ARRAY, NULL);
 
-  time(&submission_time);
+  if (!submission_time)
+    time(&submission_time);
   gmtime_r(&submission_time, &submission_tm);
 
   snprintf(submission_date, sizeof(submission_date), "%04d-%02d-%02dT%02d:%02d:%02dZ", submission_tm.tm_year + 1900, submission_tm.tm_mon + 1, submission_tm.tm_mday, submission_tm.tm_hour, submission_tm.tm_min, submission_tm.tm_sec);

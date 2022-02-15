@@ -151,7 +151,7 @@ Issues found in the tools should be reported using the Github issues page:
 Legal Stuff
 -----------
 
-Copyright © 2014-2021 by the IEEE-ISTO Printer Working Group.
+Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
 Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 

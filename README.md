@@ -36,7 +36,7 @@ Please see the file "BUILD.md" for instructions on compiling the software.
 Legal Stuff
 -----------
 
-Copyright © 2014-2020 by the IEEE-ISTO Printer Working Group.
+Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
 Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
