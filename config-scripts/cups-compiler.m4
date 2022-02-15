@@ -1,7 +1,7 @@
 dnl
 dnl Compiler tests for CUPS.
 dnl
-dnl Copyright © 2021 by the ISTO Printer Working Group.
+dnl Copyright © 2021-2022 by the ISTO Printer Working Group.
 dnl Copyright © 2021 by OpenPrinting.
 dnl Copyright © 2007-2018 by Apple Inc.
 dnl Copyright © 1997-2007 by Easy Software Products, all rights reserved.
@@ -196,7 +196,7 @@ AS_IF([test -n "$GCC"], [
 	# "-mmacosx-version-min=10.13" tells the compiler to build for macOS
 	# 10.13 or later.  The "-arch" options build a "universal" application
 	# for Intel and ARM-based Macs.
-	OPTIM="$OPTIM -mmacosx-version-min=10.13 -arch x86_64 -arch arm64e"
+	OPTIM="$OPTIM -mmacosx-version-min=10.14 -arch x86_64 -arch arm64"
     ])
 ], [
     # Add vendor-specific compiler options...

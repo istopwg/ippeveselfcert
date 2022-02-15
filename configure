@@ -6405,7 +6405,7 @@ then :
 	# "-mmacosx-version-min=10.13" tells the compiler to build for macOS
 	# 10.13 or later.  The "-arch" options build a "universal" application
 	# for Intel and ARM-based Macs.
-	OPTIM="$OPTIM -mmacosx-version-min=10.13 -arch x86_64 -arch arm64e"
+	OPTIM="$OPTIM -mmacosx-version-min=10.14 -arch x86_64 -arch arm64"
 
 fi
 
