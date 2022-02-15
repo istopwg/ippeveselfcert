@@ -3,7 +3,7 @@
  * commands such as IPP and Bonjour conformance tests.  This tool is
  * inspired by the UNIX "find" command, thus its name.
  *
- * Copyright © 2021 by OpenPrinting.
+ * Copyright © 2021-2022 by OpenPrinting.
  * Copyright © 2020 by the IEEE-ISTO Printer Working Group
  * Copyright © 2008-2018 by Apple Inc.
  *
@@ -2167,7 +2167,9 @@ get_service(cups_array_t *services,	/* I - Service array */
   * Yes, add the service...
   */
 
-  service           = calloc(sizeof(ippfind_srv_t), 1);
+  if ((service = calloc(sizeof(ippfind_srv_t), 1)) == NULL)
+    return (NULL);
+
   service->name     = strdup(serviceName);
   service->domain   = strdup(replyDomain);
   service->regtype  = strdup(regtype);
@@ -2786,6 +2788,7 @@ show_usage(void)
   _cupsLangPuts(stderr, _("-h regex                Match hostname to regular expression"));
   _cupsLangPuts(stderr, _("-l                      List attributes"));
   _cupsLangPuts(stderr, _("-n regex                Match service name to regular expression"));
+  _cupsLangPuts(stderr, _("-N name                 Match service name to literal name value"));
   _cupsLangPuts(stderr, _("-p                      Print URI if true"));
   _cupsLangPuts(stderr, _("-q                      Quietly report match via exit code"));
   _cupsLangPuts(stderr, _("-r                      True if service is remote"));
@@ -2798,8 +2801,9 @@ show_usage(void)
   _cupsLangPuts(stderr, _("--exec utility [argument ...] ;\n"
                           "                        Execute program if true"));
   _cupsLangPuts(stderr, _("--host regex            Match hostname to regular expression"));
-  _cupsLangPuts(stderr, _("--ls                    List attributes"));
+  _cupsLangPuts(stderr, _("--literal-name name     Match service name to literal name value"));
   _cupsLangPuts(stderr, _("--local                 True if service is local"));
+  _cupsLangPuts(stderr, _("--ls                    List attributes"));
   _cupsLangPuts(stderr, _("--name regex            Match service name to regular expression"));
   _cupsLangPuts(stderr, _("--path regex            Match resource path to regular expression"));
   _cupsLangPuts(stderr, _("--port number[-number]  Match port to number or range"));

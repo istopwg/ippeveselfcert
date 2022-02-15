@@ -20,8 +20,8 @@
 #  if defined(_WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
 #    define __CUPS_SSIZE_T_DEFINED
 #    include <stddef.h>
-/* Windows does not support the ssize_t type, so map it to long... */
-typedef long ssize_t;			/* @private@ */
+/* Windows does not support the ssize_t type, so map it to __int64... */
+typedef __int64 ssize_t;			/* @private@ */
 #  endif /* _WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 #  include "file.h"
@@ -43,10 +43,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			2.0400
+#  define CUPS_VERSION			2.0401
 #  define CUPS_VERSION_MAJOR		2
 #  define CUPS_VERSION_MINOR		4
-#  define CUPS_VERSION_PATCH		0
+#  define CUPS_VERSION_PATCH		1
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
