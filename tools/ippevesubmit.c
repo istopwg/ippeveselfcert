@@ -421,6 +421,23 @@ main(int  argc,				/* I - Number of command-line arguments */
     webpage = strdup(response);
   }
 
+  if (strncmp(webpage, "http://", 7) && strncmp(webpage, "https://", 8))
+  {
+    if (strchr(webpage, '.'))
+    {
+      char	temp[1024];		/* Temporary URL string */
+
+      snprintf(temp, sizeof(temp), "https://%s/", webpage);
+      free((char *)webpage);
+      webpage = strdup(temp);
+    }
+    else
+    {
+      printf("ippevesubmit: Bad product URL '%s'.\n", webpage);
+      return (1);
+    }
+  }
+
  /*
   * Look for the cert version in the IPP results...
   */
