@@ -15,6 +15,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/raster-testpage.h>
 #include <regex.h>
 #include <sys/stat.h>
 #ifdef _WIN32
@@ -92,10 +93,24 @@ typedef struct ipptool_expect_s		/**** Expected attribute info ****/
 		repeat_match,		/* Repeat test on match */
 		repeat_no_match,	/* Repeat test on no match */
 		with_distinct,		/* WITH-DISTINCT-VALUES? */
-		with_flags,		/* WITH flags */
-		count;			/* Expected count if > 0 */
+		with_flags;		/* WITH flags */
+  size_t	count;			/* Expected count if > 0 */
   ipp_tag_t	in_group;		/* IN-GROUP value */
 } ipptool_expect_t;
+
+typedef struct ipptool_generate_s	//// GENERATE-FILE parameters
+{
+  char		media[128],		// Media size name
+		type[128];		// Raster type/color mode
+  int		xdpi,			// Horizontal resolution
+		ydpi;			// Vertical resolution
+  ipp_orient_t	orientation;		// Orientation
+  char		sides[128];		// Duplex mode
+  int		num_copies,		// Number of copies
+		num_pages;		// Number of pages
+  char		format[128];		// Document format
+  char		sheet_back[128];	// "pwg-raster-document-sheet-back" value
+} ipptool_generate_t;
 
 typedef struct ipptool_status_s		/**** Status info ****/
 {
@@ -134,21 +149,21 @@ typedef struct ipptool_test_s		/**** Test Data ****/
   cups_file_t	*outfile;		/* Output file */
   int		show_header,		/* Show the test header? */
 		xml_header;		/* 1 if XML plist header was written */
-  int		pass,			/* Have we passed all tests? */
-		test_count,		/* Number of tests (total) */
+  bool		pass;			/* Have we passed all tests? */
+  int		test_count,		/* Number of tests (total) */
 		pass_count,		/* Number of tests that passed */
 		fail_count,		/* Number of tests that failed */
 		skip_count;		/* Number of tests that were skipped */
 
   /* Per-Test State */
   cups_array_t	*errors;		/* Errors array */
-  int		prev_pass,		/* Result of previous test */
+  bool		prev_pass,		/* Result of previous test */
 		skip_previous;		/* Skip on previous test failure? */
   char		compression[16];	/* COMPRESSION value */
   useconds_t	delay;                  /* Initial delay */
-  int		num_displayed;		/* Number of displayed attributes */
+  size_t	num_displayed;		/* Number of displayed attributes */
   char		*displayed[MAX_DISPLAY];/* Displayed attributes */
-  int		num_expects;		/* Number of expected attributes */
+  size_t	num_expects;		/* Number of expected attributes */
   ipptool_expect_t expects[MAX_EXPECT],	/* Expected attributes */
 		*expect,		/* Current expected attribute */
 		*last_expect;		/* Last EXPECT (for predicates) */
@@ -161,8 +176,8 @@ typedef struct ipptool_test_s		/**** Test Data ****/
   int		request_id;		/* Current request ID */
   char		resource[512];		/* Resource for request */
   int		pass_test,		/* Pass this test? */
-		skip_test,		/* Skip this test? */
-		num_statuses;		/* Number of valid status codes */
+		skip_test;		/* Skip this test? */
+  size_t	num_statuses;		/* Number of valid status codes */
   ipptool_status_t statuses[100],	/* Valid status codes */
 		*last_status;		/* Last STATUS (for predicates) */
   char		test_id[1024];		/* Test identifier */
@@ -173,9 +188,10 @@ typedef struct ipptool_test_s		/**** Test Data ****/
   char		*monitor_uri;		/* MONITOR-PRINTER-STATE URI */
   useconds_t	monitor_delay,		/* MONITOR-PRINTER-STATE DELAY value, if any */
 		monitor_interval;	/* MONITOR-PRINTER-STATE DELAY interval */
-  int		num_monitor_expects;	/* Number MONITOR-PRINTER-STATE EXPECTs */
+  size_t	num_monitor_expects;	/* Number MONITOR-PRINTER-STATE EXPECTs */
   ipptool_expect_t monitor_expects[MAX_MONITOR];
 					/* MONITOR-PRINTER-STATE EXPECTs */
+  ipptool_generate_t *generate_params;	/* GENERATE-FILE parameters */
 } ipptool_test_t;
 
 
@@ -198,10 +214,12 @@ static int	do_test(_ipp_file_t *f, ipptool_test_t *data);
 static int	do_tests(const char *testfile, ipptool_test_t *data);
 static int	error_cb(_ipp_file_t *f, ipptool_test_t *data, const char *error);
 static int      expect_matches(ipptool_expect_t *expect, ipp_attribute_t *attr);
+static http_status_t generate_file(http_t *http, ipptool_generate_t *params);
 static char	*get_filename(const char *testfile, char *dst, const char *src, size_t dstsize);
-static const char *get_string(ipp_attribute_t *attr, int element, int flags, char *buffer, size_t bufsize);
+static const char *get_string(ipp_attribute_t *attr, size_t element, int flags, char *buffer, size_t bufsize);
 static void	init_data(ipptool_test_t *data);
 static char	*iso_date(const ipp_uchar_t *date);
+static int	parse_generate_file(_ipp_file_t *f, ipptool_test_t *data);
 static int	parse_monitor_printer_state(_ipp_file_t *f, ipptool_test_t *data);
 static void	pause_message(const char *message);
 static void	print_attr(cups_file_t *outfile, ipptool_output_t output, ipp_attribute_t *attr, ipp_tag_t *group);
@@ -343,7 +361,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'E' : /* Encrypt with TLS */
 #ifdef HAVE_TLS
-	      data.encryption = HTTP_ENCRYPT_REQUIRED;
+	      data.encryption = HTTP_ENCRYPTION_REQUIRED;
 #else
 	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 			      argv[0]);
@@ -391,7 +409,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'S' : /* Encrypt with SSL */
 #ifdef HAVE_TLS
-	      data.encryption = HTTP_ENCRYPT_ALWAYS;
+	      data.encryption = HTTP_ENCRYPTION_ALWAYS;
 #else
 	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), "ipptool");
 #endif /* HAVE_TLS */
@@ -659,7 +677,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_TLS
       if (!strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8))
-        data.encryption = HTTP_ENCRYPT_ALWAYS;
+        data.encryption = HTTP_ENCRYPTION_ALWAYS;
 #endif /* HAVE_TLS */
 
       if (!_ippVarsSet(data.vars, "uri", argv[i]))
@@ -927,7 +945,7 @@ static void *				// O - Thread exit status
 do_monitor_printer_state(
     ipptool_test_t *data)		// I - Test data
 {
-  int		i, j;			// Looping vars
+  size_t	i, j;			// Looping vars
   char		scheme[32],		// URI scheme
 		userpass[32],		// URI username:password
 		host[256],		// URI hostname/IP address
@@ -941,7 +959,7 @@ do_monitor_printer_state(
   ipp_attribute_t *found;		// Found attribute
   ipptool_expect_t *expect;		// Current EXPECT test
   char		buffer[131072];		// Copy buffer
-  int		num_pattrs;		// Number of printer attributes
+  size_t	num_pattrs;		// Number of printer attributes
   const char	*pattrs[100];		// Printer attributes we care about
 
 
@@ -963,11 +981,7 @@ do_monitor_printer_state(
     return (0);
   }
 
-#ifdef HAVE_LIBZ
   httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING, "deflate, gzip, identity");
-#else
-  httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING, "identity");
-#endif /* HAVE_LIBZ */
 
   if (data->timeout > 0.0)
     httpSetTimeout(http, data->timeout, timeout_cb, NULL);
@@ -1095,7 +1109,7 @@ do_monitor_printer_state(
       {
 	if (!expect->with_value)
 	{
-	  int last = ippGetCount(found) - 1;
+	  size_t last = ippGetCount(found) - 1;
 					// Last element in attribute
 
 	  switch (ippGetValueTag(found))
@@ -1167,10 +1181,10 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
         ipptool_test_t *data)		/* I - Test data */
 
 {
-  int	        i,			/* Looping var */
-		status_ok,		/* Did we get a matching status? */
-		repeat_count = 0,	/* Repeat count */
-		repeat_test;		/* Repeat the test? */
+  size_t        i;			/* Looping var */
+  bool		status_ok;		/* Did we get a matching status? */
+  int		repeat_count = 0;	/* Repeat count */
+  bool		repeat_test;		/* Repeat the test? */
   ipptool_expect_t *expect;		/* Current expected attribute */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
@@ -1325,7 +1339,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
     status = HTTP_STATUS_OK;
 
-    if (data->transfer == IPPTOOL_TRANSFER_CHUNKED || (data->transfer == IPPTOOL_TRANSFER_AUTO && data->file[0]))
+    if (data->transfer == IPPTOOL_TRANSFER_CHUNKED || (data->transfer == IPPTOOL_TRANSFER_AUTO && (data->file[0] || data->generate_params)))
     {
      /*
       * Send request using chunking - a 0 length means "chunk".
@@ -1370,13 +1384,12 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
 	status = cupsSendRequest(data->http, request, data->resource, length);
 
-#ifdef HAVE_LIBZ
 	if (data->compression[0])
 	  httpSetField(data->http, HTTP_FIELD_CONTENT_ENCODING, data->compression);
-#endif /* HAVE_LIBZ */
 
-	if (!Cancel && status == HTTP_STATUS_CONTINUE && ippGetState(request) == IPP_DATA && data->file[0])
+	if (!Cancel && status == HTTP_STATUS_CONTINUE && ippGetState(request) == IPP_STATE_DATA && data->file[0])
 	{
+	  // Send attached file...
 	  if ((reqfile = cupsFileOpen(data->file, "r")) != NULL)
 	  {
 	    while (!Cancel && (bytes = cupsFileRead(reqfile, buffer, sizeof(buffer))) > 0)
@@ -1390,10 +1403,15 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	  else
 	  {
 	    snprintf(buffer, sizeof(buffer), "%s: %s", data->file, strerror(errno));
-	    _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
+	    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, buffer, 0);
 
 	    status = HTTP_STATUS_ERROR;
 	  }
+	}
+	else if (!Cancel && status == HTTP_STATUS_CONTINUE && ippGetState(request) == IPP_STATE_DATA && data->generate_params)
+	{
+	  // Generate attached file...
+	  status = generate_file(data->http, data->generate_params);
 	}
 
        /*
@@ -1462,7 +1480,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
     cupsArrayClear(data->errors);
 
-    if (httpGetVersion(data->http) != HTTP_1_1)
+    if (httpGetVersion(data->http) != HTTP_VERSION_1_1)
     {
       int version = (int)httpGetVersion(data->http);
 
@@ -1514,7 +1532,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
       * as needed...
       */
 
-      if (ippGetState(response) != IPP_DATA)
+      if (ippGetState(response) != IPP_STATE_DATA)
 	add_stringf(data->errors, "Missing end-of-attributes-tag in response (RFC 2910 section 3.5.1)");
 
       if (data->version)
@@ -1557,9 +1575,9 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	if (ippGetGroupTag(attrptr) != IPP_TAG_OPERATION)
 	  add_stringf(data->errors, "status-message (text(255)) has wrong group tag %s (RFC 8011 section 4.1.6.2).", ippTagString(ippGetGroupTag(attrptr)));
 	if (ippGetCount(attrptr) != 1)
-	  add_stringf(data->errors, "status-message (text(255)) has %d values (RFC 8011 section 4.1.6.2).", ippGetCount(attrptr));
+	  add_stringf(data->errors, "status-message (text(255)) has %u values (RFC 8011 section 4.1.6.2).", (unsigned)ippGetCount(attrptr));
 	if (status_message && strlen(status_message) > 255)
-	  add_stringf(data->errors, "status-message (text(255)) has bad length %d (RFC 8011 section 4.1.6.2).", (int)strlen(status_message));
+	  add_stringf(data->errors, "status-message (text(255)) has bad length %u (RFC 8011 section 4.1.6.2).", (unsigned)strlen(status_message));
       }
 
       if ((attrptr = ippFindAttribute(response, "detailed-status-message",
@@ -1573,12 +1591,12 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	if (ippGetGroupTag(attrptr) != IPP_TAG_OPERATION)
 	  add_stringf(data->errors, "detailed-status-message (text(MAX)) has wrong group tag %s (RFC 8011 section 4.1.6.3).", ippTagString(ippGetGroupTag(attrptr)));
 	if (ippGetCount(attrptr) != 1)
-	  add_stringf(data->errors, "detailed-status-message (text(MAX)) has %d values (RFC 8011 section 4.1.6.3).", ippGetCount(attrptr));
+	  add_stringf(data->errors, "detailed-status-message (text(MAX)) has %u values (RFC 8011 section 4.1.6.3).", (unsigned)ippGetCount(attrptr));
 	if (detailed_status_message && strlen(detailed_status_message) > 1023)
-	  add_stringf(data->errors, "detailed-status-message (text(MAX)) has bad length %d (RFC 8011 section 4.1.6.3).", (int)strlen(detailed_status_message));
+	  add_stringf(data->errors, "detailed-status-message (text(MAX)) has bad length %u (RFC 8011 section 4.1.6.3).", (unsigned)strlen(detailed_status_message));
       }
 
-      a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+      a = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, NULL, NULL);
 
       for (attrptr = ippFirstAttribute(response), group = ippGetGroupTag(attrptr);
 	   attrptr;
@@ -1586,7 +1604,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
       {
 	if (ippGetGroupTag(attrptr) != group)
 	{
-	  int out_of_order = 0;	/* Are attribute groups out-of-order? */
+	  bool out_of_order = false;	/* Are attribute groups out-of-order? */
 	  cupsArrayClear(a);
 
 	  switch (ippGetGroupTag(attrptr))
@@ -1595,28 +1613,28 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 		break;
 
 	    case IPP_TAG_OPERATION :
-		out_of_order = 1;
+		out_of_order = true;
 		break;
 
 	    case IPP_TAG_UNSUPPORTED_GROUP :
 		if (group != IPP_TAG_OPERATION)
-		  out_of_order = 1;
+		  out_of_order = true;
 		break;
 
 	    case IPP_TAG_JOB :
 	    case IPP_TAG_PRINTER :
 		if (group != IPP_TAG_OPERATION && group != IPP_TAG_UNSUPPORTED_GROUP)
-		  out_of_order = 1;
+		  out_of_order = true;
 		break;
 
 	    case IPP_TAG_SUBSCRIPTION :
 		if (group > ippGetGroupTag(attrptr) && group != IPP_TAG_DOCUMENT)
-		  out_of_order = 1;
+		  out_of_order = true;
 		break;
 
 	    default :
 		if (group > ippGetGroupTag(attrptr))
-		  out_of_order = 1;
+		  out_of_order = true;
 		break;
 	  }
 
@@ -1649,27 +1667,25 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
       if (ippGetStatusCode(response) == IPP_STATUS_ERROR_BUSY && data->repeat_on_busy)
       {
         // Repeat on a server-error-busy status code...
-        status_ok   = 1;
-        repeat_test = 1;
+        status_ok   = true;
+        repeat_test = true;
       }
       else
       {
-	for (i = 0, status_ok = 0; i < data->num_statuses; i ++)
+	for (i = 0, status_ok = false; i < data->num_statuses; i ++)
 	{
-	  if (data->statuses[i].if_defined &&
-	      !_ippVarsGet(data->vars, data->statuses[i].if_defined))
+	  if (data->statuses[i].if_defined && !_ippVarsGet(data->vars, data->statuses[i].if_defined))
 	    continue;
 
-	  if (data->statuses[i].if_not_defined &&
-	      _ippVarsGet(data->vars, data->statuses[i].if_not_defined))
+	  if (data->statuses[i].if_not_defined && _ippVarsGet(data->vars, data->statuses[i].if_not_defined))
 	    continue;
 
 	  if (ippGetStatusCode(response) == data->statuses[i].status)
 	  {
-	    status_ok = 1;
+	    status_ok = true;
 
 	    if (data->statuses[i].repeat_match && repeat_count < data->statuses[i].repeat_limit)
-	      repeat_test = 1;
+	      repeat_test = true;
 
 	    if (data->statuses[i].define_match)
 	      _ippVarsSet(data->vars, data->statuses[i].define_match, "1");
@@ -1677,12 +1693,12 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	  else
 	  {
 	    if (data->statuses[i].repeat_no_match && repeat_count < data->statuses[i].repeat_limit)
-	      repeat_test = 1;
+	      repeat_test = true;
 
 	    if (data->statuses[i].define_no_match)
 	    {
 	      _ippVarsSet(data->vars, data->statuses[i].define_no_match, "1");
-	      status_ok = 1;
+	      status_ok = true;
 	    }
 	  }
 	}
@@ -1692,12 +1708,10 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
       {
 	for (i = 0; i < data->num_statuses; i ++)
 	{
-	  if (data->statuses[i].if_defined &&
-	      !_ippVarsGet(data->vars, data->statuses[i].if_defined))
+	  if (data->statuses[i].if_defined && !_ippVarsGet(data->vars, data->statuses[i].if_defined))
 	    continue;
 
-	  if (data->statuses[i].if_not_defined &&
-	      _ippVarsGet(data->vars, data->statuses[i].if_not_defined))
+	  if (data->statuses[i].if_not_defined && _ippVarsGet(data->vars, data->statuses[i].if_not_defined))
 	    continue;
 
 	  if (!data->statuses[i].repeat_match || repeat_count >= data->statuses[i].repeat_limit)
@@ -1774,7 +1788,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	    }
 
 	    if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
+	      repeat_test = true;
 	    break;
 	  }
 
@@ -1793,7 +1807,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	    }
 
 	    if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
+	      repeat_test = true;
 
 	    break;
 	  }
@@ -1812,9 +1826,8 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	      with_value(data, data->errors, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer));
 	    }
 
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
+	    if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
+	      repeat_test = true;
 
 	    break;
 	  }
@@ -1825,12 +1838,11 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	      _ippVarsSet(data->vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
 	    {
-	      add_stringf(data->errors, "EXPECTED: %s COUNT %d (got %d)", expect->name, expect->count, ippGetCount(found));
+	      add_stringf(data->errors, "EXPECTED: %s COUNT %u (got %u)", expect->name, (unsigned)expect->count, (unsigned)ippGetCount(found));
 	    }
 
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
+	    if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
+	      repeat_test = true;
 
 	    break;
 	  }
@@ -1847,14 +1859,13 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	      else if (!expect->define_match && !expect->define_value)
 	      {
 		if (!attrptr)
-		  add_stringf(data->errors, "EXPECTED: %s (%d values) SAME-COUNT-AS %s (not returned)", expect->name, ippGetCount(found), expect->same_count_as);
+		  add_stringf(data->errors, "EXPECTED: %s (%u values) SAME-COUNT-AS %s (not returned)", expect->name, (unsigned)ippGetCount(found), expect->same_count_as);
 		else if (ippGetCount(attrptr) != ippGetCount(found))
-		  add_stringf(data->errors, "EXPECTED: %s (%d values) SAME-COUNT-AS %s (%d values)", expect->name, ippGetCount(found), expect->same_count_as, ippGetCount(attrptr));
+		  add_stringf(data->errors, "EXPECTED: %s (%u values) SAME-COUNT-AS %s (%u values)", expect->name, (unsigned)ippGetCount(found), expect->same_count_as, (unsigned)ippGetCount(attrptr));
 	      }
 
-	      if (expect->repeat_no_match &&
-		  repeat_count < expect->repeat_limit)
-		repeat_test = 1;
+	      if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
+		repeat_test = true;
 
 	      break;
 	    }
@@ -1870,7 +1881,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	  {
 	    if (!expect->with_value)
 	    {
-	      int last = ippGetCount(found) - 1;
+	      size_t last = ippGetCount(found) - 1;
 					/* Last element in attribute */
 
 	      switch (ippGetValueTag(found))
@@ -1978,7 +1989,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   request = NULL;
 
   if (cupsArrayCount(data->errors) > 0)
-    data->prev_pass = data->pass = 0;
+    data->prev_pass = data->pass = false;
 
   if (data->prev_pass)
     data->pass_count ++;
@@ -2211,6 +2222,9 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   }
   data->num_monitor_expects = 0;
 
+  free(data->generate_params);
+  data->generate_params = NULL;
+
   return (data->ignore_errors || data->prev_pass);
 }
 
@@ -2241,11 +2255,7 @@ do_tests(const char     *testfile,	/* I - Test file to use */
     return (0);
   }
 
-#ifdef HAVE_LIBZ
   httpSetDefaultField(data->http, HTTP_FIELD_ACCEPT_ENCODING, "deflate, gzip, identity");
-#else
-  httpSetDefaultField(data->http, HTTP_FIELD_ACCEPT_ENCODING, "identity");
-#endif /* HAVE_LIBZ */
 
   if (data->timeout > 0.0)
     httpSetTimeout(data->http, data->timeout, timeout_cb, NULL);
@@ -2293,9 +2303,9 @@ expect_matches(
     ipptool_expect_t *expect,		/* I - Expected attribute */
     ipp_attribute_t  *attr)		/* I - Attribute */
 {
-  int		i,			/* Looping var */
-		count,			/* Number of values */
-		match;			/* Match? */
+  size_t	i,			/* Looping var */
+		count;			/* Number of values */
+  bool		match;			/* Match? */
   char		*of_type,		/* Type name to match */
 		*paren,			/* Pointer to opening parenthesis */
 		*next,			/* Next name to match */
@@ -2319,7 +2329,7 @@ expect_matches(
   value_tag = ippGetValueTag(attr);
   count     = ippGetCount(attr);
 
-  for (of_type = expect->of_type, match = 0; !match && *of_type; of_type = next)
+  for (of_type = expect->of_type, match = false; !match && *of_type; of_type = next)
   {
    /*
     * Find the next separator, and set it (temporarily) to nul if present.
@@ -2431,11 +2441,11 @@ expect_matches(
 
 	    for (i = 0; i < count; i ++)
 	    {
-	      int	datalen;	// Length of octetString value
+	      int datalen;		// Length of octetString value
 
 	      ippGetOctetString(attr, i, &datalen);
 
-	      if (datalen > upper)
+	      if (datalen > (size_t)upper)
 		break;
 	    }
 
@@ -2470,7 +2480,7 @@ expect_matches(
 
 	default :
 	    // No other constraints, so this is a match
-	    match = 1;
+	    match = true;
 	    break;
       }
     }
@@ -2487,6 +2497,64 @@ expect_matches(
   }
 
   return (match);
+}
+
+
+//
+// 'generate_file()' - Generate a print file.
+//
+
+static http_status_t
+generate_file(
+    http_t             *http,		// I - HTTP connection
+    ipptool_generate_t *params)		// I - GENERATE-FILE parameters
+{
+  cups_mode_t		mode;		// Raster output mode
+  cups_raster_t		*ras;		// Raster stream
+  cups_page_header2_t	header;		// Raster page header
+  pwg_media_t		*media;		// Media information
+
+
+  // Set the output mode...
+  if (!strcmp(params->format, "image/pwg-raster"))
+    mode = CUPS_RASTER_WRITE_PWG;
+  else if (!strcmp(params->format, "image/urf"))
+    mode = CUPS_RASTER_WRITE_APPLE;
+  else
+    mode = CUPS_RASTER_WRITE_COMPRESSED;
+
+  // Create the raster header...
+  if ((media = pwgMediaForPWG(params->media)) == NULL)
+  {
+    fprintf(stderr, "ipptool: Unable to parse media size '%s'.\n", params->media);
+    return (HTTP_STATUS_SERVER_ERROR);
+  }
+
+  cupsRasterInitPWGHeader(&header, media, params->type, params->xdpi, params->ydpi, params->sides, params->sheet_back);
+
+#if 0
+  fprintf(stderr, "ipptool: media='%s'\n", params->media);
+  fprintf(stderr, "ipptool: type='%s'\n", params->type);
+  fprintf(stderr, "ipptool: resolution=%dx%d\n", params->xdpi, params->ydpi);
+  fprintf(stderr, "ipptool: orientation=%d\n", params->orientation);
+  fprintf(stderr, "ipptool: sides='%s'\n", params->sides);
+  fprintf(stderr, "ipptool: num_copies=%d\n", params->num_copies);
+  fprintf(stderr, "ipptool: num_pages=%d\n", params->num_pages);
+  fprintf(stderr, "ipptool: format='%s'\n", params->format);
+  fprintf(stderr, "ipptool: sheet_back='%s'\n", params->sheet_back);
+#endif // 0
+
+  // Create the raster stream...
+  if ((ras = cupsRasterOpenIO((cups_raster_iocb_t)httpWrite, http, mode)) == NULL)
+    return (HTTP_STATUS_SERVER_ERROR);
+
+  // Write it...
+  if (!cupsRasterWriteTest(ras, &header, params->sheet_back, params->orientation, params->num_copies, params->num_pages))
+    return (HTTP_STATUS_SERVER_ERROR);
+
+  cupsRasterClose(ras);
+
+  return (HTTP_STATUS_CONTINUE);
 }
 
 
@@ -2568,7 +2636,7 @@ get_filename(const char *testfile,	/* I - Current test file */
 
 static const char *			/* O - Pointer to string */
 get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
-           int             element,	/* I - Element to fetch */
+           size_t          element,	/* I - Element to fetch */
            int             flags,	/* I - Value ("with") flags */
            char            *buffer,	/* I - Temporary buffer */
 	   size_t          bufsize)	/* I - Size of temporary buffer */
@@ -2655,8 +2723,8 @@ init_data(ipptool_test_t *data)	/* I - Data */
   data->def_transfer = IPPTOOL_TRANSFER_AUTO;
   data->def_version  = 11;
   data->errors       = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
-  data->pass         = 1;
-  data->prev_pass    = 1;
+  data->pass         = true;
+  data->prev_pass    = true;
   data->request_id   = (CUPS_RAND() % 1000) * 137;
   data->show_header  = 1;
 }
@@ -2683,6 +2751,678 @@ iso_date(const ipp_uchar_t *date)	/* I - IPP (RFC 1903) date/time value */
 	   utcdate.tm_hour, utcdate.tm_min, utcdate.tm_sec);
 
   return (buffer);
+}
+
+
+/*
+ * 'parse_generate_file()' - Parse the GENERATE-FILE directive.
+ *
+ * GENERATE-FILE {
+ *     MEDIA "media size name, default, ready"
+ *     COLORSPACE "colorspace_bits, auto, color, monochrome, bi-level"
+ *     RESOLUTION "resolution, min, max, default"
+ *     ORIENTATION "portrait, landscape, reverse-landscape, reverse-portrait"
+ *     SIDES "one-sided, two-sided-long-edge, two-sided-short-edge"
+ *     NUM-COPIES "copies"
+ *     NUM-PAGES "pages, min"
+ *     FORMAT "image/pwg-raster, image/urf"
+ * }
+ */
+
+static int				// O - 1 to continue, 0 to stop
+parse_generate_file(
+    _ipp_file_t    *f,			// I - IPP file data
+    ipptool_test_t *data)		// I - Test data
+{
+  size_t		i;		// Looping var
+  ipptool_generate_t	*params = NULL;	// Generation parameters
+  http_t		*http;		// Connection to printer
+  ipp_t			*request,	// Get-Printer-Attributes request
+			*response = NULL;// Get-Printer-Attributes response
+  ipp_attribute_t	*attr;		// Current attribute
+  const char		*keyword;	// Keyword value
+  char			token[256],	// Token string
+			temp[1024],	// Temporary string
+			value[1024],	// Value string
+			*ptr;		// Pointer into value
+  static const char *autos[][2] =	// Automatic color/monochrome keywords
+  {
+    { "SRGB24",     "srgb_8" },
+    { "ADOBERGB24", "adobe-rgb_8" },
+    { "DEVRGB24",   "rgb_8" },
+    { "DEVCMYK32",  "cmyk_8" },
+    { "ADOBERGB48", "adobe-rgb_16" },
+    { "DEVRGB48",   "rgb_16" },
+    { "DEVCMYK64",  "cmyk_16" },
+    { "W8",         "sgray_8" },
+    { NULL,         "black_8" },
+    { "W16",        "sgray_16" },
+    { NULL,         "black_16" },
+    { NULL,         "sgray_1" },
+    { NULL,         "black_1" }
+  };
+  static const char *bi_levels[][2] =	// Bi-level keywords
+  {
+    { NULL,         "sgray_1" },
+    { NULL,         "black_1" }
+  };
+  static const char *colors[][2] =	// Color keywords
+  {
+    { "SRGB24",     "srgb_8" },
+    { "ADOBERGB24", "adobe-rgb_8" },
+    { "DEVRGB24",   "rgb_8" },
+    { "DEVCMYK32",  "cmyk_8" },
+    { "ADOBERGB48", "adobe-rgb_16" },
+    { "DEVRGB48",   "rgb_16" },
+    { "DEVCMYK64",  "cmyk_16" }
+  };
+  static const char *monochromes[][2] =	// Monochrome keywords
+  {
+    { "W8",         "sgray_8" },
+    { NULL,         "black_8" },
+    { "W16",        "sgray_16" },
+    { NULL,         "black_16" },
+    { NULL,         "sgray_1" },
+    { NULL,         "black_1" }
+  };
+
+
+  // Make sure we have an open brace after the GENERATE-FILE...
+  if (!_ippFileReadToken(f, token, sizeof(token)) || strcmp(token, "{"))
+  {
+    print_fatal_error(data, "Missing open brace on line %d of \"%s\".", f->linenum, f->filename);
+    return (0);
+  }
+
+  // Get printer attributes...
+  if ((http = httpConnect2(data->vars->host, data->vars->port, NULL, data->family, data->encryption, 1, 30000, NULL)) == NULL)
+  {
+    print_fatal_error(data, "Unable to connect to printer for GENERATE-FILE on line %d of \"%s\".", f->linenum, f->filename);
+    print_fatal_error(data, "Error: %s", cupsLastErrorString());
+    return (0);
+  }
+
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, data->vars->uri);
+
+  response = cupsDoRequest(http, request, data->vars->resource);
+
+  httpClose(http);
+
+  if (cupsLastError() >= IPP_STATUS_ERROR_BAD_REQUEST)
+  {
+    print_fatal_error(data, "Unable to get printer attributes for GENERATE-FILE on line %d of \"%s\".", f->linenum, f->filename);
+    print_fatal_error(data, "Error: %s", cupsLastErrorString());
+    ippDelete(response);
+    return (0);
+  }
+
+  // Allocate parameters...
+  if ((params = calloc(1, sizeof(ipptool_generate_t))) == NULL)
+  {
+    print_fatal_error(data, "Unable to allocate memory for GENERATE-FILE on line %d of \"%s\".", f->linenum, f->filename);
+    return (0);
+  }
+
+  // Loop until we get a closing brace...
+  while (_ippFileReadToken(f, token, sizeof(token)))
+  {
+    if (!strcmp(token, "}"))
+    {
+      // Update the raster type as needed...
+      if (!params->type[0])
+      {
+        // Get request/printer default value for print-color-mode, default to "auto"...
+        if ((attr = ippFindAttribute(f->attrs, "print-color-mode", IPP_TAG_KEYWORD)) == NULL)
+	  attr = ippFindAttribute(response, "print-color-mode-default", IPP_TAG_KEYWORD);
+
+        if (attr)
+          strlcpy(params->type, ippGetString(attr, 0, NULL), sizeof(params->type));
+	else
+          strlcpy(params->type, "auto", sizeof(params->type));
+      }
+
+      if (!strcmp(params->type, "auto"))
+      {
+        // Find auto keyword...
+        params->type[0] = '\0';
+
+        if ((attr = ippFindAttribute(response, "pwg-raster-types-supported", IPP_TAG_KEYWORD)) == NULL)
+          attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD);
+
+	for (i = 0; i < (sizeof(autos) / sizeof(autos[0])); i ++)
+	{
+	  if (ippContainsString(attr, autos[i][0]) || ippContainsString(attr, autos[i][1]))
+	  {
+	    strlcpy(params->type, autos[i][1], sizeof(params->type));
+	    break;
+	  }
+	}
+
+        if (!params->type[0])
+        {
+	  print_fatal_error(data, "Printer does not support COLORSPACE \"auto\" on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+      else if (!strcmp(params->type, "bi-level"))
+      {
+        // Find bi-level keyword...
+        params->type[0] = '\0';
+
+        attr = ippFindAttribute(response, "pwg-raster-types-supported", IPP_TAG_KEYWORD);
+
+	for (i = 0; i < (sizeof(bi_levels) / sizeof(bi_levels[0])); i ++)
+	{
+	  if (ippContainsString(attr, bi_levels[i][1]))
+	  {
+	    strlcpy(params->type, bi_levels[i][1], sizeof(params->type));
+	    break;
+	  }
+	}
+
+	if (!params->type[0])
+	{
+	  print_fatal_error(data, "Printer does not support COLORSPACE \"bi-level\" on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+	}
+      }
+      else if (!strcmp(params->type, "color"))
+      {
+        // Find color keyword...
+        params->type[0] = '\0';
+
+        if ((attr = ippFindAttribute(response, "pwg-raster-types-supported", IPP_TAG_KEYWORD)) != NULL)
+          attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD);
+
+	for (i = 0; i < (sizeof(colors) / sizeof(colors[0])); i ++)
+	{
+	  if (ippContainsString(attr, colors[i][0]) || ippContainsString(attr, colors[i][1]))
+	  {
+	    strlcpy(params->type, colors[i][1], sizeof(params->type));
+	    break;
+	  }
+	}
+
+        if (!params->type[0])
+        {
+	  print_fatal_error(data, "Printer does not support COLORSPACE \"color\" on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+      else if (!strcmp(params->type, "monochrome"))
+      {
+        // Find grayscale keyword...
+        params->type[0] = '\0';
+
+        if ((attr = ippFindAttribute(response, "pwg-raster-types-supported", IPP_TAG_KEYWORD)) == NULL)
+          attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD);
+
+	for (i = 0; i < (sizeof(monochromes) / sizeof(monochromes[0])); i ++)
+	{
+	  if (ippContainsString(attr, monochromes[i][0]) || ippContainsString(attr, monochromes[i][1]))
+	  {
+	    strlcpy(params->type, monochromes[i][1], sizeof(params->type));
+	    break;
+	  }
+	}
+
+        if (!params->type[0])
+        {
+	  print_fatal_error(data, "Printer does not support COLORSPACE \"monochrome\" on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+
+      // Make sure we have an output format...
+      if (!params->format[0])
+      {
+        // Check the supported formats and choose a suitable one...
+        if ((keyword = ippGetString(ippFindAttribute(f->attrs, "document-format", IPP_TAG_MIMETYPE), 0, NULL)) != NULL)
+        {
+          if (strcmp(keyword, "image/pwg-raster") && strcmp(keyword, "image/urf"))
+          {
+	    print_fatal_error(data, "Unsupported \"document-format\" value on line %d of \"%s\".", f->linenum, f->filename);
+	    goto fail;
+          }
+
+          strlcpy(params->format, keyword, sizeof(params->format));
+        }
+        else if ((attr = ippFindAttribute(response, "document-format-supported", IPP_TAG_MIMETYPE)) != NULL)
+        {
+          // Default to Apple Raster unless sending bitmaps, which are only
+          // supported by PWG Raster...
+          if (ippContainsString(attr, "image/urf") && strncmp(params->type, "black_", 6) && strcmp(params->type, "srgb_1"))
+            strlcpy(params->format, "image/urf", sizeof(params->format));
+	  else if (ippContainsString(attr, "image/pwg-raster"))
+            strlcpy(params->format, "image/pwg-raster", sizeof(params->format));
+        }
+
+        if (!params->format[0])
+        {
+	  print_fatal_error(data, "Printer does not support a compatible FORMAT on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+
+      // Get default/ready media...
+      if (!params->media[0] || !strcmp(params->media, "default"))
+      {
+        // Use job ticket or default media...
+        if (!params->media[0] && (keyword = ippGetString(ippFindAttribute(f->attrs, "media", IPP_TAG_ZERO), 0, NULL)) != NULL)
+        {
+          strlcpy(params->media, keyword, sizeof(params->media));
+        }
+        else if ((keyword = ippGetString(ippFindAttribute(response, "media-default", IPP_TAG_ZERO), 0, NULL)) != NULL)
+        {
+          strlcpy(params->media, keyword, sizeof(params->media));
+        }
+        else
+        {
+	  print_fatal_error(data, "Printer does not report a default MEDIA size name on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+      else if (!strcmp(params->media, "ready"))
+      {
+        // Use ready media
+        if ((keyword = ippGetString(ippFindAttribute(response, "media-ready", IPP_TAG_ZERO), 0, NULL)) != NULL)
+        {
+          strlcpy(params->media, keyword, sizeof(params->media));
+        }
+        else
+        {
+	  print_fatal_error(data, "Printer does not report a ready MEDIA size name on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+        }
+      }
+
+      // Default resolution
+      if (!params->xdpi || !params->ydpi)
+      {
+	if ((attr = ippFindAttribute(response, "pwg-raster-document-resolution-supported", IPP_TAG_RESOLUTION)) != NULL)
+	{
+	  ipp_res_t	units;			// Resolution units
+
+          // Use the middle resolution in the list...
+          params->xdpi = ippGetResolution(attr, ippGetCount(attr) / 2, &params->ydpi, &units);
+
+          if (units == IPP_RES_PER_CM)
+          {
+            params->xdpi = (int)(params->xdpi * 2.54);
+            params->ydpi = (int)(params->ydpi * 2.54);
+	  }
+        }
+        else if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+        {
+          size_t count = ippGetCount(attr);	// Number of values
+
+          for (i = 0; i < count; i ++)
+          {
+            keyword = ippGetString(attr, i, NULL);
+            if (!strncmp(keyword, "RS", 2))
+	    {
+	      // Use the first resolution in the list...
+	      params->xdpi = params->ydpi = atoi(keyword + 2);
+	      break;
+	    }
+          }
+	}
+
+	if (!params->xdpi || !params->ydpi)
+	{
+	  print_fatal_error(data, "Printer does not report a supported RESOLUTION on line %d of \"%s\".", f->linenum, f->filename);
+	  goto fail;
+	}
+      }
+
+      // Default duplex/sides
+      if (!params->sides[0])
+      {
+        if ((keyword = ippGetString(ippFindAttribute(f->attrs, "sides", IPP_TAG_ZERO), 0, NULL)) != NULL)
+        {
+          // Use the setting from the job ticket...
+          strlcpy(params->sides, keyword, sizeof(params->sides));
+	}
+	else if (params->num_pages != 1 && (attr = ippFindAttribute(response, "sides-supported", IPP_TAG_KEYWORD)) != NULL && ippGetCount(attr) > 1)
+	{
+	  // Default to two-sided for capable printers...
+	  if (params->orientation == IPP_ORIENT_LANDSCAPE || params->orientation == IPP_ORIENT_REVERSE_LANDSCAPE)
+	    strlcpy(params->sides, "two-sided-short-edge", sizeof(params->sides));
+	  else
+	    strlcpy(params->sides, "two-sided-long-edge", sizeof(params->sides));
+	}
+	else
+	{
+	  // Fall back to 1-sided output...
+	  strlcpy(params->sides, "one-sided", sizeof(params->sides));
+	}
+      }
+
+      // Default orientation
+      if (!params->orientation)
+      {
+        // Use the job ticket value, otherwise use landscape for short-edge duplex
+        if ((attr = ippFindAttribute(f->attrs, "orientation-requested", IPP_TAG_ENUM)) != NULL)
+          params->orientation = (ipp_orient_t)ippGetInteger(attr, 0);
+	else
+	  params->orientation = !strcmp(params->sides, "two-sided-short-edge") ? IPP_ORIENT_LANDSCAPE : IPP_ORIENT_PORTRAIT;
+      }
+
+      // Default number of copies and pages...
+      if (!params->num_copies)
+        params->num_copies = 1;
+
+      if (!params->num_pages)
+        params->num_pages = !strncmp(params->sides, "two-sided-", 10) ? 2 : 1;
+
+      // Back side transform, if any
+      if (!params->sheet_back[0])
+      {
+        if ((attr = ippFindAttribute(response, "pwg-raster-document-sheet-back", IPP_TAG_KEYWORD)) != NULL)
+        {
+          strlcpy(params->sheet_back, ippGetString(attr, 0, NULL), sizeof(params->sheet_back));
+	}
+	else if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+	{
+	  if (ippContainsString(attr, "DM1"))
+	    strlcpy(params->sheet_back, "flip", sizeof(params->sheet_back));
+	  else if (ippContainsString(attr, "DM2"))
+	    strlcpy(params->sheet_back, "manual-tumble", sizeof(params->sheet_back));
+	  else if (ippContainsString(attr, "DM3"))
+	    strlcpy(params->sheet_back, "rotated", sizeof(params->sheet_back));
+	  else
+	    strlcpy(params->sheet_back, "normal", sizeof(params->sheet_back));
+	}
+	else
+        {
+          strlcpy(params->sheet_back, "normal", sizeof(params->sheet_back));
+	}
+      }
+
+      // Everything is good, save the parameters and return...
+      data->generate_params = params;
+      ippDelete(response);
+
+      return (1);
+    }
+    else if (!_cups_strcasecmp(token, "COLORSPACE"))
+    {
+      if (params->type[0])
+      {
+	print_fatal_error(data, "Unexpected extra COLORSPACE on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing COLORSPACE value on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "auto") || !strcmp(value, "bi-level") || !strcmp(value, "color") || !strcmp(value, "monochrome") || !strcmp(value, "adobe-rgb_8") || !strcmp(value, "adobe-rgb_16") || !strcmp(value, "black_1") || !strcmp(value, "black_8") || !strcmp(value, "black_16") || !strcmp(value, "cmyk_8") || !strcmp(value, "cmyk_16") || !strcmp(value, "rgb_8") || !strcmp(value, "rgb_16") || !strcmp(value, "sgray_1") || !strcmp(value, "sgray_8") || !strcmp(value, "sgray_16") || !strcmp(value, "srgb_8") || !strcmp(value, "srgb_16"))
+      {
+        // Use "print-color-mode" or "pwg-raster-document-types-supported" keyword...
+        strlcpy(params->type, value, sizeof(params->type));
+      }
+      else
+      {
+	print_fatal_error(data, "Bad COLORSPACE \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "FORMAT"))
+    {
+      if (params->format[0])
+      {
+	print_fatal_error(data, "Unexpected extra FORMAT on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing FORMAT MIME media type on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "image/pwg-raster") || !strcmp(value, "image/urf"))
+      {
+        strlcpy(params->format, value, sizeof(params->format));
+      }
+      else
+      {
+	print_fatal_error(data, "Bad FORMAT \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "MEDIA"))
+    {
+      if (params->media[0])
+      {
+	print_fatal_error(data, "Unexpected extra MEDIA on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing MEDIA size name on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "default") || !strcmp(value, "ready") || pwgMediaForPWG(value) != NULL)
+      {
+        strlcpy(params->media, value, sizeof(params->media));
+      }
+      else
+      {
+	print_fatal_error(data, "Bad MEDIA \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "NUM-COPIES"))
+    {
+      size_t	intvalue;		// Number of copies value
+
+      if (params->num_copies)
+      {
+	print_fatal_error(data, "Unexpected extra NUM-COPIES on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing NUM-COPIES number on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if ((intvalue = strtoul(value, NULL, 10)) == ULONG_MAX || intvalue < 1)
+      {
+	print_fatal_error(data, "Bad NUM-COPIES \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+
+      params->num_copies = (int)intvalue;
+    }
+    else if (!_cups_strcasecmp(token, "NUM-PAGES"))
+    {
+      size_t	intvalue;		// Number of pages value
+
+      if (params->num_pages)
+      {
+	print_fatal_error(data, "Unexpected extra NUM-PAGES on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing NUM-PAGES number on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if ((intvalue = strtoul(value, NULL, 10)) == ULONG_MAX || intvalue < 1)
+      {
+	print_fatal_error(data, "Bad NUM-PAGES \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+
+      params->num_pages = (int)intvalue;
+    }
+    else if (!_cups_strcasecmp(token, "ORIENTATION"))
+    {
+      if (params->orientation)
+      {
+	print_fatal_error(data, "Unexpected extra ORIENTATION on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing ORIENTATION on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "portrait"))
+        params->orientation = IPP_ORIENT_PORTRAIT;
+      else if (!strcmp(value, "landscape"))
+        params->orientation = IPP_ORIENT_LANDSCAPE;
+      else if (!strcmp(value, "reverse-landscape"))
+        params->orientation = IPP_ORIENT_REVERSE_LANDSCAPE;
+      else if (!strcmp(value, "reverse-portrait"))
+        params->orientation = IPP_ORIENT_REVERSE_PORTRAIT;
+      else
+      {
+	print_fatal_error(data, "Bad ORIENTATION \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "RESOLUTION"))
+    {
+      if (params->xdpi || params->ydpi)
+      {
+	print_fatal_error(data, "Unexpected extra RESOLUTION on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing RESOLUTION on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "min") || !strcmp(value, "max"))
+      {
+	if ((attr = ippFindAttribute(response, "pwg-raster-document-resolution-supported", IPP_TAG_RESOLUTION)) != NULL)
+	{
+	  ipp_res_t	units;			// Resolution units
+
+          // Use the first or last resolution in the list...
+          params->xdpi = ippGetResolution(attr, !strcmp(value, "min") ? 0 : ippGetCount(attr) - 1, &params->ydpi, &units);
+
+          if (units == IPP_RES_PER_CM)
+          {
+            params->xdpi = (int)(params->xdpi * 2.54);
+            params->ydpi = (int)(params->ydpi * 2.54);
+	  }
+        }
+        else if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+        {
+          size_t count = ippGetCount(attr);	// Number of values
+
+          for (i = 0; i < count; i ++)
+          {
+            keyword = ippGetString(attr, i, NULL);
+            if (!strncmp(keyword, "RS", 2))
+	    {
+	      if (!strcmp(value, "min"))
+	      {
+		// Use the first resolution in the list...
+		params->xdpi = params->ydpi = atoi(keyword + 2);
+	      }
+	      else
+	      {
+	        // Use the last resolution in the list...
+	        params->xdpi = params->ydpi = (int)strtol(keyword + 2, &ptr, 10);
+	        while (ptr && *ptr && *ptr == '-')
+		  params->xdpi = params->ydpi = (int)strtol(ptr + 1, &ptr, 10);
+	      }
+	      break;
+	    }
+          }
+	}
+      }
+      else if (strcmp(value, "default"))
+      {
+        char	units[8] = "";		// Resolution units (dpi or dpcm)
+
+	if (sscanf(value, "%dx%d%7s", &params->xdpi, &params->ydpi, units) == 1)
+	{
+	  sscanf(value, "%d%7s", &params->xdpi, units);
+	  params->ydpi = params->xdpi;
+	}
+
+	if (!strcmp(units, "dpcm"))
+	{
+	  params->xdpi = (int)(params->xdpi * 2.54);
+	  params->ydpi = (int)(params->ydpi * 2.54);
+	}
+	else if (strcmp(units, "dpi"))
+	  params->xdpi = params->ydpi = 0;
+      }
+
+      if (strcmp(value, "default") && (params->xdpi <= 0 || params->ydpi <= 0))
+      {
+	print_fatal_error(data, "Bad RESOLUTION \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "SIDES"))
+    {
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing SIDES on line %d of \"%s\".", f->linenum, f->filename);
+	goto fail;
+      }
+
+      _ippVarsExpand(data->vars, value, temp, sizeof(value));
+
+      if (!strcmp(value, "one-sided") || !strcmp(value, "two-sided-long-edge") || !strcmp(value, "two-sided-short-edge"))
+      {
+        strlcpy(params->sides, value, sizeof(params->sides));
+      }
+      else
+      {
+	print_fatal_error(data, "Bad SIDES \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	goto fail;
+      }
+    }
+    else
+    {
+      print_fatal_error(data, "Unknown %s on line %d of \"%s\".", token, f->linenum, f->filename);
+      goto fail;
+    }
+  }
+
+  print_fatal_error(data, "Missing closing brace on line %d of \"%s\".", f->linenum, f->filename);
+
+  fail:
+
+  free(params);
+  ippDelete(response);
+  return (0);
 }
 
 
@@ -2789,7 +3529,7 @@ parse_monitor_printer_state(
     }
     else if (!_cups_strcasecmp(token, "COUNT"))
     {
-      int	count;			/* Count value */
+      size_t	count;			/* Count value */
 
       if (!_ippFileReadToken(f, temp, sizeof(temp)))
       {
@@ -2797,7 +3537,7 @@ parse_monitor_printer_state(
 	return (0);
       }
 
-      if ((count = atoi(temp)) <= 0)
+      if ((count = strtoul(temp, NULL, 10)) == ULONG_MAX)
       {
 	print_fatal_error(data, "Bad COUNT \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
 	return (0);
@@ -3231,7 +3971,7 @@ print_attr(cups_file_t      *outfile,	/* I  - Output file */
            ipp_attribute_t  *attr,	/* I  - Attribute to print */
            ipp_tag_t        *group)	/* IO - Current group */
 {
-  int			i,		/* Looping var */
+  size_t		i,		/* Looping var */
 			count;		/* Number of values */
   ipp_attribute_t	*colattr;	/* Collection attribute */
 
@@ -3527,7 +4267,7 @@ print_ippserver_attr(
     ipp_attribute_t  *attr,		/* I - Attribute to print */
     int              indent)		/* I - Indentation level */
 {
-  int			i,		/* Looping var */
+  size_t		i,		/* Looping var */
 			count = ippGetCount(attr);
 					/* Number of values */
   ipp_attribute_t	*colattr;	/* Collection attribute */
@@ -3584,7 +4324,7 @@ print_ippserver_attr(
 	  const char *s = (const char *)ippGetOctetString(attr, i, &len);
 
 	  cupsFilePuts(data->outfile, i ? "," : " ");
-	  print_ippserver_string(data, s, (size_t)len);
+	  print_ippserver_string(data, s, len);
 	}
 	break;
 
@@ -3664,7 +4404,7 @@ print_json_attr(
 {
   const char	*name = ippGetName(attr);
 					/* Name of attribute */
-  int		i,			/* Looping var */
+  size_t	i,			/* Looping var */
 		count = ippGetCount(attr);
 					/* Number of values */
   ipp_attribute_t *colattr;		/* Collection attribute */
@@ -3869,7 +4609,7 @@ print_json_attr(
 }
 
 
-/* 
+/*
  * 'print_json_string()' - Print a string in JSON format.
  */
 
@@ -4186,7 +4926,7 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
  * 'timeout_cb()' - Handle HTTP timeouts.
  */
 
-static int				/* O - 1 to continue, 0 to cancel */
+static int				/* O - `1` to continue, `0` to cancel */
 timeout_cb(http_t *http,		/* I - Connection to server */
            void   *user_data)		/* I - User data (unused) */
 {
@@ -4287,6 +5027,21 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
     {
       return (do_test(f, data));
     }
+    else if (!strcmp(token, "GENERATE-FILE"))
+    {
+      if (data->generate_params)
+      {
+	print_fatal_error(data, "Extra GENERATE-FILE seen on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+      else if (data->file[0])
+      {
+	print_fatal_error(data, "Cannot use GENERATE-FILE on line %d of \"%s\" with FILE.", f->linenum, f->filename);
+	return (0);
+      }
+
+      return (parse_generate_file(f, data));
+    }
     else if (!strcmp(token, "MONITOR-PRINTER-STATE"))
     {
       if (data->monitor_uri)
@@ -4308,12 +5063,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
 	_ippVarsExpand(vars, data->compression, temp, sizeof(data->compression));
-#ifdef HAVE_LIBZ
-	if (strcmp(data->compression, "none") && strcmp(data->compression, "deflate") &&
-	    strcmp(data->compression, "gzip"))
-#else
-	if (strcmp(data->compression, "none"))
-#endif /* HAVE_LIBZ */
+	if (strcmp(data->compression, "none") && strcmp(data->compression, "deflate") && strcmp(data->compression, "gzip"))
 	{
 	  print_fatal_error(data, "Unsupported COMPRESSION value \"%s\" on line %d of \"%s\".", data->compression, f->linenum, f->filename);
 	  return (0);
@@ -4724,6 +5474,17 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
       * File...
       */
 
+      if (data->file[0])
+      {
+	print_fatal_error(data, "Extra FILE seen on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+      else if (data->generate_params)
+      {
+	print_fatal_error(data, "Cannot use FILE on line %d of \"%s\" with GENERATE-FILE.", f->linenum, f->filename);
+	return (0);
+      }
+
       if (!_ippFileReadToken(f, temp, sizeof(temp)))
       {
 	print_fatal_error(data, "Missing FILE filename on line %d of \"%s\".", f->linenum, f->filename);
@@ -4816,7 +5577,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
     }
     else if (!_cups_strcasecmp(token, "COUNT"))
     {
-      int	count;			/* Count value */
+      size_t	count;			/* Count value */
 
       if (!_ippFileReadToken(f, temp, sizeof(temp)))
       {
@@ -4824,7 +5585,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
 	return (0);
       }
 
-      if ((count = atoi(temp)) <= 0)
+      if ((count = strtoul(temp, NULL, 10)) == ULONG_MAX)
       {
 	print_fatal_error(data, "Bad COUNT \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
 	return (0);
@@ -5669,7 +6430,7 @@ with_distinct_values(
     cups_array_t    *errors,		// I - Array of errors
     ipp_attribute_t *attr)		// I - Attribute to test
 {
-  int		i,			// Looping var
+  size_t	i,			// Looping var
 		count;			// Number of values
   ipp_tag_t	value_tag;		// Value syntax
   const char	*value;			// Current value
@@ -5828,16 +6589,16 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	   char             *matchbuf,	/* I - Buffer to hold matching value */
 	   size_t           matchlen)	/* I - Length of match buffer */
 {
-  int		i,			/* Looping var */
-    		count,			/* Number of values */
-		match;			/* Match? */
+  size_t	i,			/* Looping var */
+    		count;			/* Number of values */
+  bool		match;			/* Match? */
   char		temp[1024],		/* Temporary value string */
 		*valptr;		/* Pointer into value */
   const char	*name;			/* Attribute name */
 
 
   *matchbuf = '\0';
-  match     = (flags & IPPTOOL_WITH_ALL) ? 1 : 0;
+  match     = (flags & IPPTOOL_WITH_ALL) ? true : false;
 
  /*
   * NULL matches everything.
@@ -5862,9 +6623,9 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	  char	op,			/* Comparison operator */
 	  	*nextptr;		/* Next pointer */
 	  int	intvalue,		/* Integer value */
-		attrvalue = ippGetInteger(attr, i),
+		attrvalue = ippGetInteger(attr, i);
 					/* Attribute value */
-	  	valmatch = 0;		/* Does the current value match? */
+	  bool	valmatch = false;	/* Does the current value match? */
 
           valptr = value;
 
@@ -5895,7 +6656,7 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	      if (!matchbuf[0])
 		snprintf(matchbuf, matchlen, "%d", attrvalue);
 
-	      valmatch = 1;
+	      valmatch = true;
 	      break;
 	    }
 	  }
@@ -5904,13 +6665,13 @@ with_value(ipptool_test_t *data,	/* I - Test data */
           {
             if (!valmatch)
             {
-              match = 0;
+              match = false;
               break;
             }
           }
           else if (valmatch)
           {
-            match = 1;
+            match = true;
             break;
           }
         }
@@ -5929,8 +6690,8 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	  	*nextptr;		/* Next pointer */
 	  int	intvalue,		/* Integer value */
 	        lower,			/* Lower range */
-	        upper,			/* Upper range */
-	  	valmatch = 0;		/* Does the current value match? */
+	        upper;			/* Upper range */
+	  bool	valmatch = false;	/* Does the current value match? */
 
 	  lower = ippGetRange(attr, i, &upper);
           valptr = value;
@@ -5962,7 +6723,7 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	      if (!matchbuf[0])
 		snprintf(matchbuf, matchlen, "%d-%d", lower, upper);
 
-	      valmatch = 1;
+	      valmatch = true;
 	      break;
 	    }
 	  }
@@ -5971,13 +6732,13 @@ with_value(ipptool_test_t *data,	/* I - Test data */
           {
             if (!valmatch)
             {
-              match = 0;
+              match = false;
               break;
             }
           }
           else if (valmatch)
           {
-            match = 1;
+            match = true;
             break;
           }
         }
@@ -6004,13 +6765,13 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
 	    if (!(flags & IPPTOOL_WITH_ALL))
 	    {
-	      match = 1;
+	      match = true;
 	      break;
 	    }
 	  }
 	  else if (flags & IPPTOOL_WITH_ALL)
 	  {
-	    match = 0;
+	    match = false;
 	    break;
 	  }
 	}
@@ -6041,13 +6802,13 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
 	    if (!(flags & IPPTOOL_WITH_ALL))
 	    {
-	      match = 1;
+	      match = true;
 	      break;
 	    }
 	  }
 	  else if (flags & IPPTOOL_WITH_ALL)
 	  {
-	    match = 0;
+	    match = false;
 	    break;
 	  }
 	}
@@ -6091,11 +6852,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	  * Value is an extended, case-sensitive POSIX regular expression...
 	  */
 
+          int		r;		/* Error, if any */
 	  regex_t	re;		/* Regular expression */
 
-          if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
+          if ((r = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
 	  {
-            regerror(i, &re, temp, sizeof(temp));
+            regerror(r, &re, temp, sizeof(temp));
 
 	    print_fatal_error(data, "Unable to compile WITH-VALUE regular expression \"%s\" - %s", value, temp);
 	    return (0);
@@ -6236,11 +6998,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
 	  void		*adata;		/* Pointer to octetString data */
 	  int		adatalen;	/* Length of octetString */
+	  int		r;		/* Error, if any */
 	  regex_t	re;		/* Regular expression */
 
-          if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
+          if ((r = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
 	  {
-            regerror(i, &re, temp, sizeof(temp));
+            regerror(r, &re, temp, sizeof(temp));
 
 	    print_fatal_error(data, "Unable to compile WITH-VALUE regular expression \"%s\" - %s", value, temp);
 	    return (0);
@@ -6307,7 +7070,7 @@ with_value(ipptool_test_t *data,	/* I - Test data */
             * Grab hex-encoded value...
             */
 
-            if ((withlen = (int)strlen(value)) & 1 || withlen > (int)(2 * (sizeof(withdata) + 1)))
+            if ((withlen = strlen(value)) & 1 || withlen > (2 * (sizeof(withdata) + 1)))
             {
 	      print_fatal_error(data, "Bad WITH-VALUE hex value.");
               return (0);
@@ -6348,7 +7111,7 @@ with_value(ipptool_test_t *data,	/* I - Test data */
             * Copy literal string value...
             */
 
-            withlen = (int)strlen(value);
+            withlen = strlen(value);
 
             memcpy(withdata, value, (size_t)withlen);
 	  }
@@ -6407,9 +7170,10 @@ with_value_from(
     char            *matchbuf,		/* I - Buffer to hold matching value */
     size_t          matchlen)		/* I - Length of match buffer */
 {
-  int	i, j,				/* Looping vars */
-	count = ippGetCount(attr),	/* Number of attribute values */
-	match = 1;			/* Match? */
+  size_t	i, j,			/* Looping vars */
+		count = ippGetCount(attr);
+					/* Number of attribute values */
+  bool		match = true;		/* Match? */
 
 
   *matchbuf = '\0';
@@ -6437,7 +7201,7 @@ with_value_from(
 	  else
 	  {
 	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
-	    match = 0;
+	    match = false;
 	  }
 	}
 	break;
@@ -6459,7 +7223,7 @@ with_value_from(
 	  else
 	  {
 	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
-	    match = 0;
+	    match = false;
 	  }
 	}
 	break;
@@ -6472,7 +7236,7 @@ with_value_from(
 	{
 	  int xres, yres;
 	  ipp_res_t units;
-          int fromcount = ippGetCount(fromattr);
+          size_t fromcount = ippGetCount(fromattr);
 	  int fromxres, fromyres;
 	  ipp_res_t fromunits;
 
@@ -6502,7 +7266,7 @@ with_value_from(
 	    else
 	      add_stringf(errors, "GOT: %s=%dx%d%s", ippGetName(attr), xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
 
-	    match = 0;
+	    match = false;
 	  }
 	}
 	break;
@@ -6533,7 +7297,7 @@ with_value_from(
 	  else
 	  {
 	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
-	    match = 0;
+	    match = false;
 	  }
 	}
 	break;
@@ -6543,7 +7307,7 @@ with_value_from(
 	{
 	  const char *value = ippGetString(attr, i, NULL);
 					/* Current string value */
-          int fromcount = ippGetCount(fromattr);
+          size_t fromcount = ippGetCount(fromattr);
 
           for (j = 0; j < fromcount; j ++)
           {
@@ -6558,13 +7322,13 @@ with_value_from(
 	  if (j >= fromcount)
 	  {
 	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
-	    match = 0;
+	    match = false;
 	  }
 	}
 	break;
 
     default :
-        match = 0;
+        match = false;
         break;
   }
 

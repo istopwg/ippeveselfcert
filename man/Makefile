@@ -1,7 +1,7 @@
 #
 # IPP documentation makefile.
 #
-# Copyright © 2014-2019 by the IEEE-ISTO Printer Working Group.
+# Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
 # Copyright © 2015-2019 by Apple Inc.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -63,3 +63,6 @@ clean:
 mantohtml:	mantohtml.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ mantohtml.o $(LIBS)
+
+
+$(HTML):	mantohtml

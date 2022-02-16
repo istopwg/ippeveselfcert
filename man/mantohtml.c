@@ -1,8 +1,9 @@
 /*
  * Man page to HTML conversion program.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 2004-2006 by Easy Software Products.
+ * Copyright © 2022 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2007-2017 by Apple Inc.
+ * Copyright © 2004-2006 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -201,6 +202,13 @@ main(int  argc,				/* I - Number of command-line args */
 	    html_putc(' ', outfile);
 
             first = 1;
+	  }
+	  else if (*lineptr == '\\' && lineptr[1] == '-')
+	  {
+	    html_putc('-', outfile);
+
+	    first = 1;
+	    lineptr ++;
 	  }
 	  else
 	  {
