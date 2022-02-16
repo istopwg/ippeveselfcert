@@ -49,9 +49,8 @@ Running the Self-Certification Tools on Windows® 7 and Higher
 In addition to this software, you also need to install the Bonjour for Windows
 software from Apple: <http://support.apple.com/kb/DL999>
 
-Extract the PWG Raster files to your Desktop directory, then open a command
-prompt or power shell and run the following commands with "Printer Name"
-replaced by the DNS-SD service name of your printer:
+Open a command prompt or power shell and run the following commands with
+"Printer Name" replaced by the DNS-SD service name of your printer:
 
     cd "C:\Program Files\IPP Everywhere Printer Self-Certification Tools"
     .\dnssd-tests.bat "Printer Name"
@@ -71,9 +70,8 @@ or the Github issue tracker at:
 Running the Self-Certification Tools on macOS® 10.13 and Higher
 ---------------------------------------------------------------
 
-Extract the PWG Raster files to the tools directory, then open a Terminal
-window and run the following commands with "Printer Name" replaced by the
-DNS-SD service name of your printer:
+Open a Terminal window and run the following commands with "Printer Name"
+replaced by the DNS-SD service name of your printer:
 
     cd /path/to/tools
     ./dnssd-tests.sh "Printer Name"
@@ -93,9 +91,8 @@ or the Github issue tracker at:
 Running the Self-Certification Tools on Red Hat Enterprise Linux 7 and Higher
 -----------------------------------------------------------------------------
 
-Extract the PWG Raster files to the tools directory, then open a Terminal
-window and run the following commands with "Printer Name" replaced by the
-DNS-SD service name of your printer:
+Open a Terminal window and run the following commands with "Printer Name"
+replaced by the DNS-SD service name of your printer:
 
     cd /path/to/tools
     ./dnssd-tests.sh "Printer Name"
@@ -115,9 +112,8 @@ or the Github issue tracker at:
 Running the Self-Certification Tools on Ubuntu 18.04 and higher
 ---------------------------------------------------------------
 
-Extract the PWG Raster files to the tools directory, then open a Terminal
-window and run the following commands with "Printer Name" replaced by the
-DNS-SD service name of your printer:
+Open a Terminal window and run the following commands with "Printer Name"
+replaced by the DNS-SD service name of your printer:
 
     cd /path/to/tools
     ./dnssd-tests.sh "Printer Name"

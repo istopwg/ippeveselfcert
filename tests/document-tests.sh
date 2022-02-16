@@ -2,7 +2,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.1: Section 7: Document Data Tests.
 #
-# Copyright 2014-2020 by the IEEE-ISTO Printer Working Group.
+# Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -41,16 +41,6 @@ for file in color.jpg document-a4.pdf document-letter.pdf; do
 		ln -s ../test/$file .
 	fi
 done
-
-if test "`ls -d pwg-raster-samples-*dpi 2>/dev/null`" = ""; then
-	echo "You must first download and extract the PWG Raster Format sample files from:"
-	echo ""
-	echo "    http://ftp.pwg.org/pub/pwg/ipp/examples/"
-	echo ""
-	echo "Before you can run this script."
-	exit 1
-fi
-
 
 PLIST="${TARGET} Document Results.plist"
 

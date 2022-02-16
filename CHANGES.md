@@ -8,6 +8,8 @@ v1.1 Update 4 (TBD)
   the document results (Issue #71)
 - The `ippevesubmit` program now validates and converts product web page URLs
   (Issue #75)
+- The IPP and document tests now support printers that do not support US letter
+  or ISO A4 sizes (Issue #78)
 - The `ipptool` program can now generate PWG Raster documents dynamically for
   printers (Issue #79)
 - The `ippevesubmit` program now uses the modification date of the plist files
