@@ -1645,7 +1645,7 @@ validate_document_results(
     errptr += strlen(errptr);
     result = 0;
   }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 34)
+  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 65)
   {
     snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 34).\n", tests_count);
     errptr += strlen(errptr);

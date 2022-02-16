@@ -4,6 +4,8 @@ Changes
 v1.1 Update 4 (TBD)
 -------------------
 
+- The `ippevesubmit` program did not validate the correct number of tests for
+  the document results (Issue #71)
 - The `ippevesubmit` program now validates and converts product web page URLs
   (Issue #75)
 - The `ippevesubmit` program now uses the modification date of the plist files
