@@ -49,6 +49,14 @@ depend:
 
 
 #
+# Run test suite...
+#
+
+test:		all
+	./testbuild.sh
+
+
+#
 # Run the Clang static code analysis tool on the sources, available here:
 #
 #    http://clang-analyzer.llvm.org

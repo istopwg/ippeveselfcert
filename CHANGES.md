@@ -4,6 +4,8 @@ Changes
 v1.1 Update 4 (TBD)
 -------------------
 
+- Added support for running the self-certification tools non-interactively
+  with the "make test" command (Issue #56, Issue #62)
 - The `ippevesubmit` program did not validate the correct number of tests for
   the document results (Issue #71)
 - The `ippevesubmit` program now validates and converts product web page URLs
