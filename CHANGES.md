@@ -8,6 +8,7 @@ v1.1 Update 4 (TBD)
   with the "make test" command (Issue #56, Issue #62)
 - The `ippevesubmit` program did not validate the correct number of tests for
   the document results (Issue #71)
+- The DNS-SD TLS key test was incorrectly specified (Issue #72)
 - The `ippevesubmit` program now validates and converts product web page URLs
   (Issue #75)
 - The IPP and document tests now support printers that do not support US letter

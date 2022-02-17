@@ -2,7 +2,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.1: Section 5: DNS-SD Tests.
 #
-# Copyright © 2014-2021 by the IEEE-ISTO Printer Working Group.
+# Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -244,7 +244,7 @@ fi
 
 # B-5. TLS tests: Performed only if TLS is supported
 start_test "B-5. TLS tests"
-$IPPFIND --literal-name "${TARGET}" --txt-TLS '^[1-9].[0-9]' --quiet
+$IPPFIND --literal-name "${TARGET}" --txt-TLS '^[1-9]\.[0-9]' --quiet
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	HAVE_TLS=1

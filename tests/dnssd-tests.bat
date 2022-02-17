@@ -2,7 +2,7 @@
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.1: Section 5: DNS-SD Tests.
 ::
-:: Copyright 2014-2021 by the IEEE-ISTO Printer Working Group.
+:: Copyright 2014-2022 by the IEEE-ISTO Printer Working Group.
 ::
 :: Licensed under Apache License v2.0.  See the file "LICENSE" for more
 :: information.
@@ -151,7 +151,7 @@ echo ^<dict^>^<key^>Name^</key^>^<string^>B-5. TLS tests^</string^> >>"%PLIST%"
 echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=SKIP
-ippfind "%name%._ipp._tcp.local." --txt-TLS '^[1-9].[0-9]' --quiet && set result=PASS
+ippfind "%name%._ipp._tcp.local." --txt-TLS '^[1-9]\.[0-9]' --quiet && set result=PASS
 if "%result%" == "PASS" (
 	set /a pass+=1
 	set HAVE_TLS=1
