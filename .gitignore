@@ -13,3 +13,8 @@ tools/ippfind
 tools/ipptool
 *.o
 *Results.plist
+/.vs/ippeveselfcert/v16/Browse.VC.db
+/.vs
+/vcnet/.vs/ippeveselfcert/v16
+/vcnet/packages/zlib-vc140-static-64.1.2.11
+/vcnet/x64

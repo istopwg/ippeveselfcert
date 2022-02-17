@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="19.1" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="18.2" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="MigrationUninstallCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-    <ROW Property="AI_CURRENT_YEAR" Value="2022" ValueLocId="-"/>
+    <ROW Property="AI_CURRENT_YEAR" Value="2021" ValueLocId="-"/>
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippeveprinter.exe" Value="x64\Release"/>
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippevesubmit.exe" Value="x64\Release"/>
     <ROW Property="AI_PROPPATH_DIR_PERBUILD_ippfind.exe" Value="x64\Release"/>
@@ -27,10 +27,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
     <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
-    <ROW Property="ProductCode" Value="1033:{448E7CC1-486C-4140-805E-5F223A1BF613} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{55C2177B-59A2-4EB9-BE16-570394E1D8CE} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="IPP Everywhere v1.1 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="11.4.0" Type="32"/>
+    <ROW Property="ProductVersion" Value="11.3.0" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
@@ -148,7 +148,6 @@
     <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
     <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
     <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
-    <ROW Fragment="Themes.aip" Path="&lt;AI_FRAGS&gt;Themes.aip"/>
     <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
     <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
     <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
@@ -192,7 +191,6 @@
     <ROW XmlAttribute="Id_1" XmlElement="Application_1" Name="Id" Flags="0" Order="0" Value="ippeveprinter"/>
     <ROW XmlAttribute="Id_2" XmlElement="Application_2" Name="Id" Flags="0" Order="0" Value="ippfind"/>
     <ROW XmlAttribute="Id_3" XmlElement="Application_3" Name="Id" Flags="0" Order="0" Value="ippevesubmit"/>
-    <ROW XmlAttribute="IgnorableNamespaces" XmlElement="Package" Name="IgnorableNamespaces" Flags="0" Order="4" Value="rescap rescap3 uap"/>
     <ROW XmlAttribute="Language" XmlElement="Resource_1" Name="Language" Flags="0" Order="0" Value="en-US"/>
     <ROW XmlAttribute="MaxVersionTested" XmlElement="TargetDeviceFamily" Name="MaxVersionTested" Flags="0" Order="0" Value="10.0.18363.0"/>
     <ROW XmlAttribute="MinVersion" XmlElement="TargetDeviceFamily" Name="MinVersion" Flags="0" Order="0" Value="10.0.17763.0"/>
@@ -227,21 +225,17 @@
     <ROW XmlAttribute="Square44x44Logo_2" XmlElement="VisualElements_2" Name="Square44x44Logo" Flags="0" Order="0" FileId="ippfindSquare44x44Logo.scale100.png"/>
     <ROW XmlAttribute="Square44x44Logo_3" XmlElement="VisualElements_3" Name="Square44x44Logo" Flags="0" Order="0" FileId="ippevesubmitSquare44x44Logo.scale100.png"/>
     <ROW XmlAttribute="Version" XmlElement="Identity" Name="Version" Flags="0" Order="0" Value="11.2.0.0"/>
-    <ROW XmlAttribute="xmlns" XmlElement="Package" Name="xmlns" Flags="0" Order="3" Value="http://schemas.microsoft.com/appx/manifest/foundation/windows10"/>
-    <ROW XmlAttribute="xmlnsrescap" XmlElement="Package" Name="xmlns:rescap" Flags="0" Order="0" Value="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"/>
-    <ROW XmlAttribute="xmlnsrescap3" XmlElement="Package" Name="xmlns:rescap3" Flags="0" Order="1" Value="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities/3"/>
-    <ROW XmlAttribute="xmlnsuap" XmlElement="Package" Name="xmlns:uap" Flags="0" Order="2" Value="http://schemas.microsoft.com/appx/manifest/uap/windows10"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlElementComponent">
     <ROW XmlElement="Application" ParentElement="Applications" Name="Application" Order="1" Flags="0" Type="4"/>
     <ROW XmlElement="Application_1" ParentElement="Applications" Name="Application" Order="2" Flags="0" Type="4"/>
     <ROW XmlElement="Application_2" ParentElement="Applications" Name="Application" Order="3" Flags="0" Type="4"/>
     <ROW XmlElement="Application_3" ParentElement="Applications" Name="Application" Order="0" Flags="0" Type="4"/>
-    <ROW XmlElement="Applications" ParentElement="Package" Name="Applications" Order="5" Flags="0" Type="3"/>
+    <ROW XmlElement="Applications" ParentElement="Package" Name="Applications" Order="4" Flags="0" Type="3"/>
     <ROW XmlElement="Bundle" Name="Bundle" Order="0" Flags="0" Type="0"/>
-    <ROW XmlElement="Capabilities" ParentElement="Package" Name="Capabilities" Order="4" Flags="0" Type="0"/>
+    <ROW XmlElement="Capabilities" ParentElement="Package" Name="Capabilities" Order="5" Flags="0" Type="0"/>
     <ROW XmlElement="Capability" ParentElement="Capabilities" Name="Capability" Order="0" Flags="0" Type="0"/>
-    <ROW XmlElement="Dependencies" ParentElement="Package" Name="Dependencies" Order="3" Flags="0" Type="0"/>
+    <ROW XmlElement="Dependencies" ParentElement="Package" Name="Dependencies" Order="1" Flags="0" Type="0"/>
     <ROW XmlElement="DesktopApp" ParentElement="DesktopAppMigration" Name="DesktopApp" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="DesktopAppMigration" ParentElement="Extension" Name="DesktopAppMigration" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="DesktopAppMigration_1" ParentElement="Extension_1" Name="DesktopAppMigration" Order="0" Flags="0" Type="0"/>
@@ -270,7 +264,7 @@
     <ROW XmlElement="InitialRotationPreference_3" ParentElement="VisualElements_3" Name="InitialRotationPreference" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="Logo" ParentElement="Properties" Name="Logo" Order="2" Flags="0" FileId="Square50x50Logo.scale100.png" Type="0"/>
     <ROW XmlElement="Package" Name="Package" Order="0" Flags="0" Type="6"/>
-    <ROW XmlElement="Properties" ParentElement="Package" Name="Properties" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Properties" ParentElement="Package" Name="Properties" Order="3" Flags="0" Type="0"/>
     <ROW XmlElement="PublisherDisplayName" ParentElement="Properties" Name="PublisherDisplayName" Order="0" Flags="0" Text="IEEE-ISTO Printer Working Group" Type="0"/>
     <ROW XmlElement="Resource" ParentElement="Resources" Name="Resource" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="Resource_1" ParentElement="Resources" Name="Resource" Order="1" Flags="0" Type="0"/>

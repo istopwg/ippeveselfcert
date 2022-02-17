@@ -100,7 +100,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>signtool sign /n "IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION" "$(TargetPath)"</Command>
+      <Command>signtool sign /fd SHA256 /n "IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION" "$(TargetPath)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Sign code with IEEE-ISTO certificate</Message>
