@@ -333,7 +333,6 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	EXPECT printer-supply DEFINE-MATCH HAVE_PRINTER_SUPPLY
 	EXPECT printer-supply-description DEFINE-MATCH HAVE_PRINTER_SUPPLY
-	EXPECT printer-supply-info-uri DEFINE-MATCH HAVE_PRINTER_SUPPLY
 
 	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX" IF-DEFINED HAVE_PRINTER_SUPPLY
 

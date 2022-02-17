@@ -18,6 +18,8 @@ v1.1 Update 4 (TBD)
 - The `ippevesubmit` program now uses the modification date of the plist files
   instead of the current date when generating the JSON submission file
   (Issue #81)
+- Fixed the conditional requirements for "printer-supply-xxx" attributes with
+  printers that do not have supplies.
 
 
 v1.1 Update 3 (May 17, 2021)
