@@ -20,6 +20,7 @@ v1.1 Update 4 (TBD)
   (Issue #81)
 - Fixed the conditional requirements for "printer-supply-xxx" attributes with
   printers that do not have supplies.
+- Fixed some problems with the Windows DNS-SD test script.
 
 
 v1.1 Update 3 (May 17, 2021)

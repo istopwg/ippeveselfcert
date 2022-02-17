@@ -64,10 +64,10 @@ if "%result%" == "PASS" (
 ) else (
 	set /a fail+=1
 	echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";" >>"%PLIST%"
 	echo ^</string^>^</array^> >>"%PLIST%"
 )
 
@@ -75,10 +75,10 @@ echo %result%
 if "%result%" == "FAIL" (
 	echo ^<key^>Successful^</key^>^<false /^> >>"%PLIST%"
 
-	ippfind "%name%._ipp._tcp.local." -x echo adminurl="{txt_adminurl}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";"
 ) else (
 	echo ^<key^>Successful^</key^>^<true /^> >>"%PLIST%"
 )
@@ -116,16 +116,16 @@ echo ^<dict^>^<key^>Name^</key^>^<string^>B-4. IPP TXT values test^</string^> >>
 echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=FAIL
-ippfind "%name%._ipp._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q -d "ADMINURL={txt_adminurl}" -d "UUID={txt_uuid}" "{}" dnssd-value-tests.test ";" && set result=PASS
+ippfind "%name%._ipp._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q -d "ADMINURL={txt_adminurl}" -d "UUID={txt_uuid}" "{}" dnssd-value-tests.test ";" && set result=PASS
 if "%result%" == "PASS" (
 	set /a pass+=1
 ) else (
 	set /a fail+=1
 	echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
-	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";" >>"%PLIST%"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";" >>"%PLIST%"
 	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST%"
 	echo ^</string^>^</array^> >>"%PLIST%"
 )
@@ -134,10 +134,10 @@ echo %result%
 if "%result%" == "FAIL" (
 	echo ^<key^>Successful^</key^>^<false /^> >>"%PLIST%"
 
-	ippfind "%name%._ipp._tcp.local." -x echo adminurl="{txt_adminurl}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo pdl="{txt_pdl}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo rp="{txt_rp}" ";"
-	ippfind "%name%._ipp._tcp.local." -x echo UUID="{txt_uuid}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";"
+	ippfind "%name%._ipp._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";"
 	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]:
 ) else (
 	echo ^<key^>Successful^</key^>^<true /^> >>"%PLIST%"
@@ -250,11 +250,11 @@ if "%HAVE_TLS%" == "1" (
 	) else (
 		set /a fail+=1
 	        echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo pdl="{txt_pdl}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo TLS="{txt_tls}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";" >>"%PLIST%"
 	        echo ^</string^>^</array^> >>"%PLIST%"
 	)
 ) else (
@@ -266,11 +266,11 @@ echo %result%
 if "%result%" == "FAIL" (
 	echo ^<key^>Successful^</key^>^<false /^> >>"%PLIST%"
 
-        ippfind "%name%._ipps._tcp.local." -x echo adminurl="{txt_adminurl}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo pdl="{txt_pdl}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo TLS="{txt_tls}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";"
 ) else (
 	if "%result%" == "SKIP" (
 		echo ^<key^>Successful^</key^>^<true /^> >>"%PLIST%"
@@ -330,11 +330,11 @@ if "%HAVE_TLS%" == "1" (
 	) else (
 		set /a fail+=1
 	        echo ^<key^>Errors^</key^>^<array^>^<string^> >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo pdl="{txt_pdl}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";" >>"%PLIST%"
-	        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo TLS="{txt_tls}" ";" >>"%PLIST%"
+	        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";" >>"%PLIST%"
 		ippfind "%name%._ipps._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]: >>"%PLIST%"
 	        echo ^</string^>^</array^> >>"%PLIST%"
 	)
@@ -347,11 +347,11 @@ echo %result%
 if "%result%" == "FAIL" (
 	echo ^<key^>Successful^</key^>^<false /^> >>"%PLIST%"
 
-        ippfind "%name%._ipps._tcp.local." -x echo adminurl="{txt_adminurl}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo pdl="{txt_pdl}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo rp="{txt_rp}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo TLS="{txt_tls}" ";"
-        ippfind "%name%._ipps._tcp.local." -x echo UUID="{txt_uuid}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo adminurl="{txt_adminurl}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo pdl="{txt_pdl}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo rp="{txt_rp}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo TLS="{txt_tls}" ";"
+        ippfind "%name%._ipps._tcp.local." -x cmd.exe /c echo UUID="{txt_uuid}" ";"
 	ippfind "%name%._ipp._tcp.local." -x ipptool -t "{}" dnssd-value-tests.test ";" | findstr /r [TG][EO][DT]:
 ) else (
 	if "%result%" == "SKIP" (
