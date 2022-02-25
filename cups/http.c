@@ -4406,10 +4406,12 @@ http_send(http_t       *http,		/* I - HTTP connection */
 
       if (i == HTTP_FIELD_HOST)
       {
+#if 0 // This break local testing against ippeveprinter
         // Issue #185: Use "localhost" for the loopback addresses to work
         // around an Avahi bug...
         if (httpAddrLocalhost(http->hostaddr))
           value = "localhost";
+#endif // 0
 
 	if (httpPrintf(http, "Host: %s:%d\r\n", value, httpAddrPort(http->hostaddr)) < 1)
 	{

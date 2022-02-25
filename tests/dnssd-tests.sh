@@ -222,7 +222,7 @@ start_test "B-4. IPP TXT values test"
 $IPPFIND --literal-name "${TARGET}" --txt-Color 'T'
 if test $? = 0; then
 	# color printer - image/jpeg is required
-	$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' -d txt-adminurl='{txt_adminurl}' -d txt-pdl='{txt_pdl}' -d txt-UUID='{txt_UUID}' -d txt-Color='{txt_Color}' dnssd-value-tests.test \;
+	$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
@@ -232,7 +232,7 @@ if test $? = 0; then
 	fi
 else
 	# monochrome printer - image/jpeg is NOT REQUIRED
-	$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' -d txt-adminurl='{txt_adminurl}' -d txt-pdl='{txt_pdl}' -d txt-UUID='{txt_UUID}' -d txt-Color='{txt_Color}' dnssd-value-tests.test \;
+	$IPPFIND --literal-name "${TARGET}" --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' dnssd-value-tests.test \;
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
