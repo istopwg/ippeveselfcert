@@ -963,6 +963,9 @@ do_monitor_printer_state(
   const char	*pattrs[100];		// Printer attributes we care about
 
 
+  if (getenv("IPPTOOL_DEBUG"))
+    fprintf(stderr, "ipptool: Monitoring printer '%s' in the background.\n", data->monitor_uri);
+
   // Connect to the printer...
   if (httpSeparateURI(HTTP_URI_CODING_ALL, data->monitor_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
   {
@@ -1205,6 +1208,9 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   if (Cancel)
     return (0);
 
+  if (getenv("IPPTOOL_DEBUG"))
+    fprintf(stderr, "ipptool: Doing test '%s', num_expects=%u, num_statuses=%u.\n", data->name, (unsigned)data->num_expects, (unsigned)data->num_statuses);
+
  /*
   * Show any PAUSE message, as needed...
   */
@@ -1333,6 +1339,9 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   {
     if (data->delay > 0)
       usleep(data->delay);
+
+    if (getenv("IPPTOOL_DEBUG"))
+      fprintf(stderr, "ipptool: Sending %s request to '%s'.\n", ippOpString(ippGetOperation(request)), data->resource);
 
     data->delay = data->repeat_interval;
     repeat_count ++;
@@ -4974,6 +4983,9 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
 	value[1024],			/* Value string */
 	*ptr;				/* Pointer into value */
 
+
+  if (getenv("IPPTOOL_DEBUG"))
+    fprintf(stderr, "ipptool: token='%s'\n", token);
 
   if (!token)
   {
