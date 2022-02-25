@@ -72,6 +72,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
+      <StackReserveSize>16777216</StackReserveSize>
+      <StackCommitSize>65536</StackCommitSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -94,6 +96,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
+      <StackReserveSize>16777216</StackReserveSize>
+      <StackCommitSize>65536</StackCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>signtool sign /fd SHA256 /n "IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION" "$(TargetPath)"</Command>

@@ -27,10 +27,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
     <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
-    <ROW Property="ProductCode" Value="1033:{448E7CC1-486C-4140-805E-5F223A1BF613} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{6ADFDA68-558B-4BC8-B21E-E2799A198CA2} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
-    <ROW Property="ProductName" Value="IPP Everywhere v1.1 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="11.4.0" Type="32"/>
+    <ROW Property="ProductName" Value="IPP Everywhere v1.1 Update 4 Printer Self-Certification Tools"/>
+    <ROW Property="ProductVersion" Value="11.4.3" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
