@@ -2,7 +2,7 @@
  * Configuration file for the IPP Everywhere Printer Self-Certification tools
  * on Windows.
  *
- * Copyright © 2014-2021 by the IEEE-ISTO Printer Working Group.
+ * Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
@@ -99,8 +99,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "IPPEVESELFCERT11 v20210517"
-#define CUPS_MINIMAL "IPPEVESELFCERT11/20210517"
+#define CUPS_SVERSION "IPPEVESELFCERT11 v20220225"
+#define CUPS_MINIMAL "IPPEVESELFCERT11/20220225"
 
 
 /*
