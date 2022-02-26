@@ -2919,8 +2919,8 @@ win32_escape_dup(const char *s)		// I - Original string
     }
   }
 
-  // If we have nothing to escape, just duplicate the original string...
-  if (dlen == strlen(s))
+  // If we have nothing to escape and no spaces, just duplicate the original string...
+  if (dlen == strlen(s) && !strchr(s, ' '))
     return (strdup(s));
 
   // Allocate memory (plus quotes and nul)...
