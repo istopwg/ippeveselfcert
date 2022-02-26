@@ -151,7 +151,7 @@ echo ^<dict^>^<key^>Name^</key^>^<string^>B-5. TLS tests^</string^> >>"%PLIST%"
 echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%PLIST%"
 
 set result=SKIP
-ippfind "%name%._ipp._tcp.local." --txt-TLS '^[1-9]\.[0-9]' --quiet && set result=PASS
+ippfind "%name%._ipp._tcp.local." --txt-TLS ^^1\.[0-9] --quiet && set result=PASS
 if "%result%" == "PASS" (
 	set /a pass+=1
 	set HAVE_TLS=1
@@ -324,7 +324,7 @@ echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.dnssd^</string^> >>"%
 
 if "%HAVE_TLS%" == "1" (
 	set result=FAIL
-	ippfind "%name%._ipps._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-pdl image/jpeg --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q "{}" dnssd-value-tests.test ";" && set result=PASS
+	ippfind "%name%._ipps._tcp.local." --txt-adminurl ^^^(http:^|https:^)// --txt-pdl image/pwg-raster --txt-rp ^^ipp/^(print^|print/[^^/]+^)$ --txt-UUID ^^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$ -x ipptool -q "{}" dnssd-value-tests.test ";" && set result=PASS
 	if "%result%" == "PASS" (
 		set /a pass+=1
 	) else (

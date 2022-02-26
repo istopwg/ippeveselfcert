@@ -2891,7 +2891,7 @@ win32_escape_dup(const char *s)		// I - Original string
 
 
   // Figure out the length of the escaped string...
-  for (dlen = 2, sptr = s; *sptr; sptr ++)
+  for (dlen = 0, sptr = s; *sptr; sptr ++)
   {
     if (*sptr == '\\')
     {
@@ -2919,8 +2919,12 @@ win32_escape_dup(const char *s)		// I - Original string
     }
   }
 
-  // Allocate memory (plus nul)...
-  if ((d = calloc(1, dlen + 1)) == NULL)
+  // If we have nothing to escape, just duplicate the original string...
+  if (dlen == strlen(s))
+    return (strdup(s));
+
+  // Allocate memory (plus quotes and nul)...
+  if ((d = calloc(1, dlen + 3)) == NULL)
     return (NULL);
 
   // Copy and escape...
