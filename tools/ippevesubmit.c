@@ -1425,7 +1425,7 @@ validate_dnssd_results(
     snprintf(errptr, errsize - (size_t)(errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
-  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd"))
+  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd"))
   {
     snprintf(errptr, errsize - (size_t)(errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
     result = 0;
@@ -1460,12 +1460,7 @@ validate_dnssd_results(
 
   tests_count = plist_array_count(tests);
 
-  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && tests_count != 10)
-  {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 10).\n", tests_count);
-    result = 0;
-  }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd") && tests_count != 10)
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.dnssd") && tests_count != 10)
   {
     snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 10).\n", tests_count);
     result = 0;
@@ -1494,72 +1489,21 @@ validate_dnssd_results(
       if (tsuccessful->type == PLIST_TYPE_FALSE)
       {
        /*
-	* Test failed, check for auto-exceptions and show error otherwise...
+	* Test failed, show error...
 	*/
 
-	int show_errors = 1;		/* Show error messages? */
+	result = 0;
 
-	if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.bonjour") && (number == 4 || number == 10) && terrors)
+	snprintf(errptr, errsize - (size_t)(errptr - errors), "FAILED %s\n", tname->value);
+	errptr += strlen(errptr);
+
+	for (terror = terrors->first_child; terror; terror = terror->next_sibling)
 	{
-	 /*
-	  * Inspect errors for the current auto-exceptions for all printers:
-	  *
-	  * - Allow rp values other than ipp/print and ipp/print/...
-	  */
+	  if (terror->type != PLIST_TYPE_STRING)
+	    continue;
 
-	  show_errors = 0;
-
-	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
-	  {
-	    if (terror->type != PLIST_TYPE_STRING)
-	    {
-	      continue;
-	    }
-	    else if (strncmp(terror->value, "rp has bad value", 16))
-	    {
-	     /*
-	      * Show any errors that don't fall under the exception here...
-	      */
-
-	      if (!show_errors)
-	      {
-		show_errors = 1;
-		snprintf(errptr, errsize - (size_t)(errptr - errors), "FAILED %s\n", tname->value);
-		errptr += strlen(errptr);
-	      }
-
-	      snprintf(errptr, errsize - (size_t)(errptr - errors), "%s\n", terror->value);
-	      errptr += strlen(errptr);
-	    }
-	  }
-
-	  if (show_errors)
-	  {
-	   /*
-	    * Since we already showed the errors we care about, clear the show
-	    * flag and say that we fail...
-	    */
-
-	    show_errors = 0;
-	    result	= 0;
-	  }
-	}
-
-	if (show_errors)
-	{
-	  result = 0;
-
-	  snprintf(errptr, errsize - (size_t)(errptr - errors), "FAILED %s\n", tname->value);
+	  snprintf(errptr, errsize - (size_t)(errptr - errors), "%s\n", terror->value);
 	  errptr += strlen(errptr);
-
-	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
-	  {
-	    if (terror->type != PLIST_TYPE_STRING)
-	      continue;
-
-	    snprintf(errptr, errsize - (size_t)(errptr - errors), "%s\n", terror->value);
-	    errptr += strlen(errptr);
-	  }
 	}
       }
     }
@@ -1603,7 +1547,7 @@ validate_document_results(
     snprintf(errptr, errsize - (size_t)(errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
-  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.document"))
+  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert11.document"))
   {
     snprintf(errptr, errsize - (size_t)(errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
     errptr += strlen(errptr);
@@ -1639,15 +1583,9 @@ validate_document_results(
 
   tests_count = plist_array_count(tests);
 
-  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.document") && tests_count != 34)
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 53)
   {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 34).\n", tests_count);
-    errptr += strlen(errptr);
-    result = 0;
-  }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.document") && tests_count != 65)
-  {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 34).\n", tests_count);
+    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 53).\n", tests_count);
     errptr += strlen(errptr);
     result = 0;
   }
@@ -1733,7 +1671,7 @@ validate_ipp_results(
     snprintf(errptr, errsize - (size_t)(errptr - errors), "FileId is not a string value.\n");
     return (0);
   }
-  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp"))
+  else if (strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp"))
   {
     snprintf(errptr, errsize - (size_t)(errptr - errors), "Unsupported FileId '%s'.\n", fileid->value);
     errptr += strlen(errptr);
@@ -1769,15 +1707,9 @@ validate_ipp_results(
 
   tests_count = plist_array_count(tests);
 
-  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && tests_count != 27)
+  if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 41)
   {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 27).\n", tests_count);
-    errptr += strlen(errptr);
-    result = 0;
-  }
-  else if (!strcmp(fileid->value, "org.pwg.ippeveselfcert11.ipp") && tests_count != 51)
-  {
-    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 51).\n",  tests_count);
+    snprintf(errptr, errsize - (size_t)(errptr - errors), "Wrong number of tests (got %d, expected 41).\n",  tests_count);
     errptr += strlen(errptr);
     result = 0;
   }
@@ -1805,88 +1737,10 @@ validate_ipp_results(
       if (tsuccessful->type == PLIST_TYPE_FALSE)
       {
        /*
-	* Test failed, check for auto-exceptions and show error otherwise...
+	* Test failed...
 	*/
 
-	int show_errors = 1;		/* Show error messages? */
-
-	if (print_server && terrors && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 9)
-	{
-	 /*
-	  * Inspect errors for the current auto-exceptions for Print Servers:
-	  *
-	  * - media-col-ready, media-ready, identify-actions-xxx,
-	  *   printer-device-id, and the printer-supply attribute are not
-	  *   required.
-	  * - The Identify-Printer operation is not required.
-	  */
-
-	  show_errors = 0;
-
-	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
-	  {
-	    if (terror->type != PLIST_TYPE_STRING)
-	      continue;
-	    else if (strncmp(terror->value, "EXPECTED: identify-actions-", 27) &&
-		     strncmp(terror->value, "EXPECTED: media-col-ready", 25) &&
-		     strncmp(terror->value, "EXPECTED: media-ready", 21) &&
-		     strncmp(terror->value, "EXPECTED: operations-supported WITH-VALUE \"0x003c\"", 50) &&
-		     strncmp(terror->value, "EXPECTED: printer-device-id", 27) &&
-		     strncmp(terror->value, "EXPECTED: printer-supply", 24) &&
-		     strncmp(terror->value, "GOT: printer-supply=", 20))
-	    {
-	     /*
-	      * Show any errors that don't fall under the exception here...
-	      */
-
-	      if (!show_errors)
-	      {
-		show_errors = 1;
-		snprintf(errptr, errsize - (size_t)(errptr - errors), "FAILED %s\n", tname->value);
-		errptr += strlen(errptr);
-	      }
-
-	      snprintf(errptr, errsize - (size_t)(errptr - errors), "%s\n", terror->value);
-	      errptr += strlen(errptr);
-	    }
-	  }
-
-	  if (show_errors)
-	  {
-	   /*
-	    * Since we already showed the errors we care about, clear the show
-	    * flag and say that we fail...
-	    */
-
-	    show_errors = 0;
-	    result	= 0;
-	  }
-	}
-	else if (print_server && !strcmp(fileid->value, "org.pwg.ippeveselfcert10.ipp") && number == 27)
-	{
-	 /*
-	  * Print Servers also do not need to support 'media-needed'.
-	  */
-
-	  show_errors = 0;
-	}
-
-	if (show_errors)
-	{
-	  result = 0;
-
-	  snprintf(errptr, errsize - (size_t)(errptr - errors), "FAILED %s\n", tname->value);
-	  errptr += strlen(errptr);
-
-	  for (terror = terrors->first_child; terror; terror = terror->next_sibling)
-	  {
-	    if (terror->type != PLIST_TYPE_STRING)
-	      continue;
-
-	    snprintf(errptr, errsize - (size_t)(errptr - errors), "%s\n", terror->value);
-	    errptr += strlen(errptr);
-	  }
-	}
+        result = 0;
       }
     }
   }
