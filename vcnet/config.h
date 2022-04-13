@@ -99,8 +99,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "IPPEVESELFCERT11 v20220225"
-#define CUPS_MINIMAL "IPPEVESELFCERT11/20220225"
+#define CUPS_SVERSION "IPPEVESELFCERT11 v20220413"
+#define CUPS_MINIMAL "IPPEVESELFCERT11/20220413"
 
 
 /*
@@ -225,9 +225,10 @@ typedef unsigned long useconds_t;
  */
 
 #define HAVE_TLS 1
+#define HAVE_OPENSSL 1
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
-#define HAVE_SSPISSL 1
+/* #undef HAVE_SSPISSL */
 
 
 /*
