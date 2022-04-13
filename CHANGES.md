@@ -20,6 +20,8 @@ v1.1 Update 4 (TBD)
   (Issue #81)
 - The `ippfind` program did not correctly escape command-line arguments passed
   during the DNS-SD tests (Issue #83)
+- The `ippevesubmit` program did not look for supported media sizes in the
+  right place (Issue #84)
 - Fixed the conditional requirements for "printer-supply-xxx" attributes with
   printers that do not have supplies.
 - Fixed some problems with the Windows DNS-SD test script.

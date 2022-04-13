@@ -491,7 +491,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and medium format is more than 11" and less than 22" wide...
     */
 
-    for (value = finishings_supported->first_child; value; value = value->next_sibling)
+    for (value = media_supported->first_child; value; value = value->next_sibling)
     {
       pwg_media_t *pwg = pwgMediaForPWG(value->value);
 					/* Decoded PWG size name */
