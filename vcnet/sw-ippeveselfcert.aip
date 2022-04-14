@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="19.1" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.3" version="19.3" Modules="professional" RootPath="." Language="en" Id="{52F3020C-FC5E-4DD6-8480-E71A5B45869D}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="ActSyncAppComponent;AutorunComponent;CPLAppletComponent;GameUxComponent;SilverlightSlnComponent"/>
     <ROW Name="MigrationUninstallCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
@@ -27,10 +28,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://www.pwg.org/ipp/everywhere.html"/>
     <ROW Property="LIMITUI" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="IEEE-ISTO Printer Working Group"/>
-    <ROW Property="ProductCode" Value="1033:{7C58790E-56EE-4F46-A48B-8BB0C842EFD0} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{AD85776D-3A5D-41A3-BBF3-2DFFAE5634CF} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="IPP Everywhere v1.1 Update 4 Printer Self-Certification Tools"/>
-    <ROW Property="ProductVersion" Value="11.4.6" Type="32"/>
+    <ROW Property="ProductVersion" Value="11.4.7"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:Suppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{C3B8AB45-EB4D-43BC-A1A1-DBE9D8C65BA0}"/>
@@ -63,7 +64,10 @@
     <ROW Component="ippeveprinter_PrimaryOutput" ComponentId="{0E94B345-160F-4DC9-A15A-2127BC4FF91B}" Directory_="APPDIR" Attributes="256" KeyPath="ippeveprinter.exe"/>
     <ROW Component="ippfind_PrimaryOutput" ComponentId="{61AB74A9-1B77-45B9-B09E-B66A5508A818}" Directory_="APPDIR" Attributes="256" KeyPath="ippfind.exe"/>
     <ROW Component="ipptool_PrimaryOutput" ComponentId="{E9A26042-462B-4E7D-B1C4-AF1B5D7DFC65}" Directory_="APPDIR" Attributes="256" KeyPath="ipptool.exe"/>
+    <ROW Component="libcrypto1_1x64.dll" ComponentId="{7B035A1A-44AB-49D0-B866-A11790AF36FB}" Directory_="APPDIR" Attributes="256" KeyPath="libcrypto1_1x64.dll"/>
     <ROW Component="libcups2_PrimaryOutput" ComponentId="{7BA0107B-BF98-47AF-BEA9-D545E9FE679C}" Directory_="APPDIR" Attributes="256" KeyPath="libcups2.dll"/>
+    <ROW Component="libssl1_1x64.dll" ComponentId="{B7B09A35-A0EE-4F9A-BDDC-CF13679260DC}" Directory_="APPDIR" Attributes="256" KeyPath="libssl1_1x64.dll"/>
+    <ROW Component="zlib.dll" ComponentId="{23698618-7C6B-4D4F-887B-F33FD9531687}" Directory_="APPDIR" Attributes="256" KeyPath="zlib.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="AiAppXAssets" Title="AiAppXAssets" Description="Description" Display="3" Level="0" Directory_="APPDIR" Attributes="0" Options="271" Builds="Build_MSIX_APPX"/>
@@ -109,6 +113,9 @@
     <ROW File="ippfindSquare150x150Logo.scale100.png" Component_="Square50x50Logo.scale100.png" FileName="IPPFIN~2.PNG|ippfindSquare150x150Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\Logo.png" SelfReg="false"/>
     <ROW File="ippevesubmitSquare44x44Logo.scale100.png" Component_="Square50x50Logo.scale100.png" FileName="IPPEVE~3.PNG|ippevesubmitSquare44x44Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\SmallLogo10.png" SelfReg="false"/>
     <ROW File="ippevesubmitSquare150x150Logo.scale100.png" Component_="Square50x50Logo.scale100.png" FileName="IPPEVE~4.PNG|ippevesubmitSquare150x150Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\Logo.png" SelfReg="false"/>
+    <ROW File="libcrypto1_1x64.dll" Component_="libcrypto1_1x64.dll" FileName="LIBCRY~1.DLL|libcrypto-1_1-x64.dll" Attributes="0" SourcePath="packages\zeroc.openssl.v143.1.1.1.1\build\native\bin\x64\Release\libcrypto-1_1-x64.dll" SelfReg="false"/>
+    <ROW File="libssl1_1x64.dll" Component_="libssl1_1x64.dll" FileName="LIBSSL~1.DLL|libssl-1_1-x64.dll" Attributes="0" SourcePath="packages\zeroc.openssl.v143.1.1.1.1\build\native\bin\x64\Release\libssl-1_1-x64.dll" SelfReg="false"/>
+    <ROW File="zlib.dll" Component_="zlib.dll" FileName="zlib.dll" Attributes="0" SourcePath="packages\zlib_native.redist.1.2.11\build\native\bin\x64\Release\zlib.dll" SelfReg="false"/>
     <ATTRIBUTE name="IcoToPng" value="Square50x50Logo.scale100.png:0:50"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AppPathsComponent">
@@ -156,6 +163,10 @@
     <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlAttributeComponent">
+    <ROW XmlAttribute="Alias" XmlElement="ExecutionAlias" Name="Alias" Flags="0" Order="0" Value="[|AI_PROPPATH_FILENAME_PERBUILD_ipptool.exe"/>
+    <ROW XmlAttribute="Alias_1" XmlElement="ExecutionAlias_1" Name="Alias" Flags="0" Order="0" Value="[|AI_PROPPATH_FILENAME_PERBUILD_ippeveprinter.exe"/>
+    <ROW XmlAttribute="Alias_2" XmlElement="ExecutionAlias_2" Name="Alias" Flags="0" Order="0" Value="[|AI_PROPPATH_FILENAME_PERBUILD_ippevesubmit.exe"/>
+    <ROW XmlAttribute="Alias_3" XmlElement="ExecutionAlias_3" Name="Alias" Flags="0" Order="0" Value="[|AI_PROPPATH_FILENAME_PERBUILD_ippfind.exe"/>
     <ROW XmlAttribute="BackgroundColor" XmlElement="VisualElements" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
     <ROW XmlAttribute="BackgroundColor_1" XmlElement="VisualElements_1" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
     <ROW XmlAttribute="BackgroundColor_2" XmlElement="VisualElements_2" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
@@ -164,6 +175,10 @@
     <ROW XmlAttribute="Category_1" XmlElement="Extension_1" Name="Category" Flags="0" Order="0" Value="windows.desktopAppMigration"/>
     <ROW XmlAttribute="Category_2" XmlElement="Extension_2" Name="Category" Flags="0" Order="0" Value="windows.desktopAppMigration"/>
     <ROW XmlAttribute="Category_3" XmlElement="Extension_3" Name="Category" Flags="0" Order="0" Value="windows.desktopAppMigration"/>
+    <ROW XmlAttribute="Category_4" XmlElement="Extension_4" Name="Category" Flags="0" Order="0" Value="windows.appExecutionAlias"/>
+    <ROW XmlAttribute="Category_5" XmlElement="Extension_5" Name="Category" Flags="0" Order="0" Value="windows.appExecutionAlias"/>
+    <ROW XmlAttribute="Category_6" XmlElement="Extension_6" Name="Category" Flags="0" Order="0" Value="windows.appExecutionAlias"/>
+    <ROW XmlAttribute="Category_7" XmlElement="Extension_7" Name="Category" Flags="0" Order="0" Value="windows.appExecutionAlias"/>
     <ROW XmlAttribute="Description" XmlElement="VisualElements" Name="Description" Flags="0" Order="0" Value="ipptool"/>
     <ROW XmlAttribute="Description_1" XmlElement="VisualElements_1" Name="Description" Flags="0" Order="0" Value="ippeveprinter"/>
     <ROW XmlAttribute="Description_2" XmlElement="VisualElements_2" Name="Description" Flags="0" Order="0" Value="ippfind"/>
@@ -233,6 +248,10 @@
     <ROW XmlAttribute="xmlnsuap" XmlElement="Package" Name="xmlns:uap" Flags="0" Order="2" Value="http://schemas.microsoft.com/appx/manifest/uap/windows10"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlElementComponent">
+    <ROW XmlElement="AppExecutionAlias" ParentElement="Extension_4" Name="AppExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="AppExecutionAlias_1" ParentElement="Extension_5" Name="AppExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="AppExecutionAlias_2" ParentElement="Extension_6" Name="AppExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="AppExecutionAlias_3" ParentElement="Extension_7" Name="AppExecutionAlias" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="Application" ParentElement="Applications" Name="Application" Order="1" Flags="0" Type="4"/>
     <ROW XmlElement="Application_1" ParentElement="Applications" Name="Application" Order="2" Flags="0" Type="4"/>
     <ROW XmlElement="Application_2" ParentElement="Applications" Name="Application" Order="3" Flags="0" Type="4"/>
@@ -255,10 +274,18 @@
     <ROW XmlElement="DesktopApp_6" ParentElement="DesktopAppMigration_3" Name="DesktopApp" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="DesktopApp_7" ParentElement="DesktopAppMigration_3" Name="DesktopApp" Order="1" Flags="0" Type="0"/>
     <ROW XmlElement="DisplayName" ParentElement="Properties" Name="DisplayName" Order="1" Flags="0" Text="IPP Everywhere v1.1 Printer Self-Certification Tools" Type="0"/>
+    <ROW XmlElement="ExecutionAlias" ParentElement="AppExecutionAlias" Name="ExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="ExecutionAlias_1" ParentElement="AppExecutionAlias_1" Name="ExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="ExecutionAlias_2" ParentElement="AppExecutionAlias_2" Name="ExecutionAlias" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="ExecutionAlias_3" ParentElement="AppExecutionAlias_3" Name="ExecutionAlias" Order="0" Flags="0" Type="0"/>
     <ROW XmlElement="Extension" ParentElement="Extensions" Name="Extension" Order="0" Flags="0" Type="55"/>
     <ROW XmlElement="Extension_1" ParentElement="Extensions_1" Name="Extension" Order="0" Flags="0" Type="55"/>
     <ROW XmlElement="Extension_2" ParentElement="Extensions_2" Name="Extension" Order="0" Flags="0" Type="55"/>
     <ROW XmlElement="Extension_3" ParentElement="Extensions_3" Name="Extension" Order="0" Flags="0" Type="55"/>
+    <ROW XmlElement="Extension_4" ParentElement="Extensions" Name="Extension" Order="1" Flags="0" Type="54"/>
+    <ROW XmlElement="Extension_5" ParentElement="Extensions_1" Name="Extension" Order="1" Flags="0" Type="54"/>
+    <ROW XmlElement="Extension_6" ParentElement="Extensions_3" Name="Extension" Order="1" Flags="0" Type="54"/>
+    <ROW XmlElement="Extension_7" ParentElement="Extensions_2" Name="Extension" Order="1" Flags="0" Type="54"/>
     <ROW XmlElement="Extensions" ParentElement="Application" Name="Extensions" Order="1" Flags="0" Type="0"/>
     <ROW XmlElement="Extensions_1" ParentElement="Application_1" Name="Extensions" Order="1" Flags="0" Type="0"/>
     <ROW XmlElement="Extensions_2" ParentElement="Application_2" Name="Extensions" Order="1" Flags="0" Type="0"/>
@@ -349,6 +376,9 @@
     <ROW Feature_="MainFeature" Component_="APPDIR"/>
     <ROW Feature_="AiAppXAssets" Component_="Square50x50Logo.scale100.png"/>
     <ROW Feature_="MainFeature" Component_="AI_PROPPATH_FILENAME_PERBUILD_ippevesubmit.exe"/>
+    <ROW Feature_="MainFeature" Component_="libcrypto1_1x64.dll"/>
+    <ROW Feature_="MainFeature" Component_="libssl1_1x64.dll"/>
+    <ROW Feature_="MainFeature" Component_="zlib.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="ippeverywhere.ico" SourcePath="ipp-everywhere.ico" Index="0"/>
@@ -376,7 +406,9 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Path" Root="2" Key="Software\cups.org" Name="installdir" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Software" Root="2" Key="Software" Name="\"/>
     <ROW Registry="Version" Root="2" Key="Software\cups.org" Name="version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="cups.org" Root="2" Key="Software\cups.org" Name="\"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
     <ROW Shortcut="IPPEverywherePrinterSelfCertifica_1" Directory_="DesktopFolder" Name="IPPEVE~1|IPP Everywhere Printer Self-Certification Tools" Component_="libcups2_PrimaryOutput" Target="C:\Windows\System32\cmd.exe" Arguments="Your Arguments" Hotkey="0" Icon_="ippeverywhere.ico" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
