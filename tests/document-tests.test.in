@@ -482,7 +482,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	GENERATE-FILE {
 	    COLORSPACE auto
 	    RESOLUTION max
-	    NUM-PAGES 8
+	    NUM-PAGES 4
 	}
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
@@ -518,7 +518,7 @@ FILE-ID "org.pwg.@IPPEVESELFCERT_VERSION@.document"
 	GENERATE-FILE {
 	    COLORSPACE auto
 	    RESOLUTION max
-	    NUM-PAGES 8
+	    NUM-PAGES 4
 	}
 	STATUS successful-ok
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
