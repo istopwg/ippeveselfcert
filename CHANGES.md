@@ -28,6 +28,9 @@ v1.1 Update 4 (TBD)
 - Fixed some problems with the Windows DNS-SD test script.
 - Fixed the expected test counts in ippevesubmit and removed support for
   submitting IPP Everywhere v1.0 results.
+- Fixed the "media-col-database" and "media-col-ready" tests to allow
+  rangeOfInteger values for the "x-dimension" and "y-dimension" member
+  attributes which are needed for roll feed and custom media support.
 
 
 v1.1 Update 3 (May 17, 2021)
