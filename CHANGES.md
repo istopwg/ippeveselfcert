@@ -31,6 +31,7 @@ v1.1 Update 4 (TBD)
 - Fixed the "media-col-database" and "media-col-ready" tests to allow
   rangeOfInteger values for the "x-dimension" and "y-dimension" member
   attributes which are needed for roll feed and custom media support.
+- Fixed another issue with reporting finishing options from `ippevesubmit`.
 
 
 v1.1 Update 3 (May 17, 2021)

@@ -473,13 +473,19 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     for (value = finishings_supported->first_child; value; value = value->next_sibling)
     {
-      if (!strncmp(value->value, "fold", 4))
+      const char *keyword;		// Keyword value
+      if (isdigit(value->value[0] & 255))
+        keyword = ippEnumString("finishings", atoi(value->value));
+      else
+        keyword = value->value;
+
+      if (!strncmp(keyword, "fold", 4))
 	finishings_fold = 1;
-      else if (!strncmp(value->value, "punch", 5))
+      else if (!strncmp(keyword, "punch", 5))
 	finishings_punch = 1;
-      else if (!strncmp(value->value, "staple", 6))
+      else if (!strncmp(keyword, "staple", 6))
 	finishings_staple = 1;
-      else if (!strncmp(value->value, "trim", 4))
+      else if (!strncmp(keyword, "trim", 4))
 	finishings_trim = 1;
     }
   }
