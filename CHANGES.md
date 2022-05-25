@@ -23,6 +23,7 @@ v1.1 Update 4 (TBD)
 - The `ippevesubmit` program did not look for supported media sizes in the
   right place (Issue #84)
 - Added the test numbers to all print job tests (Issue #85)
+- Changed the I-20 prompt to insert media (Issue #88)
 - Fixed the conditional requirements for "printer-supply-xxx" attributes with
   printers that do not have supplies.
 - Fixed some problems with the Windows DNS-SD test script.

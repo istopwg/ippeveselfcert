@@ -2049,7 +2049,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	}
 
         MONITOR-PRINTER-STATE $uri {
-            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED DISPLAY-MATCH "======== Insert paper. ========"
+            EXPECT printer-state-reasons WITH-VALUE "/^media-needed/" DEFINE-MATCH HAVE_MEDIA_NEEDED DISPLAY-MATCH "======== OK to insert media. ========"
         }
 
 	STATUS successful-ok
@@ -2072,7 +2072,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 # Test 'media-needed' reason
 {
 	SKIP-IF-DEFINED IPP_EVERYWHERE_SERVER
-        PASS-IF-DEFINED HAVE_MEDIA_NEEDED
+        SKIP-IF-DEFINED HAVE_MEDIA_NEEDED
 
 	DELAY 5
 
@@ -2087,7 +2087,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	STATUS successful-ok
 
-	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24 DISPLAY-MATCH "======== Insert paper. ========"
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/" REPEAT-NO-MATCH REPEAT-LIMIT 24 DISPLAY-MATCH "======== OK to insert media. ========"
 
 	## Issue #50: Relax Get-Printer-Attributes tests
 	EXPECT !printer-state IF-DEFINED STRICT
