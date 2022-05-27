@@ -44,7 +44,7 @@ done
 
 PLIST="${TARGET} Document Results.plist"
 
-$IPPFIND --literal-name "${TARGET}" -x $IPPTOOL -P "$PLIST" -I '{}' document-tests.test \;
+$IPPFIND --literal-name "${TARGET}" -x $IPPTOOL -P "$PLIST" -I -T 120 '{}' document-tests.test \;
 
 # confirm that the PLIST is well formed, if plutil is available (e.g. running on Darwin / OS X / macOS)
 test `which plutil` && plutil -lint -s "${PLIST}"

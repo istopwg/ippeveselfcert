@@ -24,6 +24,7 @@ v1.1 Update 4 (TBD)
   right place (Issue #84)
 - Added the test numbers to all print job tests (Issue #85)
 - Changed the I-20 prompt to insert media (Issue #88)
+- Added 120 second timeout for all IPP and document tests (Issue #91)
 - Fixed the conditional requirements for "printer-supply-xxx" attributes with
   printers that do not have supplies.
 - Fixed some problems with the Windows DNS-SD test script.
