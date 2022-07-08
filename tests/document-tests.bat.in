@@ -14,4 +14,4 @@
 
 set name=%1
 set name=%name:~1,-1%
-ippfind "%name%._ipp._tcp.local." -x ipptool -P "%USERPROFILE%\Desktop\%name% Document Results.plist" -I -T 120 {} document-tests.test ";"
+ippfind "%name%._ipp._tcp.local." -x ipptool -P "%USERPROFILE%\Desktop\%name% Document Results.plist" -I -T 300 {} document-tests.test ";"
