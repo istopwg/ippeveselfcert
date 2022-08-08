@@ -4,12 +4,6 @@ IPP Everywhere™ v1.1 Printer Self-Certification Tools
 This directory contains the IPP Everywhere™ v1.1 Printer Self-Certification
 tools.
 
-In addition to the files in this directory, you must also download and
-extract one or more PWG Raster Format file archives from
-<https://ftp.pwg.org/pub/pwg/ipp/examples/>
-
-These archives are used for the Document Data tests.
-
 > Note: Tests are intended to be run on an isolated network, or at least when no
 > other users are printing using the target printer.  Otherwise the test scripts
 > will fail randomly.
@@ -31,7 +25,7 @@ Scripts for running the self-certification tests:
 
 Tools:
 
-- "ippeveprinter": Sample IPP Everywhere printer, useful for testing
+- "ippeveprinter": Sample IPP Everywhere printer application, useful for testing
 - "ippevesubmit": IPP Everywhere Printer Self-Certification submission tool
 - "ippfind": Tool for finding printers with DNS-SD (Bonjour)
 - "ipptool": IPP test tool
