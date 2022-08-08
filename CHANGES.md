@@ -1,8 +1,8 @@
 Changes
 =======
 
-v1.1 Update 4 (TBD)
--------------------
+v1.1 Update 4 (August 8, 2022)
+------------------------------
 
 - Added support for running the self-certification tools non-interactively
   with the "make test" command (Issue #56, Issue #62)
@@ -25,6 +25,8 @@ v1.1 Update 4 (TBD)
 - Added the test numbers to all print job tests (Issue #85)
 - Changed the I-20 prompt to insert media (Issue #88)
 - Added 300 second timeout for all IPP and document tests (Issue #91, Issue #92)
+- Fixed handling of long dimension values of 0 for roll media (Issue #93,
+  Issue #94)
 - Fixed the conditional requirements for "printer-supply-xxx" attributes with
   printers that do not have supplies.
 - Fixed some problems with the Windows DNS-SD test script.

@@ -42,10 +42,15 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 DEFINE LINK_LOCAL "/^(\[|\[v1.)fe80:/"
 DEFINE UUID_URI "/^urn:uuid:[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{12,12}/"
 
-# Regular expression for PWG media size names (eek!)
+# Regular expressions for PWG media size names (eek!)
+#
+# MEDIA_REGEX is for supported media and MEDIA_READY_REGEX is for ready media
+# where the long dimension can be 0 for roll-fed media.
 #
 # Generated with help from: http://abnf.msweet.org/
 DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)){2,}|(custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)$$/"
+
+DEFINE MEDIA_READY_REGEX "/^(choice(_((custom|na|asme|roc|oe)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)){2,}|(custom|na|asme|roc|oe)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm|roll_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9]|0)(in|mm))$$/"
 
 # Regular expression for printer-alert attribute
 #
@@ -413,7 +418,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 
 	EXPECT media-left-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
 
-	EXPECT media-ready OF-TYPE keyword|name|no-value IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$MEDIA_REGEX"
+	EXPECT media-ready OF-TYPE keyword|name|no-value IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$MEDIA_READY_REGEX"
 
 	EXPECT media-right-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
 
@@ -441,7 +446,7 @@ DEFINE SUPPLY_REGEX "/^((type\=[A-Za-z]+;|maxcapacity\=-{0,1}[0-9]+;|level\=-{0,
 	EXPECT media-col-ready OF-TYPE collection|no-value IN-GROUP printer-attributes-tag
 	EXPECT-ALL media-col-ready/media-size OF-TYPE collection COUNT 1
 	EXPECT-ALL media-col-ready/media-size/x-dimension OF-TYPE integer|rangeOfInteger COUNT 1 WITH-VALUE >0
-	EXPECT-ALL media-col-ready/media-size/y-dimension OF-TYPE integer|rangeOfInteger COUNT 1 WITH-VALUE >0
+	EXPECT-ALL media-col-ready/media-size/y-dimension OF-TYPE integer|rangeOfInteger COUNT 1 WITH-VALUE >-1
 	EXPECT-ALL media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
 	EXPECT-ALL ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
 	EXPECT-ALL media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
