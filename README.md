@@ -44,8 +44,6 @@ Legal Stuff
 -----------
 
 Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
-Copyright © 2007-2019 by Apple Inc.
-Copyright © 1997-2007 by Easy Software Products.
 
 This software is provided under the terms of the Apache License, Version 2.0.
 A copy of this license can be found in the file `LICENSE`.  Additional legal
