@@ -3,14 +3,10 @@ autom4te.cache
 config.h
 config.log
 config.status
-cups/libcups.a
-sw-ippeveselfcert11-*
+configure~
+sw-ippeveselfcert[0-9][0-9]-*
 man/mantohtml
-tests/pwg-raster-samples-*
-tools/ippeveprinter
-tools/ippevesubmit
-tools/ippfind
-tools/ipptool
+selfcert/selfcert
 *.o
 *Results.plist
 /.vs

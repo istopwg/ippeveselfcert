@@ -1,85 +1,51 @@
 #
-# Common makefile definitions for CUPS.
+# Common makefile definitions for the IPP Everywhere Printer Self-Certification
+# tools.
 #
-# Copyright 2015-2021 by the ISTO Printer Working Group.
-# Copyright 2007-2019 by Apple Inc.
-# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright © 2015-2022 by the ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
 #
 
-#
-# Version of the IPP Everywhere Printer Self-Certification Manual
-#
+# Versions...
+IPPEVESELFCERT_DOCVERSION = @IPPEVESELFCERT_DOCVERSION@
+IPPEVESELFCERT_SWVERSION = @IPPEVESELFCERT_SWVERSION@
 
-SELFCERTVERSION	=	@CUPS_VERSION@
-IPPEVESELFCERT_VERSION = @IPPEVESELFCERT_VERSION@
 
-#
 # Programs...
-#
-
-AR		=	@AR@
-AWK		=	@AWK@
 CC		=	@CC@
-CHMOD		=	@CHMOD@
-GZIP		=	@GZIP@
-RANLIB		=	@RANLIB@
+CODE_SIGN	=	@CODE_SIGN@
+CXX		=	@CXX@
+INSTALL		=	@INSTALL@
+LN		=	@LN@ -sf
+MKDIR           =       @MKDIR@ -p
 RM		=	@RM@ -f
 RMDIR		=	@RMDIR@
-SED		=	@SED@
 SHELL		=	/bin/sh
 
-#
-# Libraries...
-#
 
-LIBZ		=	@LIBZ@
+# Installation programs...
+INSTALL_BIN	=	$(INSTALL) -c -m 755
+INSTALL_DATA	=	$(INSTALL) -c -m 444
+INSTALL_DIR	=	$(INSTALL) -d -m 755
+INSTALL_LIB	=	$(INSTALL) -c -m 755
+INSTALL_MAN	=	$(INSTALL) -c -m 444
 
-#
-# Program options...
-#
-# ARCHFLAGS     Defines the default architecture build options.
-# OPTIM         Defines the common compiler optimization/debugging options
-#               for all architectures.
-# OPTIONS       Defines other compile-time options (currently only -DDEBUG
-#               for extra debug info)
-#
 
-ALL_CFLAGS	=	-I.. -D_CUPS_SOURCE -DCUPS_LITE $(CFLAGS) $(TLSFLAGS) \
-			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
-ALL_CXXFLAGS	=	-I.. -D_CUPS_SOURCE -DCUPS_LITE $(CXXFLAGS) $(TLSFLAGS) \
-			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
-ARCHFLAGS	=	@ARCHFLAGS@
-ARFLAGS		=	@ARFLAGS@
-CFLAGS		=	@CPPFLAGS@ @CFLAGS@
-COMMONLIBS	=	@LIBS@
-DNSSDLIBS	=	@DNSSDLIBS@
-LDFLAGS		=	@LDARCHFLAGS@ @LDFLAGS@ $(OPTIM)
-LINKCUPS	=	../cups/libcups.a $(TLSLIBS) $(DNSSDLIBS) $(LIBZ)
-LIBS		=	$(LINKCUPS) $(COMMONLIBS)
+# Programs options...
+CFLAGS		=	@CFLAGS@ $(CPPFLAGS) $(OPTIM) $(WARNINGS)
+CODESIGN_IDENTITY =	-
+CPPFLAGS	=	-I.. -I../libcups -I../pdfio @CPPFLAGS@
+CSFLAGS		=	-s "$(CODESIGN_IDENTITY)" @CSFLAGS@ --timestamp
+CXXFLAGS	=	@CXXFLAGS@ $(CPPFLAGS) $(OPTIM) $(WARNINGS)
+LDFLAGS		=	@LDFLAGS@ $(OPTIM)
+LIBS		=	-L../libcups/cups `PKG_CONFIG_PATH=../libcups pkg-config --libs cups` @LIBS@
 OPTIM		=	@OPTIM@
-OPTIONS		=
-TLSFLAGS	=	@TLSFLAGS@
-TLSLIBS		=	@TLSLIBS@
+WARNINGS	=	@WARNINGS@
 
 
-#
 # Directories...
-#
-# The first section uses the GNU names (which are *extremely*
-# difficult to find in a makefile because they are lowercase...)
-# We have to define these first because autoconf uses ${prefix}
-# and ${exec_prefix} for most of the other directories...
-#
-# The "datarootdir" variable may not get defined if you are using
-# a version of autoconf prior to 2.60.
-#
-# This is immediately followed by definition in ALL CAPS for the
-# needed directories...
-#
-
 bindir		=	@bindir@
 datadir		=	@datadir@
 datarootdir	=	@datarootdir@
@@ -99,16 +65,17 @@ srcdir		=	@srcdir@
 sysconfdir	=	@sysconfdir@
 top_srcdir	=	@top_srcdir@
 
-BUILDROOT	=	$(DSTROOT)
+BUILDROOT	=	$(DSTROOT)$(RPM_BUILD_ROOT)$(DESTDIR)
 
 
-#
-# Rules...
-#
-
+# Build commands...
 .SILENT:
-.SUFFIXES:	.a .c .h .o
+.SUFFIXES:	.c .cxx .h .o
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
