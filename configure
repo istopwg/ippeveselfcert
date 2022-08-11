@@ -615,6 +615,7 @@ PACKAGE_STRING='IPPEVESELFCERT20 2.0b1'
 PACKAGE_BUGREPORT='https://github.com/istopwg/ippeveselfcert/issues'
 PACKAGE_URL='http://www.pwg.org/ipp/everywhere.html'
 
+enable_option_checking=no
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stddef.h>
@@ -659,6 +660,9 @@ RMDIR
 RM
 MKDIR
 CODE_SIGN
+ac_ct_CXX
+CXXFLAGS
+CXX
 OBJEXT
 EXEEXT
 ac_ct_CC
@@ -677,6 +681,7 @@ build_cpu
 build
 IPPEVESELFCERT_SWVERSION
 IPPEVESELFCERT_DOCVERSION
+subdirs
 target_alias
 host_alias
 build_alias
@@ -732,8 +737,11 @@ CC
 CFLAGS
 LDFLAGS
 LIBS
-CPPFLAGS'
-
+CPPFLAGS
+CXX
+CXXFLAGS
+CCC'
+ac_subdirs_all='libcups'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1373,6 +1381,8 @@ Some influential environment variables:
   LIBS        libraries to pass to the linker, e.g. -l<library>
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1494,6 +1504,45 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_try_compile
+
+# ac_fn_cxx_try_compile LINENO
+# ----------------------------
+# Try to compile conftest.$ac_ext, and return whether this succeeded.
+ac_fn_cxx_try_compile ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  rm -f conftest.$ac_objext conftest.beam
+  if { { ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+printf "%s\n" "$ac_try_echo"; } >&5
+  (eval "$ac_compile") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    grep -v '^ *+' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+    mv -f conftest.er1 conftest.err
+  fi
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext
+then :
+  ac_retval=0
+else $as_nop
+  printf "%s\n" "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_retval=1
+fi
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_cxx_try_compile
 
 # ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
@@ -2130,6 +2179,222 @@ main (int argc, char **argv)
 }
 "
 
+# Test code for whether the C++ compiler supports C++98 (global declarations)
+ac_cxx_conftest_cxx98_globals='
+// Does the compiler advertise C++98 conformance?
+#if !defined __cplusplus || __cplusplus < 199711L
+# error "Compiler does not advertise C++98 conformance"
+#endif
+
+// These inclusions are to reject old compilers that
+// lack the unsuffixed header files.
+#include <cstdlib>
+#include <exception>
+
+// <cassert> and <cstring> are *not* freestanding headers in C++98.
+extern void assert (int);
+namespace std {
+  extern int strcmp (const char *, const char *);
+}
+
+// Namespaces, exceptions, and templates were all added after "C++ 2.0".
+using std::exception;
+using std::strcmp;
+
+namespace {
+
+void test_exception_syntax()
+{
+  try {
+    throw "test";
+  } catch (const char *s) {
+    // Extra parentheses suppress a warning when building autoconf itself,
+    // due to lint rules shared with more typical C programs.
+    assert (!(strcmp) (s, "test"));
+  }
+}
+
+template <typename T> struct test_template
+{
+  T const val;
+  explicit test_template(T t) : val(t) {}
+  template <typename U> T add(U u) { return static_cast<T>(u) + val; }
+};
+
+} // anonymous namespace
+'
+
+# Test code for whether the C++ compiler supports C++98 (body of main)
+ac_cxx_conftest_cxx98_main='
+  assert (argc);
+  assert (! argv[0]);
+{
+  test_exception_syntax ();
+  test_template<double> tt (2.0);
+  assert (tt.add (4) == 6.0);
+  assert (true && !false);
+}
+'
+
+# Test code for whether the C++ compiler supports C++11 (global declarations)
+ac_cxx_conftest_cxx11_globals='
+// Does the compiler advertise C++ 2011 conformance?
+#if !defined __cplusplus || __cplusplus < 201103L
+# error "Compiler does not advertise C++11 conformance"
+#endif
+
+namespace cxx11test
+{
+  constexpr int get_val() { return 20; }
+
+  struct testinit
+  {
+    int i;
+    double d;
+  };
+
+  class delegate
+  {
+  public:
+    delegate(int n) : n(n) {}
+    delegate(): delegate(2354) {}
+
+    virtual int getval() { return this->n; };
+  protected:
+    int n;
+  };
+
+  class overridden : public delegate
+  {
+  public:
+    overridden(int n): delegate(n) {}
+    virtual int getval() override final { return this->n * 2; }
+  };
+
+  class nocopy
+  {
+  public:
+    nocopy(int i): i(i) {}
+    nocopy() = default;
+    nocopy(const nocopy&) = delete;
+    nocopy & operator=(const nocopy&) = delete;
+  private:
+    int i;
+  };
+
+  // for testing lambda expressions
+  template <typename Ret, typename Fn> Ret eval(Fn f, Ret v)
+  {
+    return f(v);
+  }
+
+  // for testing variadic templates and trailing return types
+  template <typename V> auto sum(V first) -> V
+  {
+    return first;
+  }
+  template <typename V, typename... Args> auto sum(V first, Args... rest) -> V
+  {
+    return first + sum(rest...);
+  }
+}
+'
+
+# Test code for whether the C++ compiler supports C++11 (body of main)
+ac_cxx_conftest_cxx11_main='
+{
+  // Test auto and decltype
+  auto a1 = 6538;
+  auto a2 = 48573953.4;
+  auto a3 = "String literal";
+
+  int total = 0;
+  for (auto i = a3; *i; ++i) { total += *i; }
+
+  decltype(a2) a4 = 34895.034;
+}
+{
+  // Test constexpr
+  short sa[cxx11test::get_val()] = { 0 };
+}
+{
+  // Test initializer lists
+  cxx11test::testinit il = { 4323, 435234.23544 };
+}
+{
+  // Test range-based for
+  int array[] = {9, 7, 13, 15, 4, 18, 12, 10, 5, 3,
+                 14, 19, 17, 8, 6, 20, 16, 2, 11, 1};
+  for (auto &x : array) { x += 23; }
+}
+{
+  // Test lambda expressions
+  using cxx11test::eval;
+  assert (eval ([](int x) { return x*2; }, 21) == 42);
+  double d = 2.0;
+  assert (eval ([&](double x) { return d += x; }, 3.0) == 5.0);
+  assert (d == 5.0);
+  assert (eval ([=](double x) mutable { return d += x; }, 4.0) == 9.0);
+  assert (d == 5.0);
+}
+{
+  // Test use of variadic templates
+  using cxx11test::sum;
+  auto a = sum(1);
+  auto b = sum(1, 2);
+  auto c = sum(1.0, 2.0, 3.0);
+}
+{
+  // Test constructor delegation
+  cxx11test::delegate d1;
+  cxx11test::delegate d2();
+  cxx11test::delegate d3(45);
+}
+{
+  // Test override and final
+  cxx11test::overridden o1(55464);
+}
+{
+  // Test nullptr
+  char *c = nullptr;
+}
+{
+  // Test template brackets
+  test_template<::test_template<int>> v(test_template<int>(12));
+}
+{
+  // Unicode literals
+  char const *utf8 = u8"UTF-8 string \u2500";
+  char16_t const *utf16 = u"UTF-8 string \u2500";
+  char32_t const *utf32 = U"UTF-32 string \u2500";
+}
+'
+
+# Test code for whether the C compiler supports C++11 (complete).
+ac_cxx_conftest_cxx11_program="${ac_cxx_conftest_cxx98_globals}
+${ac_cxx_conftest_cxx11_globals}
+
+int
+main (int argc, char **argv)
+{
+  int ok = 0;
+  ${ac_cxx_conftest_cxx98_main}
+  ${ac_cxx_conftest_cxx11_main}
+  return ok;
+}
+"
+
+# Test code for whether the C compiler supports C++98 (complete).
+ac_cxx_conftest_cxx98_program="${ac_cxx_conftest_cxx98_globals}
+int
+main (int argc, char **argv)
+{
+  int ok = 0;
+  ${ac_cxx_conftest_cxx98_main}
+  return ok;
+}
+"
+
 as_fn_append ac_header_c_list " stdio.h stdio_h HAVE_STDIO_H"
 as_fn_append ac_header_c_list " stdlib.h stdlib_h HAVE_STDLIB_H"
 as_fn_append ac_header_c_list " string.h string_h HAVE_STRING_H"
@@ -2306,6 +2571,12 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+ac_config_headers="$ac_config_headers config.h"
+
+
+
+subdirs="$subdirs libcups"
+
 
 
 IPPEVESELFCERT_DOCVERSION="ippeveselfcert20"
@@ -2415,6 +2686,7 @@ fi
 
 CFLAGS="${CFLAGS:=}"
 CPPFLAGS="${CPPFLAGS:=}"
+CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 LIBS="${LIBS:=}"
 OPTIM="${OPTIM:=}"
@@ -3417,6 +3689,381 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+
+
+
+
+
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+if test -z "$CXX"; then
+  if test -n "$CCC"; then
+    CXX=$CCC
+  else
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_CXX+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CXX="$ac_tool_prefix$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CXX=$ac_cv_prog_CXX
+if test -n "$CXX"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
+printf "%s\n" "$CXX" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+    test -n "$CXX" && break
+  done
+fi
+if test -z "$CXX"; then
+  ac_ct_CXX=$CXX
+  for ac_prog in g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_ac_ct_CXX+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$ac_ct_CXX"; then
+  ac_cv_prog_ac_ct_CXX="$ac_ct_CXX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CXX="$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_CXX=$ac_cv_prog_ac_ct_CXX
+if test -n "$ac_ct_CXX"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_ct_CXX" >&5
+printf "%s\n" "$ac_ct_CXX" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+  test -n "$ac_ct_CXX" && break
+done
+
+  if test "x$ac_ct_CXX" = x; then
+    CXX="g++"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+printf "%s\n" "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    CXX=$ac_ct_CXX
+  fi
+fi
+
+  fi
+fi
+# Provide some information about the compiler.
+printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for C++ compiler version" >&5
+set X $ac_compile
+ac_compiler=$2
+for ac_option in --version -v -V -qversion; do
+  { { ac_try="$ac_compiler $ac_option >&5"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+printf "%s\n" "$ac_try_echo"; } >&5
+  (eval "$ac_compiler $ac_option >&5") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    sed '10a\
+... rest of stderr output deleted ...
+         10q' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+  fi
+  rm -f conftest.er1 conftest.err
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+done
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports GNU C++" >&5
+printf %s "checking whether the compiler supports GNU C++... " >&6; }
+if test ${ac_cv_cxx_compiler_gnu+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+#ifndef __GNUC__
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  ac_compiler_gnu=yes
+else $as_nop
+  ac_compiler_gnu=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ac_cv_cxx_compiler_gnu=$ac_compiler_gnu
+
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_compiler_gnu" >&5
+printf "%s\n" "$ac_cv_cxx_compiler_gnu" >&6; }
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+if test $ac_compiler_gnu = yes; then
+  GXX=yes
+else
+  GXX=
+fi
+ac_test_CXXFLAGS=${CXXFLAGS+y}
+ac_save_CXXFLAGS=$CXXFLAGS
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CXX accepts -g" >&5
+printf %s "checking whether $CXX accepts -g... " >&6; }
+if test ${ac_cv_prog_cxx_g+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_save_cxx_werror_flag=$ac_cxx_werror_flag
+   ac_cxx_werror_flag=yes
+   ac_cv_prog_cxx_g=no
+   CXXFLAGS="-g"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  ac_cv_prog_cxx_g=yes
+else $as_nop
+  CXXFLAGS=""
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+
+else $as_nop
+  ac_cxx_werror_flag=$ac_save_cxx_werror_flag
+	 CXXFLAGS="-g"
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  ac_cv_prog_cxx_g=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+   ac_cxx_werror_flag=$ac_save_cxx_werror_flag
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_g" >&5
+printf "%s\n" "$ac_cv_prog_cxx_g" >&6; }
+if test $ac_test_CXXFLAGS; then
+  CXXFLAGS=$ac_save_CXXFLAGS
+elif test $ac_cv_prog_cxx_g = yes; then
+  if test "$GXX" = yes; then
+    CXXFLAGS="-g -O2"
+  else
+    CXXFLAGS="-g"
+  fi
+else
+  if test "$GXX" = yes; then
+    CXXFLAGS="-O2"
+  else
+    CXXFLAGS=
+  fi
+fi
+ac_prog_cxx_stdcxx=no
+if test x$ac_prog_cxx_stdcxx = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++11 features" >&5
+printf %s "checking for $CXX option to enable C++11 features... " >&6; }
+if test ${ac_cv_prog_cxx_11+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_prog_cxx_11=no
+ac_save_CXX=$CXX
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_cxx_conftest_cxx11_program
+_ACEOF
+for ac_arg in '' -std=gnu++11 -std=gnu++0x -std=c++11 -std=c++0x -qlanglvl=extended0x -AA
+do
+  CXX="$ac_save_CXX $ac_arg"
+  if ac_fn_cxx_try_compile "$LINENO"
+then :
+  ac_cv_prog_cxx_cxx11=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam
+  test "x$ac_cv_prog_cxx_cxx11" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CXX=$ac_save_CXX
+fi
+
+if test "x$ac_cv_prog_cxx_cxx11" = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+printf "%s\n" "unsupported" >&6; }
+else $as_nop
+  if test "x$ac_cv_prog_cxx_cxx11" = x
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+printf "%s\n" "none needed" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_cxx11" >&5
+printf "%s\n" "$ac_cv_prog_cxx_cxx11" >&6; }
+     CXX="$CXX $ac_cv_prog_cxx_cxx11"
+fi
+  ac_cv_prog_cxx_stdcxx=$ac_cv_prog_cxx_cxx11
+  ac_prog_cxx_stdcxx=cxx11
+fi
+fi
+if test x$ac_prog_cxx_stdcxx = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++98 features" >&5
+printf %s "checking for $CXX option to enable C++98 features... " >&6; }
+if test ${ac_cv_prog_cxx_98+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_prog_cxx_98=no
+ac_save_CXX=$CXX
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_cxx_conftest_cxx98_program
+_ACEOF
+for ac_arg in '' -std=gnu++98 -std=c++98 -qlanglvl=extended -AA
+do
+  CXX="$ac_save_CXX $ac_arg"
+  if ac_fn_cxx_try_compile "$LINENO"
+then :
+  ac_cv_prog_cxx_cxx98=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam
+  test "x$ac_cv_prog_cxx_cxx98" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CXX=$ac_save_CXX
+fi
+
+if test "x$ac_cv_prog_cxx_cxx98" = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+printf "%s\n" "unsupported" >&6; }
+else $as_nop
+  if test "x$ac_cv_prog_cxx_cxx98" = x
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+printf "%s\n" "none needed" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_cxx98" >&5
+printf "%s\n" "$ac_cv_prog_cxx_cxx98" >&6; }
+     CXX="$CXX $ac_cv_prog_cxx_cxx98"
+fi
+  ac_cv_prog_cxx_stdcxx=$ac_cv_prog_cxx_cxx98
+  ac_prog_cxx_stdcxx=cxx98
+fi
+fi
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 for ac_prog in codesign true
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3701,8 +4348,8 @@ then :
 
 else $as_nop
 
-    CPPFLAGS="$CPPFLAGS $($FLTKCONFIG --use-images --cflags)"
-    LIBS="$LIBS $($FLTKCONFIG --use-images --ldflags)"
+    CPPFLAGS="$CPPFLAGS $($FLTKCONFIG --cflags)"
+    LIBS="$LIBS $($FLTKCONFIG --ldflags)"
 
 fi
 
@@ -4285,43 +4932,7 @@ test "x$prefix" = xNONE && prefix=$ac_default_prefix
 # Let make expand exec_prefix.
 test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 
-# Transform confdefs.h into DEFS.
-# Protect against shell expansion while executing Makefile rules.
-# Protect against Makefile macro expansion.
-#
-# If the first sed substitution is executed (which looks for macros that
-# take arguments), then branch to the quote section.  Otherwise,
-# look for a macro that doesn't take arguments.
-ac_script='
-:mline
-/\\$/{
- N
- s,\\\n,,
- b mline
-}
-t clear
-:clear
-s/^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 (][^	 (]*([^)]*)\)[	 ]*\(.*\)/-D\1=\2/g
-t quote
-s/^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 ][^	 ]*\)[	 ]*\(.*\)/-D\1=\2/g
-t quote
-b any
-:quote
-s/[	 `~#$^&*(){}\\|;'\''"<>?]/\\&/g
-s/\[/\\&/g
-s/\]/\\&/g
-s/\$/$$/g
-H
-:any
-${
-	g
-	s/^\n//
-	s/\n/ /g
-	p
-}
-'
-DEFS=`sed -n "$ac_script" confdefs.h`
-
+DEFS=-DHAVE_CONFIG_H
 
 ac_libobjs=
 ac_ltlibobjs=
@@ -4748,11 +5359,15 @@ case $ac_config_files in *"
 "*) set x $ac_config_files; shift; ac_config_files=$*;;
 esac
 
+case $ac_config_headers in *"
+"*) set x $ac_config_headers; shift; ac_config_headers=$*;;
+esac
 
 
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 # Files that config.status was made for.
 config_files="$ac_config_files"
+config_headers="$ac_config_headers"
 
 _ACEOF
 
@@ -4773,9 +5388,14 @@ Usage: $0 [OPTION]... [TAG]...
       --recheck    update $as_me by reconfiguring in the same conditions
       --file=FILE[:TEMPLATE]
                    instantiate the configuration file FILE
+      --header=FILE[:TEMPLATE]
+                   instantiate the configuration header FILE
 
 Configuration files:
 $config_files
+
+Configuration headers:
+$config_headers
 
 Report bugs to <https://github.com/istopwg/ippeveselfcert/issues>.
 IPPEVESELFCERT20 home page: <http://www.pwg.org/ipp/everywhere.html>."
@@ -4840,7 +5460,18 @@ do
     esac
     as_fn_append CONFIG_FILES " '$ac_optarg'"
     ac_need_defaults=false;;
-  --he | --h |  --help | --hel | -h )
+  --header | --heade | --head | --hea )
+    $ac_shift
+    case $ac_optarg in
+    *\'*) ac_optarg=`printf "%s\n" "$ac_optarg" | sed "s/'/'\\\\\\\\''/g"` ;;
+    esac
+    as_fn_append CONFIG_HEADERS " '$ac_optarg'"
+    ac_need_defaults=false;;
+  --he | --h)
+    # Conflict between --help and --header
+    as_fn_error $? "ambiguous option: \`$1'
+Try \`$0 --help' for more information.";;
+  --help | --hel | -h )
     printf "%s\n" "$ac_cs_usage"; exit ;;
   -q | -quiet | --quiet | --quie | --qui | --qu | --q \
   | -silent | --silent | --silen | --sile | --sil | --si | --s)
@@ -4896,6 +5527,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "Makedefs") CONFIG_FILES="$CONFIG_FILES Makedefs" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -4909,6 +5541,7 @@ done
 # bizarre bug on SunOS 4.1.3.
 if $ac_need_defaults; then
   test ${CONFIG_FILES+y} || CONFIG_FILES=$config_files
+  test ${CONFIG_HEADERS+y} || CONFIG_HEADERS=$config_headers
 fi
 
 # Have a temporary directory for convenience.  Make it in the build tree
@@ -5096,8 +5729,116 @@ fi
 cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 fi # test -n "$CONFIG_FILES"
 
+# Set up the scripts for CONFIG_HEADERS section.
+# No need to generate them if there are no CONFIG_HEADERS.
+# This happens for instance with `./config.status Makefile'.
+if test -n "$CONFIG_HEADERS"; then
+cat >"$ac_tmp/defines.awk" <<\_ACAWK ||
+BEGIN {
+_ACEOF
 
-eval set X "  :F $CONFIG_FILES      "
+# Transform confdefs.h into an awk script `defines.awk', embedded as
+# here-document in config.status, that substitutes the proper values into
+# config.h.in to produce config.h.
+
+# Create a delimiter string that does not exist in confdefs.h, to ease
+# handling of long lines.
+ac_delim='%!_!# '
+for ac_last_try in false false :; do
+  ac_tt=`sed -n "/$ac_delim/p" confdefs.h`
+  if test -z "$ac_tt"; then
+    break
+  elif $ac_last_try; then
+    as_fn_error $? "could not make $CONFIG_HEADERS" "$LINENO" 5
+  else
+    ac_delim="$ac_delim!$ac_delim _$ac_delim!! "
+  fi
+done
+
+# For the awk script, D is an array of macro values keyed by name,
+# likewise P contains macro parameters if any.  Preserve backslash
+# newline sequences.
+
+ac_word_re=[_$as_cr_Letters][_$as_cr_alnum]*
+sed -n '
+s/.\{148\}/&'"$ac_delim"'/g
+t rset
+:rset
+s/^[	 ]*#[	 ]*define[	 ][	 ]*/ /
+t def
+d
+:def
+s/\\$//
+t bsnl
+s/["\\]/\\&/g
+s/^ \('"$ac_word_re"'\)\(([^()]*)\)[	 ]*\(.*\)/P["\1"]="\2"\
+D["\1"]=" \3"/p
+s/^ \('"$ac_word_re"'\)[	 ]*\(.*\)/D["\1"]=" \2"/p
+d
+:bsnl
+s/["\\]/\\&/g
+s/^ \('"$ac_word_re"'\)\(([^()]*)\)[	 ]*\(.*\)/P["\1"]="\2"\
+D["\1"]=" \3\\\\\\n"\\/p
+t cont
+s/^ \('"$ac_word_re"'\)[	 ]*\(.*\)/D["\1"]=" \2\\\\\\n"\\/p
+t cont
+d
+:cont
+n
+s/.\{148\}/&'"$ac_delim"'/g
+t clear
+:clear
+s/\\$//
+t bsnlc
+s/["\\]/\\&/g; s/^/"/; s/$/"/p
+d
+:bsnlc
+s/["\\]/\\&/g; s/^/"/; s/$/\\\\\\n"\\/p
+b cont
+' <confdefs.h | sed '
+s/'"$ac_delim"'/"\\\
+"/g' >>$CONFIG_STATUS || ac_write_fail=1
+
+cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
+  for (key in D) D_is_set[key] = 1
+  FS = ""
+}
+/^[\t ]*#[\t ]*(define|undef)[\t ]+$ac_word_re([\t (]|\$)/ {
+  line = \$ 0
+  split(line, arg, " ")
+  if (arg[1] == "#") {
+    defundef = arg[2]
+    mac1 = arg[3]
+  } else {
+    defundef = substr(arg[1], 2)
+    mac1 = arg[2]
+  }
+  split(mac1, mac2, "(") #)
+  macro = mac2[1]
+  prefix = substr(line, 1, index(line, defundef) - 1)
+  if (D_is_set[macro]) {
+    # Preserve the white space surrounding the "#".
+    print prefix "define", macro P[macro] D[macro]
+    next
+  } else {
+    # Replace #undef with comments.  This is necessary, for example,
+    # in the case of _POSIX_SOURCE, which is predefined and required
+    # on some systems where configure will not decide to define it.
+    if (defundef == "undef") {
+      print "/*", prefix defundef, macro, "*/"
+      next
+    }
+  }
+}
+{ print }
+_ACAWK
+_ACEOF
+cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
+  as_fn_error $? "could not setup config headers machinery" "$LINENO" 5
+fi # test -n "$CONFIG_HEADERS"
+
+
+eval set X "  :F $CONFIG_FILES  :H $CONFIG_HEADERS    "
 shift
 for ac_tag
 do
@@ -5305,7 +6046,30 @@ which seems to be undefined.  Please make sure it is defined" >&2;}
   esac \
   || as_fn_error $? "could not create $ac_file" "$LINENO" 5
  ;;
-
+  :H)
+  #
+  # CONFIG_HEADER
+  #
+  if test x"$ac_file" != x-; then
+    {
+      printf "%s\n" "/* $configure_input  */" >&1 \
+      && eval '$AWK -f "$ac_tmp/defines.awk"' "$ac_file_inputs"
+    } >"$ac_tmp/config.h" \
+      || as_fn_error $? "could not create $ac_file" "$LINENO" 5
+    if diff "$ac_file" "$ac_tmp/config.h" >/dev/null 2>&1; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: $ac_file is unchanged" >&5
+printf "%s\n" "$as_me: $ac_file is unchanged" >&6;}
+    else
+      rm -f "$ac_file"
+      mv "$ac_tmp/config.h" "$ac_file" \
+	|| as_fn_error $? "could not create $ac_file" "$LINENO" 5
+    fi
+  else
+    printf "%s\n" "/* $configure_input  */" >&1 \
+      && eval '$AWK -f "$ac_tmp/defines.awk"' "$ac_file_inputs" \
+      || as_fn_error $? "could not create -" "$LINENO" 5
+  fi
+ ;;
 
 
   esac
@@ -5340,6 +6104,149 @@ if test "$no_create" != yes; then
   # Use ||, not &&, to avoid exiting from the if with $? = 1, which
   # would make configure fail if this is the last instruction.
   $ac_cs_success || as_fn_exit 1
+fi
+
+#
+# CONFIG_SUBDIRS section.
+#
+if test "$no_recursion" != yes; then
+
+  # Remove --cache-file, --srcdir, and --disable-option-checking arguments
+  # so they do not pile up.
+  ac_sub_configure_args=
+  ac_prev=
+  eval "set x $ac_configure_args"
+  shift
+  for ac_arg
+  do
+    if test -n "$ac_prev"; then
+      ac_prev=
+      continue
+    fi
+    case $ac_arg in
+    -cache-file | --cache-file | --cache-fil | --cache-fi \
+    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
+      ac_prev=cache_file ;;
+    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
+    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* \
+    | --c=*)
+      ;;
+    --config-cache | -C)
+      ;;
+    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
+      ac_prev=srcdir ;;
+    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
+      ;;
+    -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
+      ac_prev=prefix ;;
+    -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+      ;;
+    --disable-option-checking)
+      ;;
+    *)
+      case $ac_arg in
+      *\'*) ac_arg=`printf "%s\n" "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
+      esac
+      as_fn_append ac_sub_configure_args " '$ac_arg'" ;;
+    esac
+  done
+
+  # Always prepend --prefix to ensure using the same prefix
+  # in subdir configurations.
+  ac_arg="--prefix=$prefix"
+  case $ac_arg in
+  *\'*) ac_arg=`printf "%s\n" "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
+  esac
+  ac_sub_configure_args="'$ac_arg' $ac_sub_configure_args"
+
+  # Pass --silent
+  if test "$silent" = yes; then
+    ac_sub_configure_args="--silent $ac_sub_configure_args"
+  fi
+
+  # Always prepend --disable-option-checking to silence warnings, since
+  # different subdirs can have different --enable and --with options.
+  ac_sub_configure_args="--disable-option-checking $ac_sub_configure_args"
+
+  ac_popdir=`pwd`
+  for ac_dir in : $subdirs; do test "x$ac_dir" = x: && continue
+
+    # Do not complain, so a configure script can configure whichever
+    # parts of a large source tree are present.
+    test -d "$srcdir/$ac_dir" || continue
+
+    ac_msg="=== configuring in $ac_dir (`pwd`/$ac_dir)"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: $ac_msg" >&5
+    printf "%s\n" "$ac_msg" >&6
+    as_dir="$ac_dir"; as_fn_mkdir_p
+    ac_builddir=.
+
+case "$ac_dir" in
+.) ac_dir_suffix= ac_top_builddir_sub=. ac_top_build_prefix= ;;
+*)
+  ac_dir_suffix=/`printf "%s\n" "$ac_dir" | sed 's|^\.[\\/]||'`
+  # A ".." for each directory in $ac_dir_suffix.
+  ac_top_builddir_sub=`printf "%s\n" "$ac_dir_suffix" | sed 's|/[^\\/]*|/..|g;s|/||'`
+  case $ac_top_builddir_sub in
+  "") ac_top_builddir_sub=. ac_top_build_prefix= ;;
+  *)  ac_top_build_prefix=$ac_top_builddir_sub/ ;;
+  esac ;;
+esac
+ac_abs_top_builddir=$ac_pwd
+ac_abs_builddir=$ac_pwd$ac_dir_suffix
+# for backward compatibility:
+ac_top_builddir=$ac_top_build_prefix
+
+case $srcdir in
+  .)  # We are building in place.
+    ac_srcdir=.
+    ac_top_srcdir=$ac_top_builddir_sub
+    ac_abs_top_srcdir=$ac_pwd ;;
+  [\\/]* | ?:[\\/]* )  # Absolute name.
+    ac_srcdir=$srcdir$ac_dir_suffix;
+    ac_top_srcdir=$srcdir
+    ac_abs_top_srcdir=$srcdir ;;
+  *) # Relative name.
+    ac_srcdir=$ac_top_build_prefix$srcdir$ac_dir_suffix
+    ac_top_srcdir=$ac_top_build_prefix$srcdir
+    ac_abs_top_srcdir=$ac_pwd/$srcdir ;;
+esac
+ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
+
+
+    cd "$ac_dir"
+
+    # Check for configure.gnu first; this name is used for a wrapper for
+    # Metaconfig's "Configure" on case-insensitive file systems.
+    if test -f "$ac_srcdir/configure.gnu"; then
+      ac_sub_configure=$ac_srcdir/configure.gnu
+    elif test -f "$ac_srcdir/configure"; then
+      ac_sub_configure=$ac_srcdir/configure
+    else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: no configuration information is in $ac_dir" >&5
+printf "%s\n" "$as_me: WARNING: no configuration information is in $ac_dir" >&2;}
+      ac_sub_configure=
+    fi
+
+    # The recursion is here.
+    if test -n "$ac_sub_configure"; then
+      # Make the cache file name correct relative to the subdirectory.
+      case $cache_file in
+      [\\/]* | ?:[\\/]* ) ac_sub_cache_file=$cache_file ;;
+      *) # Relative name.
+	ac_sub_cache_file=$ac_top_build_prefix$cache_file ;;
+      esac
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&5
+printf "%s\n" "$as_me: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&6;}
+      # The eval makes quoting arguments work.
+      eval "\$SHELL \"\$ac_sub_configure\" $ac_sub_configure_args \
+	   --cache-file=\"\$ac_sub_cache_file\" --srcdir=\"\$ac_srcdir\"" ||
+	as_fn_error $? "$ac_sub_configure failed for $ac_dir" "$LINENO" 5
+    fi
+
+    cd "$ac_popdir"
+  done
 fi
 if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5

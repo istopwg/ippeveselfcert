@@ -13,6 +13,7 @@ include ../Makedefs
 COBJS		=	\
 			plist.o
 CXXOBJS		=	\
+			main.o \
 			SelfCertApp.o
 OBJS		=	$(COBJS) $(CXXOBJS)
 TARGETS         =       \

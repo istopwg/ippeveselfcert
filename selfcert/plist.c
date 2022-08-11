@@ -1,5 +1,6 @@
 //
-// plist utilities
+// Selfcert plist utilities for the IPP Everywhere Printer Self-Certification
+// application.
 //
 // Copyright © 2019-2022 by the IEEE-ISTO Printer Working Group.
 //
@@ -13,8 +14,10 @@
 
 // Local functions...
 static void	json_puts(FILE *fp, const char *s);
-static void	report_error(plist_error_cb_t cb, void *cb_data, int linenum, const char *message, ...);
+static FILE	*open_file(const char *filename, const char *mode, plist_error_cb_t cb, void *cb_data);
+static void	report_error(plist_error_cb_t cb, void *cb_data, const char *filename, int linenum, const char *message, ...) SELFCERT_FORMAT(5,6);
 static char	*xml_gets(FILE *fp, char *buffer, size_t bufsize, int *linenum);
+static void	xml_puts(FILE *fp, const char *s);
 static void	xml_unescape(char *buffer);
 
 
@@ -205,15 +208,27 @@ plist_find(plist_t    *parent,		// I - Parent node
 
 
 //
+// 'plist_new()' - Create a new plist (XML) file with its plist root node.
+//
+
+plist_t	*				// O - Root node or `NULL` on error
+plist_new(void)
+{
+  return (plist_add(NULL, PLIST_TYPE_PLIST, NULL));
+}
+
+
+//
 // 'plist_read()' - Read a plist (XML) file.
 //
 
 plist_t *				// O - Root node of plist file or `NULL` on error
-plist_read(FILE             *fp,	// I - File to read
+plist_read(FILE             *fp,	// I - Input file or `NULL` to open filename
            const char       *filename,	// I - Filename
-           plist_error_cb_t cb,		// I - Callback function
-           void             *cb_data)	// I - Callback data
+           plist_error_cb_t cb,		// I - Error callback function
+           void             *cb_data)	// I - Error callback data
 {
+  bool		close_fp = fp != NULL;	// Close the input file?
   plist_t	*plist = NULL,		// Root plist node
 		*parent = NULL;		// Current parent node
   char		buffer[65536];		// Element/value buffer
@@ -221,6 +236,18 @@ plist_read(FILE             *fp,	// I - File to read
   int		needval = 0;		// Just read a <key>, need a value
 
 
+  // Range check input...
+  if (!fp && !filename)
+    return (NULL);
+
+  // Open file as needed...
+  if (!fp)
+  {
+    if ((fp = open_file(filename, "r", cb, cb_data)) == NULL)
+      return (NULL);
+  }
+
+  // Read the file...
   while (xml_gets(fp, buffer, sizeof(buffer), &linenum))
   {
     if (!strncmp(buffer, "<?xml ", 6) || !strncmp(buffer, "<!DOCTYPE ", 10))
@@ -423,6 +450,10 @@ plist_read(FILE             *fp,	// I - File to read
     plist = NULL;
   }
 
+  // Close the file as needed...
+  if (close_fp)
+    fclose(fp);
+
   return (plist);
 }
 
@@ -432,9 +463,113 @@ plist_read(FILE             *fp,	// I - File to read
 //
 
 bool					// O - `true` on success, `false` on error
-plist_write(FILE    *fp,		// I - Output file
-            plist_t *plist)		// I - plist to write
+plist_write(
+    FILE             *fp,		// I - Output file or `NULL` to open filename
+    const char       *filename,		// I - Filename
+    plist_t          *plist,		// I - plist to write
+    plist_error_cb_t cb,		// I - Error callback function
+    void             *cb_data)		// I - Error callback data
 {
+  bool		close_fp = fp != NULL;	// Close the input file?
+  plist_t	*current,		// Current node
+		*next;			// Next node
+  int		indent = 0;		// Indentation
+  static const char *elements[] =	// Elements
+  {
+    "plist",			// <plist> ... </plist>
+    "array",			// <array> ... </array>
+    "dict",			// <dict> ... </dict>
+    "key",			// <key>value</key>
+    "data",			// <data>value</data>
+    "date",			// <date>value</date>
+    "false",			// <false />
+    "integer",			// <integer>value</integer>
+    "string",			// <string>value</string>
+    "true"			// <true />
+  };
+
+
+  // Range check input...
+  if ((!fp && !filename) || !plist)
+    return (false);
+
+  // Create file as needed...
+  if (!fp)
+  {
+    if ((fp = open_file(filename, "w", cb, cb_data)) == NULL)
+      return (NULL);
+  }
+
+  // Write file header...
+  fputs("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", fp);
+  fputs("<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n", fp);
+
+  for (current = plist->first_child; current; current = next)
+  {
+    if (current->prev_sibling && current->parent->type == PLIST_TYPE_ARRAY)
+      fputs(",\n", fp);
+
+    switch (current->type)
+    {
+      case PLIST_TYPE_PLIST :
+          fputs("<plist version=\"1.0\">\n", fp);
+	  break;
+      case PLIST_TYPE_ARRAY :
+      case PLIST_TYPE_DICT :
+          fprintf(fp, "%*s<%s>\n", indent, "", elements[current->type]);
+	  break;
+      case PLIST_TYPE_KEY :
+      case PLIST_TYPE_DATA :
+      case PLIST_TYPE_DATE :
+      case PLIST_TYPE_INTEGER :
+      case PLIST_TYPE_STRING :
+          fprintf(fp, "%*s<%s>", indent, "", elements[current->type]);
+          xml_puts(fp, current->value);
+          fprintf(fp, "</%s\n>", elements[current->type]);
+	  break;
+      case PLIST_TYPE_FALSE :
+      case PLIST_TYPE_TRUE :
+          fprintf(fp, "%*s<%s/>\n", indent, "", elements[current->type]);
+	  break;
+    }
+
+    if ((next = current->first_child) != NULL)
+    {
+      // Descend into child...
+      indent += 4;
+    }
+    else if ((next = current->next_sibling) == NULL)
+    {
+      // Ascend parent(s)...
+      next = current->parent;
+      indent -= 4;
+
+      while (next)
+      {
+	if (next->type == PLIST_TYPE_ARRAY || next->type == PLIST_TYPE_DICT)
+          fprintf(fp, "%*s</%s>\n", indent, "", elements[next->type]);
+
+	if (next->next_sibling)
+	{
+	  // Next sibling...
+	  next = next->next_sibling;
+	  break;
+	}
+	else
+	{
+	  // Ascend parent...
+	  next = next->parent;
+	  indent -= 4;
+	}
+      }
+    }
+  }
+
+  // Close the file as needed...
+  if (close_fp)
+    fclose(fp);
+
+  return (true);
 }
 
 
@@ -443,9 +578,165 @@ plist_write(FILE    *fp,		// I - Output file
 //
 
 bool					// O - `true` on success, `false` on error
-plist_write_json(FILE    *fp,		// I - Output file
-                 plist_t *plist)	// I - plist to write
+plist_write_json(
+    FILE             *fp,		// I - Output file or `NULL` to open filename
+    const char       *filename,		// I - Filename
+    plist_t          *plist,		// I - plist to write
+    plist_error_cb_t cb,		// I - Error callback function
+    void             *cb_data)		// I - Error callback data
 {
+  bool		close_fp = fp != NULL;	// Close the input file?
+  plist_t	*current,		// Current node
+		*next;			// Next node
+
+
+  // Range check input...
+  if ((!fp && !filename) || !plist)
+    return (false);
+
+  // Create file as needed...
+  if (!fp)
+  {
+    if ((fp = open_file(filename, "w", cb, cb_data)) == NULL)
+      return (NULL);
+  }
+
+  // Write the plist as a JSON array...
+  putc('[', fp);
+
+  if (plist->type == PLIST_TYPE_DICT)
+    putc('{', fp);
+
+  for (current = plist->first_child; current; current = next)
+  {
+    if (current->prev_sibling && current->parent->type == PLIST_TYPE_ARRAY)
+      fputs(",\n", fp);
+
+    switch (current->type)
+    {
+      case PLIST_TYPE_PLIST :
+	  break;
+      case PLIST_TYPE_ARRAY :
+	  putc('[', fp);
+	  break;
+      case PLIST_TYPE_DICT :
+	  putc('{', fp);
+	  break;
+      case PLIST_TYPE_KEY :
+	  if (current->prev_sibling)
+	    putc(',', fp);
+
+	  json_puts(fp, current->value);
+	  putc(':', fp);
+	  break;
+      case PLIST_TYPE_DATA :
+      case PLIST_TYPE_DATE :
+      case PLIST_TYPE_STRING :
+	  json_puts(fp, current->value);
+	  break;
+      case PLIST_TYPE_FALSE :
+	  fputs("false", fp);
+	  break;
+      case PLIST_TYPE_TRUE :
+	  fputs("true", fp);
+	  break;
+      case PLIST_TYPE_INTEGER :
+	  fputs(current->value, fp);
+	  break;
+    }
+
+    next = current->first_child;
+    if (!next)
+      next = current->next_sibling;
+    if (!next)
+    {
+      next = current->parent;
+      while (next)
+      {
+	if (next->type == PLIST_TYPE_ARRAY)
+	  putc(']', fp);
+	else if (next->type == PLIST_TYPE_DICT)
+	  putc('}', fp);
+
+	if (next->next_sibling)
+	{
+	  next = next->next_sibling;
+	  break;
+	}
+	else
+	  next = next->parent;
+      }
+    }
+  }
+
+  if (plist->type == PLIST_TYPE_DICT)
+    putc(']', fp);
+
+  putc('\n', fp);
+
+  // Close the file as needed...
+  if (close_fp)
+    fclose(fp);
+
+  return (true);
+}
+
+
+//
+// 'json_puts()' - Write a string with JSON encoding to a file.
+//
+
+static void
+json_puts(FILE	     *fp,		// I - File to write to
+	  const char *s)		// I - String to write
+{
+  putc('\"', fp);
+
+  while (*s)
+  {
+    if (*s == '\b')
+      fputs("\\b", fp);
+    else if (*s == '\f')
+      fputs("\\f", fp);
+    else if (*s == '\n')
+      fputs("\\n", fp);
+    else if (*s == '\r')
+      fputs("\\r", fp);
+    else if (*s == '\t')
+      fputs("\\t", fp);
+    else if (*s == '\\')
+      fputs("\\\\", fp);
+    else if (*s == '\"')
+      fputs("\\\"", fp);
+    else if (*s == '\'')
+      fputs("\\'", fp);
+    else if ((*s & 255) >= ' ')
+      putc(*s, fp);
+
+    s ++;
+  }
+
+  putc('\"', fp);
+}
+
+
+//
+// 'open_file()' - Open a file.
+//
+
+static FILE *				// O - File pointer or `NULL` on error
+open_file(const char       *filename,	// I - Filename to open
+          const char       *mode,	// I - "r" to read or "w" to write
+          plist_error_cb_t cb,		// I - Error callback function
+          void             *cb_data)	// I - Error callback data
+{
+  FILE	*fp;				// File pointer
+
+
+  if ((fp = fopen(filename, mode)) == NULL)
+    report_error(cb, cb_data, filename, 0, "%s", strerror(errno));
+
+  return (fp);
 }
 
 
@@ -471,13 +762,26 @@ report_error(plist_error_cb_t cb,	// I - Callback function
     return;
 
   // Prefix the message with the filename and line number...
-  snprintf(buffer, sizeof(buffer), "%s:%d - ", filename, linenum);
+  if (linenum)
+    snprintf(buffer, sizeof(buffer), "%s:%d  ", filename, linenum);
+  else
+    snprintf(buffer, sizeof(buffer), "%s  ", filename);
+
   bufptr = buffer + strlen(buffer);
 
-  // Format the message...
-  va_start(ap, message);
-  vsnprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), message, ap);
-  va_end(ap);
+  // Append the message...
+  if (strchr(message, '%'))
+  {
+    // Format the message...
+    va_start(ap, message);
+    vsnprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), message, ap);
+    va_end(ap);
+  }
+  else
+  {
+    // Copy the literal message...
+    cupsCopyString(bufptr, message, sizeof(buffer) - (size_t)(bufptr - buffer));
+  }
 
   // Call the error callback...
   (cb)(cb_data, buffer);
@@ -605,6 +909,57 @@ xml_gets(FILE	*fp,			// I  - File to read from
   }
 
   return (buffer);
+}
+
+
+//
+// 'xml_puts()'- Write a string to an XML file, escaping as needed.
+//
+
+static void
+xml_puts(FILE       *fp,		// I - Output file
+         const char *s)			// I - String
+{
+  const char	*start,			// Start of fragment
+		*end;			// End of fragment
+
+
+  // Loop through the string...
+  for (start = s, end = s; *end; end ++)
+  {
+    if (strchr("&<>", *end))
+    {
+      // Need to escape this character...
+      if (end > start)
+      {
+        // Write literal fragment..
+	fwrite(start, end - start, 1, fp);
+      }
+
+      // Next fragment starts after this character...
+      start = end + 1;
+
+      // Write the escaped version...
+      switch (*end)
+      {
+        case '&' :
+            fputs("&amp;", fp);
+            break;
+        case '<' :
+            fputs("&lt;", fp);
+            break;
+        case '>' :
+            fputs("&gt;", fp);
+            break;
+      }
+    }
+  }
+
+  if (end > start)
+  {
+    // Write trailing literal fragment...
+    fwrite(start, end - start, 1, fp);
+  }
 }
 
 

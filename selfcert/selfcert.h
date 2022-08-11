@@ -1,5 +1,5 @@
 //
-// Selfcert header file for the  IPP Everywhere Printer Self-Certification
+// Selfcert header file for the IPP Everywhere Printer Self-Certification
 // application.
 //
 // Copyright © 2019-2022 by the IEEE-ISTO Printer Working Group.
@@ -13,6 +13,7 @@
 #  include <config.h>
 #  include <stdio.h>
 #  include <stdlib.h>
+#  include <stdbool.h>
 #  include <string.h>
 #  include <ctype.h>
 #  include <errno.h>
@@ -25,6 +26,21 @@
 extern "C" {
 #  endif // __cplusplus
 
+
+// Annotations...
+#  if _WIN32
+#    define SELFCERT_FORMAT(a,b)
+#    define SELFCERT_NONNULL(...)
+#    define SELFCERT_NORETURN
+#  elif defined(__has_extension) || defined(__GNUC__)
+#    define SELFCERT_FORMAT(a,b)  __attribute__ ((__format__(__printf__, a,b)))
+#    define SELFCERT_NONNULL(...) __attribute__ ((nonnull(__VA_ARGS__)))
+#    define SELFCERT_NORETURN     __attribute__ ((noreturn))
+#  else
+#    define SELFCERT_FORMAT(a,b)
+#    define SELFCERT_NONNULL(...)
+#    define SELFCERT_NORETURN
+#  endif // __has_extension || __GNUC__
 
 // Types...
 typedef void (*plist_error_cb_t)(void *cb_data, const char *message);
@@ -60,9 +76,14 @@ extern plist_t	*plist_add(plist_t *parent, plist_type_t type, const char *value)
 extern size_t	plist_array_count(plist_t *plist);
 extern void	plist_delete(plist_t *plist);
 extern plist_t	*plist_find(plist_t *parent, const char *path);
+extern plist_t	*plist_new(void);
 extern plist_t	*plist_read(FILE *fp, const char *filename, plist_error_cb_t cb, void *cb_data);
-extern bool	plist_write(FILE *fp, plist_t *plist);
-extern bool	plist_write_json(FILE *fp, plist_t *plist);
+extern bool	plist_write(FILE *fp, const char *filename, plist_t *plist, plist_error_cb_t cb, void *cb_data);
+extern bool	plist_write_json(FILE *fp, const char *filename, plist_t *plist, plist_error_cb_t cb, void *cb_data);
+
+extern bool	validate_dnssd_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
+extern bool	validate_document_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
+extern bool	validate_ipp_results(const char *filename, plist_t *results, int print_server, char *errors, size_t errsize);
 
 
 #  ifdef __cplusplus

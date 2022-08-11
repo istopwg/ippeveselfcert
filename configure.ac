@@ -14,6 +14,8 @@ AC_PREREQ([2.70])
 
 dnl Package name and version...
 AC_INIT([IPPEVESELFCERT20], [2.0b1], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SUBDIRS([libcups])
 
 
 dnl IPP Everywhere Printer Self-Certification Manual version...
@@ -72,8 +74,8 @@ AC_PATH_PROG(FLTKCONFIG,fltk-config)
 AS_IF([test "x$FLTKCONFIG" = x], [
     AC_MSG_ERROR([ippeveselfcert requires the FLTK library.])
 ], [
-    CPPFLAGS="$CPPFLAGS $($FLTKCONFIG --use-images --cflags)"
-    LIBS="$LIBS $($FLTKCONFIG --use-images --ldflags)"
+    CPPFLAGS="$CPPFLAGS $($FLTKCONFIG --cflags)"
+    LIBS="$LIBS $($FLTKCONFIG --ldflags)"
 ])
 
 

@@ -10,30 +10,40 @@ class SelfCertApp {
   } {
     Fl_Window window {
       label {IPP Everywhere™ Printer Self-Certification Tool v2.0} open
-      xywh {462 352 600 500} type Double align 80 resizable visible
+      private xywh {462 352 600 500} type Double align 80 resizable visible
     } {
       Fl_Tile tile {open
-        xywh {0 0 600 500} resizable
+        private xywh {0 0 600 500} resizable
       } {
         Fl_Browser browser {
-          xywh {0 0 600 100}
+          private xywh {0 0 600 100}
         }
         Fl_Group results {open
-          xywh {0 100 600 400} resizable
+          private xywh {0 100 600 400} resizable
         } {
           Fl_Browser resultsBrowser {
-            xywh {0 100 600 365} textfont 4 resizable
+            private xywh {0 100 600 365} textfont 4 resizable
           }
           Fl_Button resultsSubmit {
-            label Submit selected
-            xywh {450 470 65 25}
+            label Submit
+            private xywh {450 470 65 25}
           }
           Fl_Button resultsCancel {
-            label Cancel
-            xywh {525 470 65 25}
+            label Cancel selected
+            private xywh {525 470 65 25}
           }
         }
       }
     }
+  }
+  Function {~SelfCertApp()} {open
+  } {
+    code {delete window;} {}
+  }
+  Function {show(int argc, char *argv[])} {open return_type void
+  } {
+    code {window->show(argc, argv);} {}
+  }
+  decl {bool test(const char *name);} {public local
   }
 }
