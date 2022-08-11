@@ -17,7 +17,7 @@ CXXOBJS		=	\
 			SelfCertApp.o
 OBJS		=	$(COBJS) $(CXXOBJS)
 TARGETS         =       \
-                        selfcert
+                        ippeveselfcert
 
 
 #
@@ -51,7 +51,7 @@ depend:
 install:	all
 	echo "Installing selfcert to $(BUILDROOT)$(bindir)..."
 	$(INSTALL_DIR) $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) selfcert $(BUILDROOT)$(bindir)
+	$(INSTALL_BIN) ippeveselfcert $(BUILDROOT)$(bindir)
 
 
 #
@@ -65,7 +65,7 @@ test:
 # selfcert
 #
 
-selfcert:	$(OBJS) ../libcups/cups/libcups.a
+ippeveselfcert:	$(OBJS) ../libcups/cups/libcups.a
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 

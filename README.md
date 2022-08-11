@@ -1,19 +1,26 @@
-IPP Everywhere™ v1.1 Printer Self-Certification Tools
+IPP Everywhere™ v2.0 Printer Self-Certification Tools
 =====================================================
+
+> Note: The current v1.1 self-certification tools are provided in the
+> "v1.1-updates" branch of this repository.
+
+![Version](https://img.shields.io/github/v/release/istopwg/ippeveselfcert?include_prereleases)
+![Apache 2.0](https://img.shields.io/github/license/istopwg/ippeveselfcert)
+![Build and Test](https://github.com/istopwg/ippeveselfcert/workflows/Build%20and%20Test/badge.svg)
+[![ippeveselfcert](https://snapcraft.io/ippeveselfcert/badge.svg)](https://snapcraft.io/ippeveselfcert)
+[![Coverity Scan Status](https://img.shields.io/coverity/scan/25371.svg)](https://scan.coverity.com/projects/istopwg-ippeveselfcert)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/istopwg/ippeveselfcert.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/istopwg/ippeveselfcert/alerts/)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/istopwg/ippeveselfcert.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/istopwg/ippeveselfcert/context:cpp)
 
 The IPP Everywhere™ Printer self-certification tools are used to test the
 conformance of printers to PWG Candidate Standard 5100.14-20xx: IPP Everywhere™
-v1.1. The testing and submission procedures are defined in PWG Candidate
-Standard 5100.20-20xx: IPP Everywhere™ v1.1 Printer Self-Certification Manual.
+v2.0. The testing and submission procedures are defined in PWG Candidate
+Standard 5100.20-20xx: IPP Everywhere™ v2.0 Printer Self-Certification Manual.
 
 The [IPP Everywhere™ home page](http://www.pwg.org/ipp/everywhere.html) provides
-access to all information relevant to IPP Everywhere™. Sample PWG Raster files
-(needed for the document tests) can be downloaded from the PWG FTP server at
-<https://ftp.pwg.org/pub/pwg/ipp/examples> - only the files dated on or after
-June 7th, 2018 can be used.
-
-The "ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere
-Printer Self-Certification. You can subscribe at
+access to all information relevant to IPP Everywhere™.  The
+"ippeveselfcert@pwg.org" mailing list is used to discuss IPP Everywhere Printer
+Self-Certification.  You can subscribe at
 <https://www.pwg.org/mailman/listinfo/ippeveselfcert>.
 
 Issues found in the tools should be reported using the Github issues page at

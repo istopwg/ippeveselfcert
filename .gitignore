@@ -6,7 +6,7 @@ config.status
 configure~
 sw-ippeveselfcert[0-9][0-9]-*
 man/mantohtml
-selfcert/selfcert
+selfcert/ippeveselfcert
 *.o
 *Results.plist
 /.vs
