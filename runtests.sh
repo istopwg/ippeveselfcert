@@ -9,6 +9,6 @@ if test $# != 2; then
 	exit 1
 fi
 
-PATH="`pwd`/tools:$PATH"; export PATH
+PATH="`pwd`/libcups/tools:$PATH"; export PATH
 cd tests
 sh "$@"

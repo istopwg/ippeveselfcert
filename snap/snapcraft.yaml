@@ -21,6 +21,9 @@ apps:
     ippeveprinter:
         command: usr/local/bin/ippeveprinter
         plugs: [avahi-observe, home, network, network-bind]
+    ippevesubmit:
+        command: usr/local/bin/ippevesubmit
+        plugs: [home]
     ippfind:
         command: usr/local/bin/ippfind
         plugs: [avahi-observe, home, network]

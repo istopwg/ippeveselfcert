@@ -10,14 +10,18 @@
 include ../Makedefs
 
 
-COBJS		=	\
-			plist.o
-CXXOBJS		=	\
+COMMON_COBJS	=	\
+			plist.o \
+			validate.o
+APP_CXXOBJS	=	\
 			main.o \
 			SelfCertApp.o
-OBJS		=	$(COBJS) $(CXXOBJS)
+SUBMIT_COBJS	=	\
+			ippevesubmit.o
+OBJS		=	$(COMMON_COBJS) $(APP_CXXOBJS) $(SUBMIT_COBJS)
 TARGETS         =       \
-                        ippeveselfcert
+                        ippeveselfcert \
+                        ippevesubmit
 
 
 #
@@ -40,8 +44,8 @@ clean:
 #
 
 depend:
-	$(CC) -MM $(CPPFLAGS) $(COBJS:.o=.c) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >Dependencies
-	$(CXX) -MM $(CPPFLAGS) $(CXXOBJS:.o=.cxx) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >>Dependencies
+	$(CC) -MM $(CPPFLAGS) $(COMMON_COBJS:.o=.c) $(SUBMIT_COBJS:.o=.c) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >Dependencies
+	$(CXX) -MM $(CPPFLAGS) $(APP_CXXOBJS:.o=.cxx) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >>Dependencies
 
 
 #
@@ -51,7 +55,9 @@ depend:
 install:	all
 	echo "Installing selfcert to $(BUILDROOT)$(bindir)..."
 	$(INSTALL_DIR) $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ippeveselfcert $(BUILDROOT)$(bindir)
+	for file in $(TARGETS); do \
+		$(INSTALL_BIN) $$file $(BUILDROOT)$(bindir)/$$file; \
+	done
 
 
 #
@@ -62,12 +68,21 @@ test:
 
 
 #
-# selfcert
+# ippeveselfcert
 #
 
-ippeveselfcert:	$(OBJS) ../libcups/cups/libcups.a
+ippeveselfcert:	$(APP_CXXOBJS) $(COMMON_COBJS) ../libcups/cups/libcups.a
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ $(APP_CXXOBJS) $(COMMON_COBJS) $(LIBS)
+
+
+#
+# ippevesubmit
+#
+
+ippevesubmit:	$(SUBMIT_COBJS) $(COMMON_COBJS) ../libcups/cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ $(SUBMIT_COBJS) $(COMMON_COBJS) $(LIBS)
 
 
 #

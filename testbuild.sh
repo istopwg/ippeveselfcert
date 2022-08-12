@@ -9,7 +9,7 @@
 #
 
 # Run ippeveprinter in the background...
-tools/ippeveprinter -vvv -f image/jpeg,image/pwg-raster,application/pdf -s 10,5 "Test" >test.log 2>&1 &
+libcups/tools/ippeveprinter -vvv -f image/jpeg,image/pwg-raster,application/pdf -s 10,5 "Test" >test.log 2>&1 &
 pid=$!
 
 # Run the tests for a print server...
@@ -30,7 +30,7 @@ echo "Test Printer 3000" >>/tmp/test-models.txt
 
 echo "ippevesubmit Test: \c"
 cd tests
-if ../tools/ippevesubmit -f standard -m /tmp/test-models.txt -p "Test Product Family" -t server -u "https://www.pwg.org/" -y "Test" >/tmp/test.log 2>&1; then
+if ../selfcert/ippevesubmit -f standard -m /tmp/test-models.txt -p "Test Product Family" -t server -u "https://www.pwg.org/" -y "Test" >/tmp/test.log 2>&1; then
 	if test $(wc -l <Test.json) = 3; then
 		echo "PASS"
 		cat /tmp/test.log
