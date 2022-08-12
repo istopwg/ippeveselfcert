@@ -37,7 +37,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install prerequisites
-      run: brew install cppcheck libfltk libjpeg libpng libusb openssl
+      run: brew install cppcheck fltk libjpeg libpng libusb openssl
     - name: Configure
       run: ./configure --enable-debug --enable-maintainer --enable-sanitizer --enable-static --disable-shared
     - name: Make
