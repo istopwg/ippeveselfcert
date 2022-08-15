@@ -2,33 +2,58 @@
 
 #include "SelfCertApp.h"
 
+void SelfCertApp::cb_browser_i(Fl_Browser*, void*) {
+  test(browser->text(browser->value()));
+}
+void SelfCertApp::cb_browser(Fl_Browser* o, void* v) {
+  ((SelfCertApp*)(o->parent()->parent()->user_data()))->cb_browser_i(o,v);
+}
+
 /**
  Constructor
 */
 SelfCertApp::SelfCertApp() {
-  { window = new Fl_Double_Window(600, 500, "IPP Everywhere\342\204\242 Printer Self-Certification Tool v2.0");
+  { window = new Fl_Double_Window(800, 600, "IPP Everywhere\342\204\242 Printer Self-Certification Tool v2.0");
+    window->color((Fl_Color)55);
     window->user_data((void*)(this));
     window->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
-    { tile = new Fl_Tile(0, 0, 600, 500);
-      { browser = new Fl_Browser(0, 0, 600, 100);
+    { tile = new Fl_Tile(0, 0, 800, 555);
+      { browser = new Fl_Browser(0, 0, 800, 100);
+        browser->type(1);
+        browser->box(FL_DOWN_BOX);
+        browser->callback((Fl_Callback*)cb_browser);
       } // Fl_Browser* browser
-      { results = new Fl_Group(0, 100, 600, 400);
-        { resultsBrowser = new Fl_Browser(0, 100, 600, 365);
-          resultsBrowser->textfont(4);
-          Fl_Group::current()->resizable(resultsBrowser);
-        } // Fl_Browser* resultsBrowser
-        { resultsSubmit = new Fl_Button(450, 470, 65, 25, "Submit");
-        } // Fl_Button* resultsSubmit
-        { resultsCancel = new Fl_Button(525, 470, 65, 25, "Cancel");
-        } // Fl_Button* resultsCancel
-        results->end();
-        Fl_Group::current()->resizable(results);
-      } // Fl_Group* results
+      { output = new Fl_Text_Display(0, 100, 800, 455);
+        output->box(FL_DOWN_BOX);
+        output->color((Fl_Color)34);
+        output->textfont(4);
+        output->textcolor(FL_BACKGROUND2_COLOR);
+        Fl_Group::current()->resizable(output);
+      } // Fl_Text_Display* output
       tile->end();
-      Fl_Group::current()->resizable(tile);
     } // Fl_Tile* tile
+    { results = new Fl_Group(0, 555, 800, 45);
+      { resultsSubmit = new Fl_Button(650, 565, 65, 25, "Submit");
+        resultsSubmit->box(FL_ROUNDED_BOX);
+        resultsSubmit->down_box(FL_ROUNDED_BOX);
+        resultsSubmit->color(FL_FOREGROUND_COLOR);
+        resultsSubmit->selection_color(FL_DARK3);
+        resultsSubmit->labelcolor(FL_BACKGROUND2_COLOR);
+        resultsSubmit->deactivate();
+      } // Fl_Button* resultsSubmit
+      { resultsCancel = new Fl_Button(725, 565, 65, 25, "Cancel");
+        resultsCancel->box(FL_ROUNDED_BOX);
+        resultsCancel->down_box(FL_ROUNDED_BOX);
+        resultsCancel->selection_color((Fl_Color)55);
+      } // Fl_Button* resultsCancel
+      results->end();
+    } // Fl_Group* results
     window->end();
   } // Fl_Double_Window* window
+  browser->add("Test Printer");
+
+  buffer = new Fl_Text_Buffer();
+  output->buffer(buffer);
 }
 
 SelfCertApp::~SelfCertApp() {

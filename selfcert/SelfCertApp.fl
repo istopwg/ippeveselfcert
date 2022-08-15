@@ -5,36 +5,43 @@ code_name {.cxx}
 class SelfCertApp {
   comment {Self-Certification application window} open
 } {
+  decl {Fl_Text_Buffer *buffer;} {private local
+  }
   Function {SelfCertApp()} {
     comment Constructor open return_type {SelfCertApp *}
   } {
     Fl_Window window {
-      label {IPP Everywhere™ Printer Self-Certification Tool v2.0} open
-      private xywh {462 352 600 500} type Double align 80 resizable visible
+      label {IPP Everywhere™ Printer Self-Certification Tool v2.0} open selected
+      private xywh {383 277 800 600} type Double color 55 align 80 visible
     } {
       Fl_Tile tile {open
-        private xywh {0 0 600 500} resizable
+        private xywh {0 0 800 555}
       } {
         Fl_Browser browser {
-          private xywh {0 0 600 100}
+          callback {test(browser->text(browser->value()));}
+          private xywh {0 0 800 100} type Select box DOWN_BOX
         }
-        Fl_Group results {open
-          private xywh {0 100 600 400} resizable
-        } {
-          Fl_Browser resultsBrowser {
-            private xywh {0 100 600 365} textfont 4 resizable
-          }
-          Fl_Button resultsSubmit {
-            label Submit
-            private xywh {450 470 65 25}
-          }
-          Fl_Button resultsCancel {
-            label Cancel selected
-            private xywh {525 470 65 25}
-          }
+        Fl_Text_Display output {
+          private xywh {0 100 800 455} box DOWN_BOX color 34 textfont 4 textcolor 7 resizable
+        }
+      }
+      Fl_Group results {open
+        private xywh {0 555 800 45}
+      } {
+        Fl_Button resultsSubmit {
+          label Submit
+          private xywh {650 565 65 25} box ROUNDED_BOX down_box ROUNDED_BOX color 0 selection_color 39 labelcolor 7 deactivate
+        }
+        Fl_Button resultsCancel {
+          label Cancel
+          private xywh {725 565 65 25} box ROUNDED_BOX down_box ROUNDED_BOX selection_color 55
         }
       }
     }
+    code {browser->add("Test Printer");
+
+buffer = new Fl_Text_Buffer();
+output->buffer(buffer);} {}
   }
   Function {~SelfCertApp()} {open
   } {

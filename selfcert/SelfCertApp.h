@@ -6,6 +6,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Tile.H>
 #include <FL/Fl_Browser.H>
+#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 
@@ -13,14 +14,17 @@
  Self-Certification application window
 */
 class SelfCertApp {
+  Fl_Text_Buffer *buffer;
 public:
   SelfCertApp();
 private:
   Fl_Double_Window *window;
   Fl_Tile *tile;
   Fl_Browser *browser;
+  inline void cb_browser_i(Fl_Browser*, void*);
+  static void cb_browser(Fl_Browser*, void*);
+  Fl_Text_Display *output;
   Fl_Group *results;
-  Fl_Browser *resultsBrowser;
   Fl_Button *resultsSubmit;
   Fl_Button *resultsCancel;
 public:
