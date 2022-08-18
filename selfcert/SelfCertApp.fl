@@ -11,7 +11,7 @@ class SelfCertApp {
     comment Constructor open return_type {SelfCertApp *}
   } {
     Fl_Window window {
-      label {IPP Everywhere™ Printer Self-Certification Tool v2.0} open selected
+      label {IPP Everywhere™ Printer Self-Certification Tool v2.0} open
       private xywh {383 277 800 600} type Double color 55 align 80 visible
     } {
       Fl_Tile tile {open
@@ -30,12 +30,65 @@ class SelfCertApp {
       } {
         Fl_Button resultsSubmit {
           label Submit
-          private xywh {650 565 65 25} box ROUNDED_BOX down_box ROUNDED_BOX color 0 selection_color 39 labelcolor 7 deactivate
+          callback {submissionForm->hotspot(window->x() + window->w() / 2, window->y() + window->h() / 2);
+submissionForm->show();} selected
+          private xywh {650 565 65 25} down_box DOWN_BOX deactivate
         }
         Fl_Button resultsCancel {
           label Cancel
-          private xywh {725 565 65 25} box ROUNDED_BOX down_box ROUNDED_BOX selection_color 55
+          private xywh {725 565 65 25} down_box DOWN_BOX
         }
+      }
+    }
+    Fl_Window submissionForm {
+      label {Submission Form} open
+      private xywh {359 272 400 445} type Double modal visible
+    } {
+      Fl_Group {} {
+        label {Questions:} open
+        xywh {10 30 380 145} align 5
+      } {
+        Fl_Check_Button usedPWGTools {
+          label {Did you use the PWG-supplied self-certification tools?}
+          private xywh {20 45 360 20} down_box DOWN_BOX
+        }
+        Fl_Check_Button usedProductionReadyCode {
+          label {Did you use production-ready code?}
+          private xywh {20 70 360 20} down_box DOWN_BOX
+        }
+        Fl_Check_Button printedCorrectly {
+          label {Did all output print correctly?}
+          private xywh {20 95 360 20} down_box DOWN_BOX
+        }
+        Fl_Check_Button isPrintServer {
+          label {Is this a print server?}
+          private xywh {20 120 360 20} down_box DOWN_BOX
+        }
+        Fl_Check_Button partOfFirmwareUpdate {
+          label {Is IPP Everywhere support part of a firmware update?}
+          private xywh {20 145 360 20} down_box DOWN_BOX
+        }
+      }
+      Fl_Input productFamilyName {
+        label {Product Family Name:}
+        private xywh {10 195 380 25} align 5
+      }
+      Fl_Input productFamilyURL {
+        label {Product Family Web Page (URL)}
+        private xywh {10 245 380 25} align 5
+      }
+      Fl_Input modelNames {
+        label {Model Names:}
+        private xywh {10 295 380 100} type Multiline align 5
+      }
+      Fl_Button generateJSON {
+        label {Generate JSON File}
+        private xywh {165 410 150 25} deactivate
+      }
+      Fl_Button {} {
+        label Cancel
+        callback {submissionForm->hide();}
+        xywh {325 410 65 25}
       }
     }
     code {browser->add("Test Printer");

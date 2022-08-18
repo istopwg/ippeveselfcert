@@ -9,6 +9,8 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Input.H>
 
 /**
  Self-Certification application window
@@ -26,7 +28,21 @@ private:
   Fl_Text_Display *output;
   Fl_Group *results;
   Fl_Button *resultsSubmit;
+  inline void cb_resultsSubmit_i(Fl_Button*, void*);
+  static void cb_resultsSubmit(Fl_Button*, void*);
   Fl_Button *resultsCancel;
+  Fl_Double_Window *submissionForm;
+  Fl_Check_Button *usedPWGTools;
+  Fl_Check_Button *usedProductionReadyCode;
+  Fl_Check_Button *printedCorrectly;
+  Fl_Check_Button *isPrintServer;
+  Fl_Check_Button *partOfFirmwareUpdate;
+  Fl_Input *productFamilyName;
+  Fl_Input *productFamilyURL;
+  Fl_Input *modelNames;
+  Fl_Button *generateJSON;
+  inline void cb_Cancel_i(Fl_Button*, void*);
+  static void cb_Cancel(Fl_Button*, void*);
 public:
   ~SelfCertApp();
   void show(int argc, char *argv[]);

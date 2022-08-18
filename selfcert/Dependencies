@@ -1,0 +1,62 @@
+plist.o: plist.c selfcert.h ../config.h ../libcups/cups/cups.h \
+  ../libcups/cups/file.h ../libcups/cups/base.h ../libcups/cups/ipp.h \
+  ../libcups/cups/http.h ../libcups/cups/array.h \
+  ../libcups/cups/language.h ../libcups/cups/pwg.h
+validate.o: validate.c selfcert.h ../config.h ../libcups/cups/cups.h \
+  ../libcups/cups/file.h ../libcups/cups/base.h ../libcups/cups/ipp.h \
+  ../libcups/cups/http.h ../libcups/cups/array.h \
+  ../libcups/cups/language.h ../libcups/cups/pwg.h
+ippevesubmit.o: ippevesubmit.c selfcert.h ../config.h \
+  ../libcups/cups/cups.h ../libcups/cups/file.h ../libcups/cups/base.h \
+  ../libcups/cups/ipp.h ../libcups/cups/http.h ../libcups/cups/array.h \
+  ../libcups/cups/language.h ../libcups/cups/pwg.h
+main.o: main.cxx SelfCertApp.h \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  selfcert.h ../config.h ../libcups/cups/cups.h ../libcups/cups/file.h \
+  ../libcups/cups/base.h ../libcups/cups/ipp.h ../libcups/cups/http.h \
+  ../libcups/cups/array.h ../libcups/cups/language.h \
+  ../libcups/cups/pwg.h
+SelfCertApp.o: SelfCertApp.cxx SelfCertApp.h \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+  \
+ 
