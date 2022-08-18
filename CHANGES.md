@@ -36,6 +36,8 @@ v1.1 Update 4 (August 8, 2022)
   rangeOfInteger values for the "x-dimension" and "y-dimension" member
   attributes which are needed for roll feed and custom media support.
 - Fixed another issue with reporting finishing options from `ippevesubmit`.
+- Fixed the media size name regular expressions to allow "." in the name
+  portion.
 
 
 v1.1 Update 3 (May 17, 2021)
