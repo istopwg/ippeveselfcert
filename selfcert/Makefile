@@ -71,7 +71,7 @@ test:
 # ippeveselfcert
 #
 
-ippeveselfcert:	$(APP_CXXOBJS) $(COMMON_COBJS) ../libcups/cups/libcups.a
+ippeveselfcert:	$(APP_CXXOBJS) $(COMMON_COBJS) ../libcups/cups/libcups3.a
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ $(APP_CXXOBJS) $(COMMON_COBJS) $(LIBS)
 
@@ -80,7 +80,7 @@ ippeveselfcert:	$(APP_CXXOBJS) $(COMMON_COBJS) ../libcups/cups/libcups.a
 # ippevesubmit
 #
 
-ippevesubmit:	$(SUBMIT_COBJS) $(COMMON_COBJS) ../libcups/cups/libcups.a
+ippevesubmit:	$(SUBMIT_COBJS) $(COMMON_COBJS) ../libcups/cups/libcups3.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(SUBMIT_COBJS) $(COMMON_COBJS) $(LIBS)
 
