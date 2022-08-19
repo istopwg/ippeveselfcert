@@ -1,8 +1,8 @@
 Changes
 =======
 
-v1.1 Update 4 (August 8, 2022)
-------------------------------
+v1.1 Update 4 (August 19, 2022)
+-------------------------------
 
 - Added support for running the self-certification tools non-interactively
   with the "make test" command (Issue #56, Issue #62)
