@@ -107,6 +107,7 @@ if test x$platform = xmacos; then
 	fi
 
 	echo "Notarizing ZIP file $pkgfile..."
+	echo xcrun altool --notarize-app -f $pkgfile --primary-bundle-id org.pwg.$pkgname --username $APPLEID --password @keychain:AC_$TEAMID --asc-provider $TEAMID
 	xcrun altool --notarize-app -f $pkgfile --primary-bundle-id org.pwg.$pkgname --username $APPLEID --password @keychain:AC_$TEAMID --asc-provider $TEAMID | tee .notarize
 	uuid=`grep RequestUUID .notarize | awk '{print $3}'`
 
