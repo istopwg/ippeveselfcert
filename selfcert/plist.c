@@ -228,7 +228,7 @@ plist_read(FILE             *fp,	// I - Input file or `NULL` to open filename
            plist_error_cb_t cb,		// I - Error callback function
            void             *cb_data)	// I - Error callback data
 {
-  bool		close_fp = fp != NULL;	// Close the input file?
+  bool		close_fp = !fp;		// Close the input file?
   plist_t	*plist = NULL,		// Root plist node
 		*parent = NULL;		// Current parent node
   char		buffer[65536];		// Element/value buffer
@@ -470,7 +470,7 @@ plist_write(
     plist_error_cb_t cb,		// I - Error callback function
     void             *cb_data)		// I - Error callback data
 {
-  bool		close_fp = fp != NULL;	// Close the input file?
+  bool		close_fp = !fp;		// Close the input file?
   plist_t	*current,		// Current node
 		*next;			// Next node
   int		indent = 0;		// Indentation
@@ -506,9 +506,6 @@ plist_write(
 
   for (current = plist->first_child; current; current = next)
   {
-    if (current->prev_sibling && current->parent->type == PLIST_TYPE_ARRAY)
-      fputs(",\n", fp);
-
     switch (current->type)
     {
       case PLIST_TYPE_PLIST :
@@ -585,7 +582,7 @@ plist_write_json(
     plist_error_cb_t cb,		// I - Error callback function
     void             *cb_data)		// I - Error callback data
 {
-  bool		close_fp = fp != NULL;	// Close the input file?
+  bool		close_fp = !fp;		// Close the input file?
   plist_t	*current,		// Current node
 		*next;			// Next node
 
@@ -801,8 +798,8 @@ xml_gets(FILE	*fp,			// I  - File to read from
 	 size_t bufsize,		// I  - Size of buffer
 	 int	*linenum)		// IO - Current line number
 {
-  char	ch,				// Current character
-	*bufptr,			// Pointer into buffer
+  int	ch;				// Current character
+  char	*bufptr,			// Pointer into buffer
 	*bufend;			// Pointer to end of buffer
 
 
@@ -833,7 +830,7 @@ xml_gets(FILE	*fp,			// I  - File to read from
     while ((ch = getc(fp)) != EOF)
     {
       if (bufptr < bufend)
-	*bufptr++ = ch;
+	*bufptr++ = (char)ch;
 
       if (ch == '\n')
       {
@@ -846,12 +843,12 @@ xml_gets(FILE	*fp,			// I  - File to read from
       else if (ch == '\"' || ch == '\'')
       {
         // Read quoted string...
-	char quote = ch;		// Quote character
+	int quote = ch;			// Quote character
 
 	while ((ch = getc(fp)) != EOF)
 	{
 	  if (bufptr < bufend)
-	    *bufptr++ = ch;
+	    *bufptr++ = (char)ch;
 
 	  if (ch == '\n')
 	    (*linenum)++;
