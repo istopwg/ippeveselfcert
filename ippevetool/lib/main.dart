@@ -59,7 +59,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
   final printers = <NsdServiceInfo>[];
 
   Future<void> startDiscovery() async {
-    await flutterNsd.discoverServices("_ipp._tcp.,_print");
+    await flutterNsd.discoverServices("_ipp._tcp.");
   }
 
   @override
@@ -104,12 +104,19 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
       );
     } else {
       return ListView.builder(
-        itemBuilder: (context_, index) => ListTile(
-          leading: const Icon(Icons.print),
-          title: Text(printers[index].name ?? "Invalid printer name"),
+        itemBuilder: (context_, index) => GestureDetector(
+          onTap: () => _onPrinterTap(context, printers[index]),
+          child: ListTile(
+            leading: const Icon(Icons.print),
+            title: Text(printers[index].name ?? "Invalid printer name"),
+          ),
         ),
         itemCount: printers.length,
       );
     }
+  }
+
+  _onPrinterTap(BuildContext context, NsdServiceInfo printer) {
+    print(printer.name);
   }
 }
