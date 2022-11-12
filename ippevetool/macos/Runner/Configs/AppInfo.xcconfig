@@ -8,7 +8,10 @@
 PRODUCT_NAME = ippevetool
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.ippevetool
+PRODUCT_BUNDLE_IDENTIFIER = org.pwg.ippevetool
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 The ISTO Printer Working Group. All rights reserved.
+
+// Minimum macOS version
+MACOSX_DEPLOYMENT_TARGET = 10.14

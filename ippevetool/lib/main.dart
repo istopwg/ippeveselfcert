@@ -1,36 +1,39 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const IppEveToolApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class IppEveToolApp extends StatelessWidget {
+  const IppEveToolApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'IPP Everywhere™ Tool',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        // Theme colors are based on the PWG logo colors, which are also used on the PWG web page...
+        primarySwatch: const MaterialColor(0xff4b5aa8, {
+            50:  Color(0xff181814),
+            100: Color(0xff262d54),
+            200: Color(0xff2B397F),
+            300: Color(0xff394ba8),
+            400: Color(0xff445299),
+            500: Color(0xff4b5aa8),
+            600: Color(0xff626CA8),
+            700: Color(0xff94a4ff),
+            800: Color(0xffb8c3ff),
+            900: Color(0xffccccc0),
+        }),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const IppEveHomePage(title: 'IPP Everywhere™ Tool'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class IppEveHomePage extends StatefulWidget {
+  const IppEveHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -44,10 +47,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<IppEveHomePage> createState() => _IppEveHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _IppEveHomePageState extends State<IppEveHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -71,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
+        // Here we take the value from the IppEveHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
@@ -108,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.print),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
