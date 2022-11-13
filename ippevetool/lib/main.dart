@@ -109,7 +109,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
   }
 
   _onPrinterTap(BuildContext context, NsdServiceInfo printer) {
-    print(printer.name);
+//    print(printer.name);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => IppEveDetailsPage(printer: printer,)),
@@ -134,7 +134,48 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: const Center(child: Text("Details")),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Image(
+                image: AssetImage("../libcups/tools/printer.png"),
+                color: Color(0xff77cc77),
+                colorBlendMode: BlendMode.multiply,
+                width: 160,
+              ),
+              Text(
+                "idle, accepting jobs\n'printer state message'\nmedia-empty, toner-low, cover-open",
+                textScaleFactor: 1.5,
+              ),
+            ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.explore),
+            label: "Overview",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore),
+            label: "DNS-SD Values",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore),
+            label: "IPP Attributes",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore),
+            label: "Print File",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore),
+            label: "Self-Certification",
+          ),
+        ],
+      ),
     );
   }
 }
