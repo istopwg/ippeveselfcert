@@ -134,44 +134,138 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: Column(
-        children: [
-          Row(
+      body: ListView(
             children: [
-              Image(
-                image: AssetImage("../libcups/tools/printer.png"),
-                color: Color(0xff77cc77),
-                colorBlendMode: BlendMode.multiply,
-                width: 160,
+              Row(
+                children: [
+                  Image(
+                    image: AssetImage("../libcups/tools/printer.png"),
+                    width: 160,
+                  ),
+                  Text(
+                    "idle, accepting jobs\n'printer state message'\nmedia-empty,  toner-low, cover-open",
+                    textScaleFactor: 1.5,
+                  ),
+                ],
               ),
-              Text(
-                "idle, accepting jobs\n'printer state message'\nmedia-empty, toner-low, cover-open",
-                textScaleFactor: 1.5,
+              Row(
+                children: [
+                  Text("txtvers"),
+                  Text("1"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("qtotal"),
+                  Text("1"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("pdl"),
+                  Text("application/vnd.hp-PCL,application/vnd.hp-PCLXL,application/postscript,application/pdf,image/jpeg,application/PCLm,image/urf"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("rp"),
+                  Text("ipp/print"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("PaperMax"),
+                  Text("legal-A4"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("kind"),
+                  Text("document,envelope,photo,postcard"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("URF"),
+                  Text("CP1,MT1-2-8-9-10-11,PQ3-4-5,RS300-600,SRGB24,OB10,W8,DEVW8,DEVRGB24,ADOBERGB24,DM3,IS19-1-2,V1.4"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("ty"),
+                  Text("HP Officejet Pro X576dw MFP"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("product"),
+                  Text("(HP Officejet Pro X576dw MFP)"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("usb_MFG"),
+                  Text("HP"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("usb_MDL"),
+                  Text("HP Officejet Pro X576dw MFP"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("priority"),
+                  Text("20"),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("adminurl"),
+                  Text("http://HPFC15B43483FE.local./#hId-pgAirPrint"),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.explore),
+//          ListView(// DNS-SD Values
+//            children: [
+//            ],
+//          ),
+//          ListView(// IPP Attributes
+//            children: [
+//            ],
+//          ),
+//          ListView(// Print File
+//            children: [
+//            ],
+//          ),
+//          ListView(// Self-Certification
+//            children: [
+//            ],
+//          ),
+//        ],
+//      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
             label: "Overview",
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             label: "DNS-SD Values",
           ),
-          NavigationDestination(
-            icon: Icon(Icons.explore),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
             label: "IPP Attributes",
           ),
-          NavigationDestination(
-            icon: Icon(Icons.explore),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.print),
             label: "Print File",
           ),
-          NavigationDestination(
-            icon: Icon(Icons.explore),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.run_circle),
             label: "Self-Certification",
           ),
         ],
