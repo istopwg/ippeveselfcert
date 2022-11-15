@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter_nsd/flutter_nsd.dart';
+import 'package:flutter/material.dart';
+import 'package:nsd/nsd.dart';
 
 
 void main() {
@@ -47,28 +47,23 @@ class IppEveHomePage extends StatefulWidget {
 }
 
 class _IppEveHomePageState extends State<IppEveHomePage> {
-  final flutterNsd = FlutterNsd();
-  final printers = <NsdServiceInfo>[];
+  final printers = <Service>[];
 
-  Future<void> startDiscovery() async {
-    await flutterNsd.discoverServices("_ipp._tcp.");
+   Future<void> _startDiscovery() async {
+    final discovery = await startDiscovery("_ipp._tcp.", autoResolve: false);
+    discovery.addServiceListener((service, status) {
+      print("${service.name} => ${status}");
+      if (status == ServiceStatus.found)
+        printers.add(service);
+    });
+    return;
   }
 
   @override
   void initState() {
     super.initState();
 
-    flutterNsd.stream.listen(
-      (NsdServiceInfo printer) {
-        setState(() {
-          printers.add(printer);
-        });
-      },
-      onError: (e) {
-      },
-    );
-
-    startDiscovery();
+    _startDiscovery();
   }
 
   @override
@@ -108,7 +103,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
     }
   }
 
-  _onPrinterTap(BuildContext context, NsdServiceInfo printer) {
+  _onPrinterTap(BuildContext context, Service printer) {
 //    print(printer.name);
     Navigator.push(
       context,
@@ -121,7 +116,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
 class IppEveDetailsPage extends StatefulWidget {
   const IppEveDetailsPage({super.key, required this.printer});
 
-  final NsdServiceInfo printer;
+  final Service printer;
 
   @override
   State<IppEveDetailsPage> createState() => _IppEveDetailsPageState();
