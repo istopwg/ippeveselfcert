@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nsd/nsd.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const IppEveToolApp());
@@ -51,7 +53,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
   final printers = <Service>[];
 
    Future<void> _startDiscovery() async {
-    final discovery = await startDiscovery("_ipp._tcp.", autoResolve: false);
+    final discovery = await startDiscovery("_ipp._tcp.", autoResolve: true);
     discovery.addServiceListener((service, status) {
       print("${service.name} => ${status}");
       if (status == ServiceStatus.found) {
@@ -146,60 +148,8 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                   DataColumn(label: Expanded(child: Text("Key"))),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
-                rows: [
-                DataRow(cells: [
-                  DataCell(Text("txtvers")),
-                  DataCell(Text("1")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("qtotal")),
-                  DataCell(Text("1")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("pdl")),
-                  DataCell(Text("application/vnd.hp-PCL,application/vnd.hp-PCLXL,application/postscript,application/pdf,image/jpeg,application/PCLm,image/urf")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("rp")),
-                  DataCell(Text("ipp/print")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("PaperMax")),
-                  DataCell(Text("legal-A4")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("kind")),
-                  DataCell(Text("document,envelope,photo,postcard")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("URF")),
-                  DataCell(Text("CP1,MT1-2-8-9-10-11,PQ3-4-5,RS300-600,SRGB24,OB10,W8,DEVW8,DEVRGB24,ADOBERGB24,DM3,IS19-1-2,V1.4")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("ty")),
-                  DataCell(Text("HP Officejet Pro X576dw MFP")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("product")),
-                  DataCell(Text("(HP Officejet Pro X576dw MFP)")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("usb_MFG")),
-                  DataCell(Text("HP")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("usb_MDL")),
-                  DataCell(Text("HP Officejet Pro X576dw MFP")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("priority")),
-                  DataCell(Text("20")),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text("adminurl")),
-                  DataCell(Text("http://HPFC15B43483FE.local./#hId-pgAirPrint")),
-                ]),
-              ]),
+                rows: _buildDataRows(widget.printer.txt),
+              ),
             ]),
 //          ListView(// DNS-SD Values
 //            children: [
@@ -244,5 +194,35 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
         ],
       ),
     );
+  }
+
+  List<DataRow> _buildDataRows(Map<String, Uint8List?>? txt) {
+    var list = <DataRow>[ ];
+
+    if (txt != null) {
+      print("txt record contains ${txt.length} entries.");
+      txt.forEach((key,value){
+        var svalue = "<null>";
+        if (value != null) {
+          svalue = Utf8Decoder().convert(value);
+        }
+
+        list.add(DataRow(cells: [DataCell(Text(key)),DataCell(Text(svalue), onTap:(){_tapValue(svalue);})]));
+      });
+    } else {
+      print("txt record is null.");
+    }
+
+    return (list);
+  }
+
+  void _tapValue(String value) {
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      // Open URL...
+      launchUrl(Uri.parse(value));
+    } else {
+      // Copy to clipboard...
+      Clipboard.setData(ClipboardData(text: value));
+    }
   }
 }
