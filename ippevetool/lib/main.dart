@@ -148,7 +148,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                   DataColumn(label: Expanded(child: Text("Key"))),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
-                rows: _buildDataRows(widget.printer.txt),
+                rows: _buildTxtRows(widget.printer.txt),
               ),
             ]),
 //          ListView(// DNS-SD Values
@@ -192,11 +192,14 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
             label: "Self-Certification",
           ),
         ],
+        currentIndex: 0,
+        selectedItemColor: Color(0xff4b5aa8),
+        unselectedItemColor: Color(0xff94a4ff),
       ),
     );
   }
 
-  List<DataRow> _buildDataRows(Map<String, Uint8List?>? txt) {
+  List<DataRow> _buildTxtRows(Map<String, Uint8List?>? txt) {
     var list = <DataRow>[ ];
 
     if (txt != null) {
@@ -220,9 +223,9 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
     if (value.startsWith("http://") || value.startsWith("https://")) {
       // Open URL...
       launchUrl(Uri.parse(value));
-    } else {
-      // Copy to clipboard...
-      Clipboard.setData(ClipboardData(text: value));
     }
+
+    // Copy to clipboard...
+    Clipboard.setData(ClipboardData(text: value));
   }
 }
