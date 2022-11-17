@@ -31,6 +31,7 @@ class IppEveToolApp extends StatelessWidget {
             900: Color(0xffccccc0),
         }),
       ),
+      debugShowCheckedModeBanner: false,
       home: const IppEveHomePage(title: 'IPP Everywhere™ Tool'),
     );
   }
@@ -54,7 +55,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
     discovery.addServiceListener((service, status) {
       print("${service.name} => ${status}");
       if (status == ServiceStatus.found) {
-        printers.add(service);
+        setState((){ printers.add(service); });
       }
     });
     return;
