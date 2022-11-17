@@ -130,7 +130,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: Column(children: [
+      body: ListView(children: [
               Row(children: [
                 Image(
                   image: AssetImage("../libcups/tools/printer.png"),
@@ -142,6 +142,8 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                 ),
               ]),
               DataTable(columns: [
+                  DataColumn(label: Expanded(child: Text("Key"))),
+                  DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: [
                 DataRow(cells: [
