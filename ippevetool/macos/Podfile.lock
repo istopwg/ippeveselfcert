@@ -1,22 +1,22 @@
 PODS:
-  - flutter_nsd (0.0.1):
-    - FlutterMacOS
   - FlutterMacOS (1.0.0)
+  - nsd_macos (0.0.1):
+    - FlutterMacOS
 
 DEPENDENCIES:
-  - flutter_nsd (from `Flutter/ephemeral/.symlinks/plugins/flutter_nsd/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - nsd_macos (from `Flutter/ephemeral/.symlinks/plugins/nsd_macos/macos`)
 
 EXTERNAL SOURCES:
-  flutter_nsd:
-    :path: Flutter/ephemeral/.symlinks/plugins/flutter_nsd/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  nsd_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/nsd_macos/macos
 
 SPEC CHECKSUMS:
-  flutter_nsd: 60e24f98ea47106c4f82e24d7f0fab78b3fbe8df
   FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
+  nsd_macos: 1a38a38a33adbb396b4c6f303bc076073514cadc
 
-PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
+PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7
 
 COCOAPODS: 1.11.3

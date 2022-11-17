@@ -53,8 +53,9 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
     final discovery = await startDiscovery("_ipp._tcp.", autoResolve: false);
     discovery.addServiceListener((service, status) {
       print("${service.name} => ${status}");
-      if (status == ServiceStatus.found)
+      if (status == ServiceStatus.found) {
         printers.add(service);
+      }
     });
     return;
   }
@@ -129,9 +130,8 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: GridView.count(
-              crossAxisCount: 2,
-              children: [
+      body: Column(children: [
+              Row(children: [
                 Image(
                   image: AssetImage("../libcups/tools/printer.png"),
                   width: 160,
@@ -140,47 +140,64 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                   "idle, accepting jobs\n'printer state message'\nmedia-empty,  toner-low, cover-open",
                   textScaleFactor: 1.5,
                 ),
-
-                Text("txtvers"),
-                Text("1"),
-
-                Text("qtotal"),
-                Text("1"),
-
-                Text("pdl"),
-                Text("application/vnd.hp-PCL,application/vnd.hp-PCLXL,application/postscript,application/pdf,image/jpeg,application/PCLm,image/urf"),
-
-                Text("rp"),
-                Text("ipp/print"),
-
-                Text("PaperMax"),
-                Text("legal-A4"),
-
-                Text("kind"),
-                Text("document,envelope,photo,postcard"),
-
-                Text("URF"),
-                Text("CP1,MT1-2-8-9-10-11,PQ3-4-5,RS300-600,SRGB24,OB10,W8,DEVW8,DEVRGB24,ADOBERGB24,DM3,IS19-1-2,V1.4"),
-
-                Text("ty"),
-                Text("HP Officejet Pro X576dw MFP"),
-
-                Text("product"),
-                Text("(HP Officejet Pro X576dw MFP)"),
-
-                Text("usb_MFG"),
-                Text("HP"),
-
-                Text("usb_MDL"),
-                Text("HP Officejet Pro X576dw MFP"),
-
-                Text("priority"),
-                Text("20"),
-
-                Text("adminurl"),
-                Text("http://HPFC15B43483FE.local./#hId-pgAirPrint"),
-              ],
-            ),
+              ]),
+              DataTable(columns: [
+                ],
+                rows: [
+                DataRow(cells: [
+                  DataCell(Text("txtvers")),
+                  DataCell(Text("1")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("qtotal")),
+                  DataCell(Text("1")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("pdl")),
+                  DataCell(Text("application/vnd.hp-PCL,application/vnd.hp-PCLXL,application/postscript,application/pdf,image/jpeg,application/PCLm,image/urf")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("rp")),
+                  DataCell(Text("ipp/print")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("PaperMax")),
+                  DataCell(Text("legal-A4")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("kind")),
+                  DataCell(Text("document,envelope,photo,postcard")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("URF")),
+                  DataCell(Text("CP1,MT1-2-8-9-10-11,PQ3-4-5,RS300-600,SRGB24,OB10,W8,DEVW8,DEVRGB24,ADOBERGB24,DM3,IS19-1-2,V1.4")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("ty")),
+                  DataCell(Text("HP Officejet Pro X576dw MFP")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("product")),
+                  DataCell(Text("(HP Officejet Pro X576dw MFP)")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("usb_MFG")),
+                  DataCell(Text("HP")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("usb_MDL")),
+                  DataCell(Text("HP Officejet Pro X576dw MFP")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("priority")),
+                  DataCell(Text("20")),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("adminurl")),
+                  DataCell(Text("http://HPFC15B43483FE.local./#hId-pgAirPrint")),
+                ]),
+              ]),
+            ]),
 //          ListView(// DNS-SD Values
 //            children: [
 //            ],
