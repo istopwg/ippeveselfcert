@@ -10,14 +10,15 @@ void main() {
 }
 
 
-void _tapValue(String value) {
+void _tapValue(BuildContext context, String value) {
   if (value.startsWith("http://") || value.startsWith("https://")) {
     // Open URL...
     launchUrl(Uri.parse(value));
   }
 
-  // Copy to clipboard...
+  // Copy to clipboard and let the user know what happened...
   Clipboard.setData(ClipboardData(text: value));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Copied "$value" to clipboard.'), duration: Duration(seconds: 1)));
 }
 
 
@@ -66,7 +67,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
    Future<void> _startDiscovery() async {
     final discovery = await startDiscovery("_ipp._tcp.", autoResolve: true);
     discovery.addServiceListener((service, status) {
-      print("${service.name} => ${status}");
+      // print("${service.name} => ${status}");
       if (status == ServiceStatus.found) {
         setState((){ printers.add(service); });
       }
@@ -144,7 +145,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: ListView(children: [
+      body: Column(children: [
               Row(children: [
                 Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
                   width: 160,
@@ -154,17 +155,16 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                   textScaleFactor: 1.5,
                 ),
               ]),
-              DataTable(columns: [
-                  DataColumn(label: Expanded(child: Text("Key"))),
+              Row(children: [
+                Text("     TXT Record:", textAlign: TextAlign.left, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ]),
+              Expanded(child: SingleChildScrollView(child: DataTable(columns: [
+                  DataColumn(label: Container(child: Text("Key"), width: 100,)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
-              ),
+              ))),
             ]),
-//          ListView(// DNS-SD Values
-//            children: [
-//            ],
-//          ),
 //          ListView(// IPP Attributes
 //            children: [
 //            ],
@@ -186,20 +186,19 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
             label: "Overview",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: "DNS-SD Values",
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.list),
-            label: "IPP Attributes",
+            label: "IPP",
+            tooltip: "IPP Attributes",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.print),
-            label: "Print File",
+            label: "Print",
+            tooltip: "Print File",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.run_circle),
-            label: "Self-Certification",
+            label: "Self-Cert",
+            tooltip: "Self-Certification",
           ),
         ],
         currentIndex: 0,
@@ -213,20 +212,17 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
     var list = <DataRow>[ ];
 
     if (txt != null) {
-      print("txt record contains ${txt.length} entries.");
       txt.forEach((key,value){
         var svalue = "<null>";
         if (value != null) {
           svalue = Utf8Decoder().convert(value);
         }
 
-        list.add(DataRow(cells: [DataCell(Text(key)),DataCell(Text(svalue), onTap:(){
-          _tapValue(svalue);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Copied!')));
-        })]));
+        list.add(DataRow(cells: [
+          DataCell(Text(key)),
+          DataCell(Expanded(child: Text(svalue, softWrap: true), onTap:(){ _tapValue(context, svalue); })),
+        ]));
       });
-    } else {
-      print("txt record is null.");
     }
 
     return (list);
