@@ -10,6 +10,17 @@ void main() {
 }
 
 
+void _tapValue(String value) {
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    // Open URL...
+    launchUrl(Uri.parse(value));
+  }
+
+  // Copy to clipboard...
+  Clipboard.setData(ClipboardData(text: value));
+}
+
+
 class IppEveToolApp extends StatelessWidget {
   const IppEveToolApp({super.key});
 
@@ -135,8 +146,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       ),
       body: ListView(children: [
               Row(children: [
-                Image(
-                  image: AssetImage("../libcups/tools/printer.png"),
+                Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
                   width: 160,
                 ),
                 Text(
@@ -210,22 +220,15 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
           svalue = Utf8Decoder().convert(value);
         }
 
-        list.add(DataRow(cells: [DataCell(Text(key)),DataCell(Text(svalue), onTap:(){_tapValue(svalue);})]));
+        list.add(DataRow(cells: [DataCell(Text(key)),DataCell(Text(svalue), onTap:(){
+          _tapValue(svalue);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Copied!')));
+        })]));
       });
     } else {
       print("txt record is null.");
     }
 
     return (list);
-  }
-
-  void _tapValue(String value) {
-    if (value.startsWith("http://") || value.startsWith("https://")) {
-      // Open URL...
-      launchUrl(Uri.parse(value));
-    }
-
-    // Copy to clipboard...
-    Clipboard.setData(ClipboardData(text: value));
   }
 }
