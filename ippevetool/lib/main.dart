@@ -220,7 +220,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 
         list.add(DataRow(cells: [
           DataCell(Text(key)),
-          DataCell(Expanded(child: Text(svalue, softWrap: true), onTap:(){ _tapValue(context, svalue); })),
+          DataCell(Expanded(child: Text(svalue, softWrap: true)), onTap:(){ _tapValue(context, svalue); }),
         ]));
       });
     }
