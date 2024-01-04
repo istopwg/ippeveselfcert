@@ -18,7 +18,7 @@ void _tapValue(BuildContext context, String value) {
 
   // Copy to clipboard and let the user know what happened...
   Clipboard.setData(ClipboardData(text: value));
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Copied "$value" to clipboard.'), duration: Duration(seconds: 1)));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Copied "$value" to clipboard.'), duration: const Duration(seconds: 1)));
 }
 
 
@@ -150,16 +150,16 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                 Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
                   width: 160,
                 ),
-                Text(
+                const Text(
                   "idle, accepting jobs\n'printer state message'\nmedia-empty,  toner-low, cover-open",
                   textScaleFactor: 1.5,
                 ),
               ]),
-              Row(children: [
-                Text("     TXT Record:", textAlign: TextAlign.left, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const Row(children: [
+                Text("     TXT Record:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
-              Expanded(child: SingleChildScrollView(child: DataTable(columns: [
-                  DataColumn(label: Container(child: Text("Key"), width: 100,)),
+              Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
+                  DataColumn(label: SizedBox(width: 100,child: Text("Key"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
@@ -180,7 +180,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 //        ],
 //      ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Overview",
@@ -202,8 +202,8 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
           ),
         ],
         currentIndex: 0,
-        selectedItemColor: Color(0xff4b5aa8),
-        unselectedItemColor: Color(0xff94a4ff),
+        selectedItemColor: const Color(0xff4b5aa8),
+        unselectedItemColor: const Color(0xff94a4ff),
       ),
     );
   }
@@ -215,7 +215,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       txt.forEach((key,value){
         var svalue = "<null>";
         if (value != null) {
-          svalue = Utf8Decoder().convert(value);
+          svalue = const Utf8Decoder().convert(value);
         }
 
         list.add(DataRow(cells: [
