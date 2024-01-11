@@ -160,23 +160,23 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
               const Row(children: [
                 Text("     TXT Record:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
-              Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
+              SingleChildScrollView(child: DataTable(columns: const [
                   DataColumn(label: SizedBox(width: 100,child: Text("Key"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
-              ))),
+              )),
 
-            // IPP Attributes
+              // IPP Attributes
               const Row(children: [
                 Text("     IPP Attributes:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
-            Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
-                DataColumn(label: SizedBox(width: 100,child: Text("Name"),)),
-                DataColumn(label: Expanded(child: Text("Value"))),
-              ],
-              rows: _buildAttrRows(widget.printer),
-            ))),
+              Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
+                  DataColumn(label: SizedBox(width: 100,child: Text("Name"),)),
+                  DataColumn(label: Expanded(child: Text("Value"))),
+                ],
+                rows: _buildAttrRows(widget.printer),
+              ))),
 
 //          ListView(// Print File
 //            children: [
@@ -237,13 +237,14 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 
       // Build the printer URI...
       var uri = "ipp://${printer.host}:${printer.port}$rp";
+      print("printer URI = $uri\n");
 
       // Get the attributes as a JSON object
       ipptoolGetAttributes(printerUri: uri).then((attrs){
         attrs.forEach((key,value){
           list.add(DataRow(cells: [
             DataCell(Text(key)),
-            DataCell(Expanded(child: Text(value, softWrap: true)), onTap:(){ _tapValue(context, value); }),
+            DataCell(Expanded(child: Text("$value", softWrap: true)), onTap:(){ _tapValue(context, "$value"); }),
           ]));
         });
       });
