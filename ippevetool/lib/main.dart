@@ -141,13 +141,22 @@ class IppEveDetailsPage extends StatefulWidget {
 }
 
 class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
+  var attrList = <DataRow>[];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getAttrList(widget.printer);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: Column(children: [
+      body: SingleChildScrollView(child: Column(children: [
               Row(children: [
                 Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
                   width: 160,
@@ -160,23 +169,23 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
               const Row(children: [
                 Text("     TXT Record:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
-              SingleChildScrollView(child: DataTable(columns: const [
+              DataTable(columns: const [
                   DataColumn(label: SizedBox(width: 100,child: Text("Key"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
-              )),
+              ),
 
               // IPP Attributes
               const Row(children: [
                 Text("     IPP Attributes:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
-              Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
+              DataTable(columns: const [
                   DataColumn(label: SizedBox(width: 100,child: Text("Name"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
-                rows: _buildAttrRows(widget.printer),
-              ))),
+                rows: attrList,
+              ),
 
 //          ListView(// Print File
 //            children: [
@@ -188,7 +197,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 //          ),
 //        ],
 //      ),
-            ]),
+            ])),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -219,9 +228,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
   }
 
   // Build a list of attribute name and value data rows
-  List<DataRow> _buildAttrRows(Service printer) {
-    var list = <DataRow>[ ];
-
+  Future<void> _getAttrList(Service printer) async {
     if (printer.host != null && printer.port != null && printer.txt != null) {
       // Have a hostname, port, and TXT record...
       var rp = "/ipp/print";
@@ -237,20 +244,27 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 
       // Build the printer URI...
       var uri = "ipp://${printer.host}:${printer.port}$rp";
-      print("printer URI = $uri\n");
+      //print("printer URI = $uri\n");
 
       // Get the attributes as a JSON object
       ipptoolGetAttributes(printerUri: uri).then((attrs){
+        var list = <DataRow>[];
         attrs.forEach((key,value){
-          list.add(DataRow(cells: [
-            DataCell(Text(key)),
-            DataCell(Expanded(child: Text("$value", softWrap: true)), onTap:(){ _tapValue(context, "$value"); }),
-          ]));
+          //print("'$key' = '$value'\n");
+
+          if (key != "group-tag") {
+            list.add(DataRow(cells: [
+                DataCell(Text(key)),
+                DataCell(Expanded(child: Text("$value", softWrap: true)), onTap:(){ _tapValue(context, "$value"); }),
+            ]));
+          }
+        });
+
+        setState((){
+          attrList = list;
         });
       });
     }
-
-    return (list);
   }
 
   List<DataRow> _buildTxtRows(Map<String, Uint8List?>? txt) {

@@ -25,8 +25,8 @@ Future<Map<String,dynamic>> ipptoolGetAttributes({required String printerUri}) a
         });
     var result = process.exitCode;
 
-    print("result=$result\n");
-    print("json=$json\n");
+    //print("result=$result\n");
+    //print("json=$json\n");
   
     const JsonDecoder decoder = JsonDecoder();
  
