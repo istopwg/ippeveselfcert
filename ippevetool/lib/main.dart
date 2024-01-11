@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nsd/nsd.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:xml/xml.dart';
+//import 'package:xml/xml.dart';
+import 'ipptool.dart';
 
 void main() {
   runApp(const IppEveToolApp());
@@ -165,11 +166,18 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
               ))),
-            ]),
-//          ListView(// IPP Attributes
-//            children: [
-//            ],
-//          ),
+
+            // IPP Attributes
+              const Row(children: [
+                Text("     IPP Attributes:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
+              ]),
+            Expanded(child: SingleChildScrollView(child: DataTable(columns: const [
+                DataColumn(label: SizedBox(width: 100,child: Text("Name"),)),
+                DataColumn(label: Expanded(child: Text("Value"))),
+              ],
+              rows: _buildAttrRows(widget.printer),
+            ))),
+
 //          ListView(// Print File
 //            children: [
 //            ],
@@ -180,6 +188,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 //          ),
 //        ],
 //      ),
+            ]),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -207,6 +216,40 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
         unselectedItemColor: const Color(0xff94a4ff),
       ),
     );
+  }
+
+  // Build a list of attribute name and value data rows
+  List<DataRow> _buildAttrRows(Service printer) {
+    var list = <DataRow>[ ];
+
+    if (printer.host != null && printer.port != null && printer.txt != null) {
+      // Have a hostname, port, and TXT record...
+      var rp = "/ipp/print";
+
+      if (printer.txt!["rp"] != null) {
+        // Use the "rp" value from the TXT record...
+        Uint8List rpraw = printer.txt!["rp"]!;
+        rp = const Utf8Decoder().convert(rpraw);
+        if (rp[0] != '/') {
+          rp = "/$rp";
+        }
+      }
+
+      // Build the printer URI...
+      var uri = "ipp://${printer.host}:${printer.port}$rp";
+
+      // Get the attributes as a JSON object
+      ipptoolGetAttributes(printerUri: uri).then((attrs){
+        attrs.forEach((key,value){
+          list.add(DataRow(cells: [
+            DataCell(Text(key)),
+            DataCell(Expanded(child: Text(value, softWrap: true)), onTap:(){ _tapValue(context, value); }),
+          ]));
+        });
+      });
+    }
+
+    return (list);
   }
 
   List<DataRow> _buildTxtRows(Map<String, Uint8List?>? txt) {
