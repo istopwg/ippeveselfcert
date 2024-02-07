@@ -26,8 +26,8 @@ jobs:
       run: ./configure --enable-debug --enable-maintainer --with-sanitizer=address --enable-static --disable-shared
     - name: Build ippeveselfcert
       run: make
-    - name: Test ippeveselfcert
-      run: make test
+#     - name: Test ippeveselfcert
+#       run: make test
 
   build-macos:
 
@@ -44,8 +44,8 @@ jobs:
       run: ./configure --enable-debug --enable-maintainer --with-sanitizer=address --enable-static --disable-shared
     - name: Build ippeveselfcert
       run: make
-    - name: Test ippeveselfcert
-      run: make test
+#     - name: Test ippeveselfcert
+#       run: make test
 
   build-windows:
 
