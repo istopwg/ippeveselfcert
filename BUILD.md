@@ -23,10 +23,10 @@ excellent results.
 The makefiles used by the project should work with most versions of make.  BSD
 users should use GNU make (gmake) since BSD make does not support "include".
 
-Besides these tools you'll want the following libraries:
+Besides these tools you'll need the following libraries:
 
 - Avahi (Linux) or mDNSResponder (all others) for Bonjour (DNS-SD) support
-- GNU TLS for encryption support on platforms other than iOS, macOS, or Windows
+- GNU TLS, LibreSSL, or OpenSSL for encryption support
 - ZLIB for compression support
 
 
@@ -37,7 +37,7 @@ Packages are targeted for Red Hat Enterprise Linux and Ubuntu.  On a stock
 Ubuntu install, the following command will install the required prerequisites:
 
     sudo apt-get install build-essential autoconf avahi-daemon avahi-utils \
-        libavahi-client-dev libgnutls28-dev libnss-mdns zlib1g-dev
+        libavahi-client-dev libssl-dev libnss-mdns zlib1g-dev
 
 Run the following to compile the tools:
 
@@ -62,7 +62,7 @@ You'll need the current Visual Studio C++ as well as the code signing tools and
 the PWG code signing certificate (available from the PWG officers for official
 use only) - without the certificate the build will fail unless you disable the
 post-build events that add the code signatures or create a self-signed
-certificate with the name "".
+certificate with the name "IEEE INDUSTRY STANDARDS AND TECHNOLOGY ORGANIZATION".
 
 Open the "ippeveselfcert.sln" file in the "vcnet" subdirectory and build the
 installer project.
@@ -87,14 +87,10 @@ To see a complete list of configuration options, use the `--help` option:
     ./configure --help
 
 If any of the dependent libraries are not installed in a system default location
-(typically `/usr/include` and `/usr/lib`) you'll need to set the CFLAGS,
-CPPFLAGS, CXXFLAGS, DSOFLAGS, and LDFLAGS environment variables prior to running
-configure:
+(typically `/usr/include` and `/usr/lib`) you'll need to set the CPPFLAGS and
+LDFLAGS environment variables prior to running configure:
 
-    CFLAGS="-I/some/directory" \
     CPPFLAGS="-I/some/directory" \
-    CXXFLAGS="-I/some/directory" \
-    DSOFLAGS="-L/some/directory" \
     LDFLAGS="-L/some/directory" \
     ./configure ...
 
