@@ -1,7 +1,7 @@
 #
 # Selfcert makefile for the IPP Everywhere Printer Self-Certification tools.
 #
-# Copyright © 2015-2022 by the IEEE-ISTO Printer Working Group.
+# Copyright © 2015-2024 by the IEEE-ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -20,7 +20,6 @@ SUBMIT_COBJS	=	\
 			ippevesubmit.o
 OBJS		=	$(COMMON_COBJS) $(APP_CXXOBJS) $(SUBMIT_COBJS)
 TARGETS         =       \
-                        ippeveselfcert \
                         ippevesubmit
 
 
@@ -45,7 +44,6 @@ clean:
 
 depend:
 	$(CC) -MM $(CPPFLAGS) $(COMMON_COBJS:.o=.c) $(SUBMIT_COBJS:.o=.c) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >Dependencies
-	$(CXX) -MM $(CPPFLAGS) $(APP_CXXOBJS:.o=.cxx) | sed -e '1,$$s/ \/usr\/include\/[^ ]*//g' -e '1,$$s/ \/usr\/local\/include\/[^ ]*//g' >>Dependencies
 
 
 #
