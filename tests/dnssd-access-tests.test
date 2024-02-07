@@ -13,7 +13,7 @@
 #   ./ipptool -tI printer-uri dnssd-access-tests.test
 #
 
-FILE-ID "org.pwg.ippeveselfcert11.dnssd"
+FILE-ID "org.pwg.ippeveselfcert20.dnssd"
 
 {
 	# The name of the test...

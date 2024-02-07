@@ -14,7 +14,7 @@
 #   ippfind ... -x ipptool -t "{}" dnssd-value-tests.test ";"
 #
 
-FILE-ID "org.pwg.ippeveselfcert11.dnssd"
+FILE-ID "org.pwg.ippeveselfcert20.dnssd"
 
 {
 	# The name of the test...

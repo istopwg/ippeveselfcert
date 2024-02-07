@@ -16,7 +16,7 @@
 # tools but dynamically generates the PWG Raster documents.
 #
 
-FILE-ID "org.pwg.ippeveselfcert11.document"
+FILE-ID "org.pwg.ippeveselfcert20.document"
 
 {
 	NAME "D-1. PWG Raster Format Tests (mandatory)"

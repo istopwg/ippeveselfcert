@@ -2,7 +2,7 @@
 # Common makefile definitions for the IPP Everywhere Printer Self-Certification
 # tools.
 #
-# Copyright © 2015-2022 by the ISTO Printer Working Group.
+# Copyright © 2015-2024 by the ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -16,7 +16,6 @@ IPPEVESELFCERT_SWVERSION = @IPPEVESELFCERT_SWVERSION@
 # Programs...
 CC		=	@CC@
 CODE_SIGN	=	@CODE_SIGN@
-CXX		=	@CXX@
 INSTALL		=	@INSTALL@
 LN		=	@LN@ -sf
 MKDIR           =       @MKDIR@ -p
@@ -36,9 +35,8 @@ INSTALL_MAN	=	$(INSTALL) -c -m 444
 # Programs options...
 CFLAGS		=	@CFLAGS@ $(CPPFLAGS) $(OPTIM) $(WARNINGS)
 CODESIGN_IDENTITY =	-
-CPPFLAGS	=	-I.. -I../libcups -I../pdfio @CPPFLAGS@
+CPPFLAGS	=	-I.. -I../libcups @CPPFLAGS@
 CSFLAGS		=	-s "$(CODESIGN_IDENTITY)" @CSFLAGS@ --timestamp
-CXXFLAGS	=	@CXXFLAGS@ $(CPPFLAGS) $(OPTIM) $(WARNINGS)
 LDFLAGS		=	@LDFLAGS@ $(OPTIM)
 LIBS		=	-L../libcups/cups `PKG_CONFIG_PATH=../libcups pkg-config --libs cups3` @LIBS@
 OPTIM		=	@OPTIM@
@@ -70,12 +68,8 @@ BUILDROOT	=	$(DSTROOT)$(RPM_BUILD_ROOT)$(DESTDIR)
 
 # Build commands...
 .SILENT:
-.SUFFIXES:	.c .cxx .h .o
+.SUFFIXES:	.c .h .o
 
 .c.o:
 	echo Compiling $<...
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-.cxx.o:
-	echo Compiling $<...
-	$(CXX) $(CXXFLAGS) -c -o $@ $<

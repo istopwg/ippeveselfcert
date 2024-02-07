@@ -1,7 +1,7 @@
 #
 # Top-level makefile for the IPP Everywhere Printer Self-Certification tools.
 #
-# Copyright © 2015-2022 by the ISTO Printer Working Group.
+# Copyright © 2015-2024 by the ISTO Printer Working Group.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.

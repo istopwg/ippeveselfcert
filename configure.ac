@@ -2,7 +2,7 @@ dnl
 dnl Configuration script for the IPP Everywhere Printer Self-Certification
 dnl tools.
 dnl
-dnl Copyright 2015-2022 by the ISTO Printer Working Group.
+dnl Copyright © 2015-2024 by the ISTO Printer Working Group.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
 dnl information.
@@ -12,8 +12,18 @@ dnl We need at least autoconf 2.70 for --runstatedir...
 AC_PREREQ([2.70])
 
 
+dnl Check for submodules...
+AS_IF([test ! -d libcups], [
+    AS_IF([test -d .git], [
+        AC_MSG_ERROR([Run "git submodule init && git submodule update" to get the libcups submodule.])
+    ], [
+        AC_MSG_ERROR([The ZIP archive you downloaded via the Github "Code" button is missing the libcups submodule. Please download a dated release or use Git.])
+    ])
+])
+
+
 dnl Package name and version...
-AC_INIT([IPPEVESELFCERT20], [2.0b1], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
+AC_INIT([ippeveselfcert], [2.0b1], [https://github.com/istopwg/ippeveselfcert/issues], [ippeveselfcert], [http://www.pwg.org/ipp/everywhere.html])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SUBDIRS([libcups])
 
@@ -51,7 +61,6 @@ AS_IF([test "x$host_os_version" = x], [
 dnl Compiler options...
 CFLAGS="${CFLAGS:=}"
 CPPFLAGS="${CPPFLAGS:=}"
-CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 LIBS="${LIBS:=}"
 OPTIM="${OPTIM:=}"
@@ -61,22 +70,11 @@ AC_SUBST([OPTIM])
 
 dnl Programs...
 AC_PROG_CC
-AC_PROG_CXX
 AC_PATH_PROGS([CODE_SIGN], [codesign true])
 AC_PATH_PROG([MKDIR], [mkdir])
 AC_PATH_PROG([RM], [rm])
 AC_PATH_PROG([RMDIR], [rmdir])
 AC_PATH_PROG([LN], [ln])
-
-
-dnl fltk-config
-AC_PATH_PROG(FLTKCONFIG,fltk-config)
-AS_IF([test "x$FLTKCONFIG" = x], [
-    AC_MSG_ERROR([ippeveselfcert requires the FLTK library.])
-], [
-    CPPFLAGS="$CPPFLAGS $($FLTKCONFIG --cflags)"
-    LIBS="$LIBS $($FLTKCONFIG --ldflags)"
-])
 
 
 dnl install-sh
@@ -90,61 +88,15 @@ dnl Check for pkg-config, which is used for some other tests later on...
 AC_PATH_TOOL([PKGCONFIG], [pkg-config])
 
 
-dnl DNS-SD support...
-AC_ARG_WITH([dnssd], AS_HELP_STRING([--with-dnssd=LIBRARY], [set DNS-SD library (auto, avahi, mdnsresponder)]))
-
-AS_IF([test "x$with_dnssd" != xmdnsresponder -a "x$with_dnssd" != xno -a "x$PKGCONFIG" != x -a x$host_os_name != xdarwin], [
-    AC_MSG_CHECKING([for Avahi])
-    AS_IF([$PKGCONFIG --exists avahi-client], [
-	AC_MSG_RESULT([yes])
-	CPPFLAGS="$CPPFLAGS $($PKGCONFIG --cflags avahi-client)"
-	LIBS="$LIBS $($PKGCONFIG --libs avahi-client)"
-	AC_DEFINE([HAVE_DNSSD], 1, [Have DNS-SD support?])
-	AC_DEFINE([HAVE_AVAHI], 1, [Have Avahi?])
-    ], [
-	AC_MSG_RESULT([no])
-	AS_IF([test x$with_dnssd = xavahi],
-	    AC_MSG_ERROR([libavahi-client-dev needed for --with-dnssd=avahi.]))
-    ])
-], [test x$with_dnssd = xavahi], [
-    AC_MSG_ERROR([pkgconfig and libavahi-client-dev needed for --with-dnssd=avahi.])
-], [test x$with_dnssd != xavahi -a "x$with_dnssd" != xno], [
-    AC_CHECK_HEADER(dns_sd.h, [
-        AS_CASE(["$host_os_name"],
-	[darwin*], [
-	    # Darwin and macOS...
-	    AC_DEFINE([HAVE_DNSSD], 1, [Have DNS-SD support?])
-	    AC_DEFINE([HAVE_MDNSRESPONDER], 1, [Have mDNSResponder?)])
-	    LIBS="$LIBS -framework CoreFoundation -framework SystemConfiguration"
-	], [*], [
-	    # All others...
-	    AC_MSG_CHECKING(for current version of dns_sd library)
-	    SAVELIBS="$LIBS"
-	    LIBS="$LIBS -ldns_sd"
-	    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <dns_sd.h>]], [[
-		int constant = kDNSServiceFlagsShareConnection;
-		unsigned char txtRecord[100];
-		uint8_t valueLen;
-		TXTRecordGetValuePtr(sizeof(txtRecord), txtRecord, "value", &valueLen);]])
-	    ],[
-		AC_MSG_RESULT([yes])
-		AC_DEFINE([HAVE_DNSSD], 1, [Have DNS-SD support?])
-		AC_DEFINE([HAVE_MDNSRESPONDER], 1, [Have mDNSResponder?)])
-	    ],[
-		AC_MSG_RESULT([no])
-		LIBS="$SAVELIBS"
-		AS_IF([test x$with_dnssd = xmdnsresponder],
-		    AC_MSG_ERROR([mDNSResponder required for --with-dnssd=mdnsresponder.]))
-	    ])
-	])
-    ])
-])
-
-
 dnl Extra compiler options...
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [turn on debugging, default=no]))
 AC_ARG_ENABLE([maintainer], AS_HELP_STRING([--enable-maintainer], [turn on maintainer mode, default=no]))
-AC_ARG_ENABLE([sanitizer], AS_HELP_STRING([--enable-sanitizer], [build with AddressSanitizer, default=no]))
+AC_ARG_WITH([sanitizer], AS_HELP_STRING([--with-sanitizer], [build with address, leak, memory, thread, or undefined sanitizer, default=no]), [], [with_sanitizer=no])
+AS_IF([test "x$with_sanitizer" = xyes], [
+    with_sanitizer="address"
+], [test "$with_sanitizer" != address -a "$with_sanitizer" != leak -a "$with_sanitizer" != memory -a "$with_sanitizer" != no -a "$with_sanitizer" != thread -a "$with_sanitizer" != undefined], [
+    AC_MSG_ERROR([Unsupported --with-sanitizer value "$with_sanitizer" specified.])
+])
 
 AS_IF([test x$enable_debug = xyes], [
     OPTIM="$OPTIM -g"
@@ -160,13 +112,13 @@ WARNINGS=""
 AC_SUBST([WARNINGS])
 
 AS_IF([test -n "$GCC"], [
-    AS_IF([test x$enable_sanitizer = xyes], [
-	# Use -fsanitize=address with debugging...
-	OPTIM="$OPTIM -fsanitize=address"
+    AS_IF([test x$with_sanitizer != xno], [
+	# Use -fsanitize=FOO with debugging...
+	OPTIM="$OPTIM -fsanitize=$with_sanitizer"
     ], [
 	# Otherwise use the Fortify enhancements to catch any unbounded
 	# string operations...
-	CPPFLAGS="$CPPFLAGS -D_FORTIFY_SOURCE=2"
+	CPPFLAGS="$CPPFLAGS -D_FORTIFY_SOURCE=3"
     ])
 
     dnl Show all standard warnings + unused variables when compiling...
@@ -220,15 +172,34 @@ AS_IF([test -n "$GCC"], [
     CFLAGS="$OLDCFLAGS"
 
     dnl OS-specific compiler options...
+    AC_MSG_CHECKING([for OS-specific compiler options])
     AS_CASE(["$host_os_name"], [linux*], [
+    	# Make sure we get the full set of Linux APIs from the headers...
 	CPPFLAGS="$CPPFLAGS -D__USE_MISC -D_GNU_SOURCE"
+
+	# Mark read-only sections as relocatable to random addresses...
+	LDFLAGS="$LDFLAGS -Wl,-z,relro,-z,now"
+
+        AC_MSG_RESULT([-D__USE_MISC -D_GNU_SOURCE -Wl,-z,relro,-z,now])
     ], [darwin*], [
-        AS_IF([test "$host_os_version" -ge 200 -a x$enable_debug != xyes], [
-            # macOS 11.0 and higher support the Apple Silicon (arm64) CPUs
+        # When not building for debug, target macOS 11.0 or later, "universal"
+        # binaries when possible...
+        AS_IF([echo "$CPPFLAGS $CFLAGS $LDFLAGS $OPTIM" | grep -q "\\-arch "], [
+            # Don't add architecture/min-version flags if they are already present
+            AC_MSG_RESULT([none])
+        ], [echo "$CPPFLAGS $CFLAGS $LDFLAGS $OPTIM" | grep -q "\\-mmacosx-version-"], [
+            # Don't add architecture/min-version flags if they are already present
+            AC_MSG_RESULT([none])
+        ], [test x$enable_debug != xyes], [
+	    # macOS 11.0 and higher support the Apple Silicon (arm64) CPUs
 	    OPTIM="$OPTIM -mmacosx-version-min=10.14 -arch x86_64 -arch arm64"
-	], [test x$enable_debug != xyes], [
-	    OPTIM="$OPTIM -mmacosx-version-min=10.14 -arch x86_64"
+            AC_MSG_RESULT([-mmacosx-version-min=10.14 -arch x86_64 -arch arm64])
+	], [
+	    # Don't add architecture/min-version flags if debug enabled
+            AC_MSG_RESULT([none])
 	])
+    ], [*], [
+        AC_MSG_RESULT([none])
     ])
 ])
 
