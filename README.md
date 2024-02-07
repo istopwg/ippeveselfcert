@@ -2,15 +2,14 @@ IPP Everywhere™ v2.0 Printer Self-Certification Tools
 =====================================================
 
 > Note: The current v1.1 self-certification tools are provided in the
-> "v1.1-updates" branch of this repository.
+> "v1.1-updates" branch of this repository.  The master branch provides the
+> current v2.0 development code.
 
 ![Version](https://img.shields.io/github/v/release/istopwg/ippeveselfcert?include_prereleases)
 ![Apache 2.0](https://img.shields.io/github/license/istopwg/ippeveselfcert)
 ![Build and Test](https://github.com/istopwg/ippeveselfcert/workflows/Build%20and%20Test/badge.svg)
 [![ippeveselfcert](https://snapcraft.io/ippeveselfcert/badge.svg)](https://snapcraft.io/ippeveselfcert)
 [![Coverity Scan Status](https://img.shields.io/coverity/scan/25371.svg)](https://scan.coverity.com/projects/istopwg-ippeveselfcert)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/istopwg/ippeveselfcert.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/istopwg/ippeveselfcert/alerts/)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/istopwg/ippeveselfcert.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/istopwg/ippeveselfcert/context:cpp)
 
 The IPP Everywhere™ Printer self-certification tools are used to test the
 conformance of printers to PWG Candidate Standard 5100.14-20xx: IPP Everywhere™
@@ -43,7 +42,7 @@ Please see the file "BUILD.md" for instructions on compiling the software.
 Legal Stuff
 -----------
 
-Copyright © 2014-2022 by the IEEE-ISTO Printer Working Group.
+Copyright © 2014-2024 by the IEEE-ISTO Printer Working Group.
 
 This software is provided under the terms of the Apache License, Version 2.0.
 A copy of this license can be found in the file `LICENSE`.  Additional legal
