@@ -156,36 +156,42 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
       appBar: AppBar(
         title: Text(widget.printer.name ?? "Unknown"),
       ),
-      body: SingleChildScrollView(child: Column(children: [
-              Row(children: [
-                Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
-                  width: 160,
-                ),
-                const Text(
-                  "idle, accepting jobs\n'printer state message'\nmedia-empty,  toner-low, cover-open",
-                  textScaleFactor: 1.5,
-                ),
-              ]),
-              const Row(children: [
-                Text("     TXT Record:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
-              ]),
+      body: SingleChildScrollView(
+        child: Expanded(child: Column(
+          children: [
+            Row(children: [
+              Image.network("http://www.pwg.org/ipp/ipp-everywhere.png",
+                width: 160,
+              ),
+              const Text(
+                "idle, accepting jobs\n'printer state message'\nmedia-empty,  toner-low, cover-open",
+                textScaleFactor: 1.5,
+              ),
+            ]),
+            const Row(children: [
+              Text("     TXT Record:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
+            ]),
+            Row(children: [
               DataTable(columns: const [
                   DataColumn(label: SizedBox(width: 100,child: Text("Key"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: _buildTxtRows(widget.printer.txt),
               ),
+            ]),
 
-              // IPP Attributes
-              const Row(children: [
-                Text("     IPP Attributes:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
-              ]),
+            // IPP Attributes
+            const Row(children: [
+              Text("     IPP Attributes:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold)),
+            ]),
+            Row(children: [
               DataTable(columns: const [
                   DataColumn(label: SizedBox(width: 100,child: Text("Name"),)),
                   DataColumn(label: Expanded(child: Text("Value"))),
                 ],
                 rows: attrList,
               ),
+            ]),
 
 //          ListView(// Print File
 //            children: [
@@ -197,7 +203,9 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 //          ),
 //        ],
 //      ),
-            ])),
+          ]),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
