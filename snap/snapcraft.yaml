@@ -1,6 +1,6 @@
 name: ippeveselfcert
-base: core20
-version: 2.0b1
+base: core22
+version: "2.0.0"
 summary: IPP Everywhere™ Printer Self-Certification Tools
 description: |
   This snap provides IPP Everywhere™ Printer Self-Certification tools for Linux.
@@ -11,24 +11,22 @@ icon: selfcert/ipp-everywhere.png
 
 architectures:
   - build-on: amd64
+  - build-on: arm64
 
 apps:
-    ippeveselfcert:
-        extensions: [gnome-3-38]
-        command: usr/local/bin/ippeveselfcert
-        desktop: usr/local/share/applications/ippeveselfcert.desktop
+    ippevetool:
+        extensions: [gnome]
+        command: bin/ippevetool
+        desktop: share/applications/ippevetool.desktop
         plugs: [avahi-observe, home, network]
     ippeveprinter:
-        command: usr/local/bin/ippeveprinter
+        command: bin/ippeveprinter
         plugs: [avahi-observe, home, network, network-bind]
-    ippevesubmit:
-        command: usr/local/bin/ippevesubmit
-        plugs: [home]
     ippfind:
-        command: usr/local/bin/ippfind
+        command: bin/ippfind
         plugs: [avahi-observe, home, network]
     ipptool:
-        command: usr/local/bin/ipptool
+        command: bin/ipptool
         plugs: [home, network]
 
 parts:
@@ -36,5 +34,5 @@ parts:
         plugin: autotools
         source: .
         source-submodules: [libcups]
-        build-packages: [libavahi-client-dev, libfltk1.3-dev, libssl-dev, zlib1g-dev]
-        stage-packages: [libavahi-client3, libfltk1.3-dev]
+        build-packages: [libavahi-client-dev, libssl-dev, zlib1g-dev]
+        stage-packages: [libavahi-client3]
