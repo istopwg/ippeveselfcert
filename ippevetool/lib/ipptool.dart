@@ -1,5 +1,5 @@
 //
-// ipptool support functions.
+// IPP Everywhere Tool (ippevetool) support functions.
 //
 // Copyright © 2024 by the IEEE-ISTO Printer Working Group.
 //
@@ -17,17 +17,27 @@ import 'package:xml/xml.dart';
 Future<Map<String,dynamic>> ipptoolGetAttributes({required String printerUri}) async {
     var process = await Process.start("ipptool", ["-j", printerUri, "get-printer-attributes.test"]);
     var json = "";
-    process.stderr.pipe(stderr);
+    var error = "";
     await process.stdout
         .transform(utf8.decoder)
         .forEach((text) {
             json = json + text;
         });
-    var result = process.exitCode;
+    await process.stderr
+        .transform(utf8.decoder)
+        .forEach((text) {
+            error = error + text.replaceAll("\n", " ");
+        });
+    //var result = process.exitCode;
 
     //print("result=$result\n");
     //print("json=$json\n");
+    //print("error=$error\n");
   
+    if (json == "") {
+      json = "[{},{\"ipptool-error\":\"$error\"}]";
+    }
+
     const JsonDecoder decoder = JsonDecoder();
  
     return (decoder.convert(json)[1]);
@@ -59,10 +69,10 @@ Future<XmlDocument> ipptoolRunTest({required String printerUri, required String 
         .forEach((text) {
             plist = plist + text;
         });
-    var result = process.exitCode;
+//    var result = process.exitCode;
 
-    print("result=$result\n");
-    print("plist=$plist\n");
+//    print("result=$result\n");
+//    print("plist=$plist\n");
   
     return (XmlDocument.parse(plist));
 }

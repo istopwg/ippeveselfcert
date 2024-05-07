@@ -71,9 +71,8 @@ flutter:
   uses-material-design: true
 
   assets:
-  - ../libcups/tools/printer.png
-  - ../libcups/tools/printer-lg.png
-  - ../libcups/tools/printer-sm.png
+  - images/default-icon.png
+  - images/missing-icon.png
   
   # To add assets to your application, add an assets section, like this:
   # assets:
