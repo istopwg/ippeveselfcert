@@ -11,7 +11,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:nsd/nsd.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,27 +26,22 @@ void main() {
 
 
 void _showAlert(BuildContext context, String message) {
-    // set up the button
-    Widget okButton = TextButton(
-        child: const Text("OK"),
-        onPressed: () { Navigator.of(context).pop(); },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-        title: const Text("Alert"),
-        content: Text(message),
-        actions: [
-            okButton,
-        ],
-    );
-
-    // show the dialog
-    showDialog(
+    // Show a CupertinoAlertDialog
+    showCupertinoModalPopup<void>(
         context: context,
-        builder: (BuildContext context) {
-            return alert;
-        },
+        builder: (BuildContext context) => CupertinoAlertDialog(
+            title: const Text("Alert"),
+            content: Text(message),
+            actions: <CupertinoDialogAction>[
+                CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () {
+                        Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                ),
+            ],
+        ),
     );
 }
 
@@ -60,12 +55,12 @@ void _tapValue(BuildContext context, String value) {
 
     // Copy to clipboard and let the user know what happened...
     Clipboard.setData(ClipboardData(text: value));
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content:
-            Text('Copied "$value" to clipboard.'),
-            duration: const Duration(seconds: 1),
-        )
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content:
+    //         Text('Copied "$value" to clipboard.'),
+    //         duration: const Duration(seconds: 1),
+    //     )
+    // );
 }
 
 
@@ -75,25 +70,25 @@ class IppEveToolApp extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return MaterialApp(
+        return const CupertinoApp(
             title: 'IPP Everywhere™ Tool',
-            theme: ThemeData(
-                // Theme colors are based on the PWG logo colors, which are also used on the PWG web page...
-                primarySwatch: const MaterialColor(0xff4b5aa8, {
-                    50:  Color(0xff181814),
-                    100: Color(0xff262d54),
-                    200: Color(0xff2B397F),
-                    300: Color(0xff394ba8),
-                    400: Color(0xff445299),
-                    500: Color(0xff4b5aa8),
-                    600: Color(0xff626CA8),
-                    700: Color(0xff94a4ff),
-                    800: Color(0xffb8c3ff),
-                    900: Color(0xffccccc0),
-                }),
-            ),
+            // theme: ThemeData(
+            //     // Theme colors are based on the PWG logo colors, which are also used on the PWG web page...
+            //     primarySwatch: const MaterialColor(0xff4b5aa8, {
+            //         50:  Color(0xff181814),
+            //         100: Color(0xff262d54),
+            //         200: Color(0xff2B397F),
+            //         300: Color(0xff394ba8),
+            //         400: Color(0xff445299),
+            //         500: Color(0xff4b5aa8),
+            //         600: Color(0xff626CA8),
+            //         700: Color(0xff94a4ff),
+            //         800: Color(0xffb8c3ff),
+            //         900: Color(0xffccccc0),
+            //     }),
+            // ),
             debugShowCheckedModeBanner: false,
-            home: const IppEveHomePage(title: 'IPP Everywhere™ Tool'),
+            home: IppEveHomePage(title: 'IPP Everywhere™ Tool'),
         );
     }
 }
@@ -114,7 +109,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
     Future<void> _startDiscovery() async {
         final discovery = await startDiscovery("_ipp._tcp.", autoResolve: true);
         discovery.addServiceListener((service, status) {
-            // print("${service.name} => ${status}");
+            print("${service.name} => $status");
             if (status == ServiceStatus.found) {
                 setState((){
                     printers.add(service);
@@ -134,27 +129,25 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
 
     @override
     Widget build(BuildContext context) {
-        return Scaffold(
-            appBar: AppBar(
-                // Here we take the value from the IppEveHomePage object that was created by
-                // the App.build method, and use it to set our appbar title.
-                title: Text(widget.title),
+        return CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+                middle: Text(widget.title),
             ),
-            body: _buildList(context),
+            child: _buildList(context),
         );
     }
 
     _buildList(BuildContext context) {
         if (printers.isEmpty) {
             return const Center(
-                child: CircularProgressIndicator(),
+                child: CupertinoActivityIndicator(),
             );
         } else {
             return ListView.builder(
                 itemBuilder: (context_, index) => GestureDetector(
                     onTap: () => _onPrinterTap(context, printers[index]),
-                    child: ListTile(
-                        leading: const Icon(Icons.print),
+                    child: CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.printer_fill),
                         title: Text(printers[index].name ?? "Invalid printer name"),
                     ),
                 ),
@@ -166,7 +159,7 @@ class _IppEveHomePageState extends State<IppEveHomePage> {
     _onPrinterTap(BuildContext context, Service printer) {
         Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => IppEveDetailsPage(printer: printer,)),
+            CupertinoPageRoute(builder: (context) => IppEveDetailsPage(printer: printer,)),
         );
     }
 }
@@ -200,31 +193,31 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
 
     @override
     Widget build(BuildContext context) {
-        return Scaffold(
-            appBar: AppBar(
-                title: Text(widget.printer.name ?? "Unknown"),
-                actions: <Widget>[
-                    TextButton(
-                        onPressed: () {
-                            _showAlert(context, "Print File UI");
-                        },
-                        child: const Text('Print File'),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                            _showAlert(context, "Run Test UI");
-                        },
-                        child: const Text('Run Test'),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                            _showAlert(context, "Run Self-Cert UI");
-                        },
-                        child: const Text('Run Self-Cert'),
-                    ),
-                ],
+        return CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+                middle: Text(widget.printer.name ?? "Unknown"),
+                // actions: <Widget>[
+                //     TextButton(
+                //         onPressed: () {
+                //             _showAlert(context, "Print File UI");
+                //         },
+                //         child: const Text('Print File'),
+                //     ),
+                //     TextButton(
+                //         onPressed: () {
+                //             _showAlert(context, "Run Test UI");
+                //         },
+                //         child: const Text('Run Test'),
+                //     ),
+                //     TextButton(
+                //         onPressed: () {
+                //             _showAlert(context, "Run Self-Cert UI");
+                //         },
+                //         child: const Text('Run Self-Cert'),
+                //     ),
+                // ],
             ),
-            body: SingleChildScrollView(child: Column(children: [
+            child: SingleChildScrollView(child: Column(children: [
                 Row(children: [
                     const Spacer(),
                     printerIcon,
@@ -247,7 +240,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                 ]),
 
                 // Divider between sections...
-                const Divider(color: Color(0xff4b5aa8), height: 20.0, thickness: 2.0),
+                // const Divider(color: Color(0xff4b5aa8), height: 20.0, thickness: 2.0),
 
                 Row(children: [
                     const Spacer(),
@@ -274,7 +267,7 @@ class _IppEveDetailsPageState extends State<IppEveDetailsPage> {
                 ),
 
                 // Divider between sections...
-                const Divider(color: Color(0xff4b5aa8), height: 20.0, thickness: 2.0),
+                // const Divider(color: Color(0xff4b5aa8), height: 20.0, thickness: 2.0),
 
                 // IPP Attributes
                 Row(children: [
