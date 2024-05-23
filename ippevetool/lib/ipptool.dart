@@ -10,7 +10,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:xml/xml.dart';
+import 'dart:developer' as developer;
+import 'package:propertylistserialization/propertylistserialization.dart';
 
 
 // Get the printer attributes as Map<String,dynamic> value
@@ -39,14 +40,18 @@ Future<Map<String,dynamic>> ipptoolGetAttributes({required String printerUri}) a
     }
 
     const JsonDecoder decoder = JsonDecoder();
- 
-    return (decoder.convert(json)[1]);
+    var groups = decoder.convert(json);
+    if (groups.length > 1) {
+        return (groups[1]);
+    } else {
+        return (groups[0]);
+    }
 }
 
 
 // Run an ipptool test file and return the results as an XML plist file
-Future<XmlDocument> ipptoolRunTest({required String printerUri, required String testfile, String? datafile, Map<String, String>? vars}) async {
-    List<String> args = [printerUri];   // Command-line arguments
+Future<Map<String,dynamic>> ipptoolRunTest({required String printerUri, required String testfile, String? datafile, Map<String, String>? vars}) async {
+    List<String> args = [printerUri, "-X"];   // Command-line arguments
 
     if (datafile != null) {
         args.add("-f");
@@ -61,6 +66,8 @@ Future<XmlDocument> ipptoolRunTest({required String printerUri, required String 
 
     args.add(testfile);
 
+    developer.log("Starting ipptool $args", name:"ipptool");
+
     var process = await Process.start("ipptool", args);
     var plist = "";
     process.stderr.pipe(stderr);
@@ -73,6 +80,10 @@ Future<XmlDocument> ipptoolRunTest({required String printerUri, required String 
 
 //    print("result=$result\n");
 //    print("plist=$plist\n");
-  
-    return (XmlDocument.parse(plist));
+
+    try {
+        return (PropertyListSerialization.propertyListWithString(plist) as Map<String,Object>);
+    } on PropertyListReadStreamException catch (e) {
+        return ({"Successful":false, "Tests":[{"statusCode":"$e"}]});
+    }
 }

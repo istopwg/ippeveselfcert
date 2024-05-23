@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "ippevetool" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "ippevetool" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "ippevetool.exe" "\0"
             VALUE "ProductName", "ippevetool" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
