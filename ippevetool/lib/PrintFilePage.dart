@@ -181,7 +181,7 @@ class _PrintFilePageState extends State<PrintFilePage> {
                                     ],
                                 ),
                                 onTap: () async {
-                                    FilePickerResult? result = await FilePicker.platform.pickFiles();
+                                    FilePickerResult? result = await FilePicker.pickFiles();
 
                                     if (result != null) {
                                         setState((){
