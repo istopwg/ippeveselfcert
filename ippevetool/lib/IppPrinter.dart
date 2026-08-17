@@ -11,11 +11,8 @@
 
 import 'dart:core';
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'ipptool.dart';
-import 'package:nsd/nsd.dart';
+import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/cupertino.dart';
 
 
@@ -49,9 +46,9 @@ class IppPrinter {
 }
 
 
-Future<IppPrinter> ippPrinterWithService(Service service) async {
+Future<IppPrinter> ippPrinterWithService(BonsoirService service) async {
     SplayTreeMap<String,dynamic> attributes = SplayTreeMap<String,dynamic>((a, b) => a.compareTo(b));
-    String dnssdName = service.name ?? "";
+    String dnssdName = service.name;
     List<String> documentFormatSupported = [];
     String geoLocation = "";
     String icon = "";
@@ -66,32 +63,22 @@ Future<IppPrinter> ippPrinterWithService(Service service) async {
     String uuid = "";
 
     // Printer URI
-    if (service.host == null || service.port == null || service.txt == null) {
-        throw const SocketException("Bad DNS-SD service.");
-    }
-
-    // Have a hostname, port, and TXT record...
     var rp = "/ipp/print";
 
-    if (service.txt!["rp"] != null) {
+    if (service.attributes["rp"] != null) {
         // Use the "rp" value from the TXT record...
-        Uint8List rpraw = service.txt!["rp"]!;
-        rp = const Utf8Decoder().convert(rpraw);
+        rp = service.attributes["rp"]!;
         if (rp[0] != '/') {
             // Prefix with a leading slash...
             rp = "/$rp";
         }
     }
 
-    var uri = "ipps://${service.host}:${service.port}$rp";
+    var uri = "ipps://${service.hostname}:${service.port}$rp";
 
     // Convert TXT records...
-    service.txt!.forEach((key,value){
-        if (value != null) {
-            txt[key] = const Utf8Decoder().convert(value);
-        } else {
-            txt[key] = "";
-        }
+    service.attributes.forEach((key,value){
+        txt[key] = value;
     });
 
     // Get the attributes as a JSON object

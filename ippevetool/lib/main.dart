@@ -11,7 +11,7 @@ import 'dart:core';
 import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:nsd/nsd.dart';
+import 'package:bonsoir/bonsoir.dart';
 import "IppPrinter.dart";
 import "IppPrinterPage.dart";
 
@@ -90,20 +90,25 @@ class _IppEveToolHomePageState extends State<IppEveToolHomePage> {
 //         }
 
         // Look for IPPS printers...
-        final ippsBrowser = await startDiscovery("_ipps._tcp.", autoResolve: true);
-        ippsBrowser.addServiceListener((service, status) async {
-            // print("${service.name} => ${status}");
-            if (status == ServiceStatus.found) {
+        final ippsBrowser = BonsoirDiscovery(type: "_ipps._tcp");
+        await ippsBrowser.initialize();
+        ippsBrowser.eventStream?.listen((BonsoirDiscoveryEvent event) async {
+            // print("event ${event.id} for ${event.service?.name}");
+
+            if (event.service != null) {
+                BonsoirService service = event.service!;
+
+                await service.resolve(ippsBrowser.serviceResolver);
+
                 // print("Trying to add '${service.name}'...");
                 final printer = await ippPrinterWithService(service);
-
                 setState((){
                     // print("Adding ${printer.uri} from '${service.name}'...");
                     printers[printer.dnssdName] = printer;
                 });
             }
         });
-
+        ippsBrowser.start();
     }
 
 
@@ -131,7 +136,7 @@ class _IppEveToolHomePageState extends State<IppEveToolHomePage> {
 
 
     // This method builds the printer list or spinner that goes on the home page...
-    _buildList(BuildContext context) {
+    Widget _buildList(BuildContext context) {
         if (printers.isEmpty) {
             return const CupertinoActivityIndicator();
         }

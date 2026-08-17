@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  nsd_windows
+  bonsoir_windows
   url_launcher_windows
 )
 
